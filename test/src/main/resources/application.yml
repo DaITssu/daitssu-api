@@ -1,0 +1,6 @@
+# Test Module application.yml
+spring:
+  application:
+    name: Test API
+  profiles:
+    include: common

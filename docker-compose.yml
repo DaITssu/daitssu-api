@@ -1,0 +1,25 @@
+# docker-compose.yml
+version: '3.7'
+
+services:
+  db:
+    image: mysql:latest
+    container_name: blog_db
+    hostname: blog_mysql
+    # 서비스 배포 및 실행 옵션
+    environment:
+      TZ: Asia/Seoul
+      MYSQL_DATABASE: blog
+      MYSQL_USER: blog
+      MYSQL_PASSWORD: blog12
+      MYSQL_ROOT_PASSWORD: 1234
+    ports:
+      - 3306:3306
+    restart: unless-stopped
+    volumes:
+      - blog_mysql_volume:/var/lib/mysql
+      - ./table.sql:/docker-entrypoint-initdb.d/table.sql
+
+# 도커 볼륨
+volumes:
+  blog_mysql_volume:

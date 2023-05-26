@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: Test API Develop
+  datasource:
+    hikari:
+      minimum-idle: 0
+      max-lifetime: 600000
+      idle-timeout: 300000
+management:
+  health:
+    db:
+      enabled: false
