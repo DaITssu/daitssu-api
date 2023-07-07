@@ -71,14 +71,12 @@ subprojects {
         implementation("org.springframework.boot", "spring-boot-starter-batch")
         implementation("org.springframework.boot", "spring-boot-starter-data-jdbc")
         implementation("org.springframework.boot", "spring-boot-starter-data-jpa")
-        implementation("org.springframework.boot", "spring-boot-starter-data-redis")
-        implementation("org.springframework.boot", "spring-boot-starter-graphql")
         implementation("org.springframework.boot", "spring-boot-starter-security")
         implementation("org.springframework.boot", "spring-boot-starter-validation")
         implementation("org.springframework.boot", "spring-boot-starter-web")
         implementation("org.springframework.boot", "spring-boot-configuration-processor")
 
-        implementation("com.mysql:mysql-connector-j")
+        implementation("org.postgresql", "postgresql", "42.1.4")
 
         implementation("org.springframework.cloud", "spring-cloud-starter-aws", "2.2.6.RELEASE")
         implementation("org.springframework.cloud:spring-cloud-starter-aws-messaging:2.2.1.RELEASE")

@@ -3,7 +3,7 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: "jdbc:mysql://localhost:3306/blog"
-    username: "blog"
-    password: "blog12"
+    driver-class-name: org.postgresql.Driver
+    url: "jdbc:postgresql://localhost:5432/daitssu"
+    username: "daitssu"
+    password: "daitssu"
