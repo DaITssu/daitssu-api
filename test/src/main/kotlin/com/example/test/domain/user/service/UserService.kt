@@ -3,7 +3,7 @@ package com.example.test.domain.user.service
 import com.example.common.domain.user.entity.User
 import com.example.common.domain.user.repository.UserRepository
 import com.example.common.dto.UserDto
-import com.example.common.dto.mapstruct.UserMapStruct
+import com.example.common.mapstruct.domain.UserMapStruct
 import com.example.common.enums.UserRole
 import com.example.common.exception.UserAlreadyExistException
 import com.example.common.exception.UserNotFoundException

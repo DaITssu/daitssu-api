@@ -1,4 +1,4 @@
-package com.example.common.dto.mapstruct
+package com.example.common.mapstruct.domain
 
 import com.example.common.domain.user.entity.User
 import com.example.common.dto.UserDto

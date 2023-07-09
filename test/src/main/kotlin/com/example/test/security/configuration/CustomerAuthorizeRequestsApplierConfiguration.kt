@@ -21,7 +21,7 @@ class CustomerAuthorizeRequestsApplierConfiguration {
             )
             .authenticated()
             .anyRequest()
-            .authenticated()
+            .permitAll()    // login 구현 되면 .authenticated() 로 변경
     }
 
     companion object {
