@@ -80,7 +80,7 @@
         "sizeInGiB": 21
     },
     "runtimePlatform": {
-        "cpuArchitecture": "ARM64",
+        "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
     },
     "registeredAt": "2023-07-17T05:01:45.539Z",
