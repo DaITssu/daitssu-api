@@ -4,6 +4,6 @@ spring:
       matching-strategy: ant_path_matcher
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: "jdbc:postgresql://localhost:5432/daitssu"
-    username: "daitssu"
-    password: "daitssu"
+    url: "jdbc:postgresql://daitssu-postgres.ccf8zpssvvpc.ap-northeast-2.rds.amazonaws.com:5432/daitssu"
+    username: "dev"
+    password: "1q2w#E$R"
