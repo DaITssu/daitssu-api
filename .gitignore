@@ -25,8 +25,8 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
-appliation-dev.yml
-appliation-prod.yml
+application-dev.yml
+application-prod.yml
 
 ### NetBeans ###
 /nbproject/private/
