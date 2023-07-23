@@ -22,12 +22,7 @@ class CourseService (
     private val calendarRepository: CalendarRepository,
 ) {
     fun getCourseList() : List<Course>{
-        val courseResponse: MutableList<Course> = mutableListOf()
-        val course = courseRepository.findAll()
-        for (c in course) {
-            courseResponse.add(c)
-        }
-        return courseResponse
+        return courseRepository.findAll()
     }
     
     
@@ -53,9 +48,15 @@ class CourseService (
     }
     
     
-    fun getCalendar(date: String): MutableMap<String, List<CalendarResponse>> {
+    fun getCalendar(requestDate: String): MutableMap<String, List<CalendarResponse>> {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        val date = LocalDateTime.parse(date, formatter)
+        val date: LocalDateTime
+        try {
+            date = LocalDateTime.parse(requestDate, formatter)
+        } catch (e: Exception) {
+            throw IllegalArgumentException("Invalid date format. Date should be in 'yyyy-MM-dd HH:mm:ss' format.")
+        }
+        
         val yearMonth = YearMonth.of(date.year, date.monthValue)
         val startDateTime = yearMonth.atDay(1).atStartOfDay()
         val endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59)
@@ -67,41 +68,29 @@ class CourseService (
         
         for ((course, calendarList) in groupedCalendars) {
             val gcrList = calendarList.map {
-                CalendarResponse(it.type, it.dueAt.toString(), it.name)
+                CalendarResponse(it.type, it.dueAt.format(formatter), it.name)
             }
             resultMap[course] = gcrList
         }
         
         return resultMap
         
-//        for ( c in calendars ) {
-//            val hour = c.dueAt.hour
-//            val minute = c.dueAt.minute
-//
-//            val timeString = String.format("%02d:%02d", hour, minute)
-//            val formattedDate = "${timeString}까지"
-//            val gcl = GetCalendarResponse(c.type, c.course, formattedDate, c.name)
-//
-//           getCalendarResponse.add(gcl)
-//        }
-//
-//        return getCalendarResponse
     }
     
     
     fun postCalendar(
-        requestType: String,
+        requestType: CalendarCourseType,
         course: String,
         dueAt: String,
         name: String) : Boolean {
-        val type = when (requestType) {
-            "과제" -> CalendarCourseType.ASSIGNMENT
-            "강의" -> CalendarCourseType.VIDEO
-            else -> throw Exception("No Course Type")
-        }
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        val dateTime = LocalDateTime.parse(dueAt, formatter)
-        val cal = Calendar(type, course, dateTime, name)
+        val dateTime:LocalDateTime
+        try {
+            dateTime = LocalDateTime.parse(dueAt, formatter)
+        } catch (e: Exception) {
+            throw IllegalArgumentException("Invalid date format. Date should be in 'yyyy-MM-dd HH:mm:ss' format.")
+        }
+        val cal = Calendar(requestType, course, dateTime, name)
         
         calendarRepository.save(cal)
         return true

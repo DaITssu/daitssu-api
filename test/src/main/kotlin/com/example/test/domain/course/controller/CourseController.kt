@@ -35,7 +35,7 @@ class CourseController (
             )
         ],
     )
-    @GetMapping("")
+    @GetMapping()
     fun getCourseList() : List<Course> = courseService.getCourseList()
     
     
@@ -62,11 +62,10 @@ class CourseController (
     )
     @GetMapping("/calendar/{date}")
     fun getCalendar(
-        @Parameter(description = "2023-07-16 09:30:00 다음과 같은 형식", required = true, `in` = ParameterIn.PATH)
-        @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        @PathVariable("date")
         date: String
     ) : MutableMap<String, List<CalendarResponse>> = courseService.getCalendar(
-        date = date
+        requestDate = date
     )
     
     
