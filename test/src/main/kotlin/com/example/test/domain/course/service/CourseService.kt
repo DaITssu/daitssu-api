@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 @Service
 class CourseService (
@@ -53,7 +54,7 @@ class CourseService (
         val date: LocalDateTime
         try {
             date = LocalDateTime.parse(requestDate, formatter)
-        } catch (e: Exception) {
+        } catch (e: DateTimeParseException) {
             throw IllegalArgumentException("Invalid date format. Date should be in 'yyyy-MM-dd HH:mm:ss' format.")
         }
         
@@ -87,7 +88,7 @@ class CourseService (
         val dateTime:LocalDateTime
         try {
             dateTime = LocalDateTime.parse(dueAt, formatter)
-        } catch (e: Exception) {
+        } catch (e: DateTimeParseException) {
             throw IllegalArgumentException("Invalid date format. Date should be in 'yyyy-MM-dd HH:mm:ss' format.")
         }
         val cal = Calendar(requestType, course, dateTime, name)
