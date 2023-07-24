@@ -68,7 +68,7 @@ class CourseService (
         
         for ((course, calendarList) in groupedCalendars) {
             val gcrList = calendarList.map {
-                CalendarResponse(it.type, it.dueAt.format(formatter), it.name)
+                CalendarResponse(it.type, it.dueAt, it.name)
             }
             resultMap[course] = gcrList
         }
