@@ -12,10 +12,10 @@ class Course (
     val term: Int,
     
     @OneToMany(mappedBy = "course")
-    private val videos: MutableList<Video> = mutableListOf(),
+    val videos: MutableList<Video> = mutableListOf(),
     
     @OneToMany(mappedBy = "course")
-    private val assignments: MutableList<Assignment> = mutableListOf()
+    val assignments: MutableList<Assignment> = mutableListOf()
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

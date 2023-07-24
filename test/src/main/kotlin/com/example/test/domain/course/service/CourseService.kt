@@ -31,18 +31,18 @@ class CourseService (
         courseId: Long
     ) : CourseResponse {
         val course = courseRepository.findById(courseId)
-        val videos: List<Video> = videoRepository.findByCourseId(courseId)
-        val assignments: List<Assignment> = assignmentRepository.findByCourseId(courseId)
-        val courseResponse = CourseResponse(course.get().name)
+            .orElseThrow { IllegalArgumentException("not found course") }
+        val courseResponse = CourseResponse(course.name)
         
-        for (v in videos) {
-            val vd = VideoDto(v.dueAt, v.startAt, v.name, v.id)
-            courseResponse.videos.add(vd)
+
+        for (v in course.videos) {
+            val video = VideoDto(v.dueAt, v.startAt, v.name, v.id)
+            courseResponse.videos.add(video)
         }
-        
-        for (a in assignments) {
-            val am = AssignmentDto(a.dueAt, a.startAt, a.name, a.id)
-            courseResponse.assignments.add(am)
+
+        for (a in course.assignments) {
+            val assignment = AssignmentDto(a.dueAt, a.startAt, a.name, a.id)
+            courseResponse.assignments.add(assignment)
         }
         
         return courseResponse
@@ -115,9 +115,9 @@ class CourseService (
         name: String,
     ) : Boolean {
         val course = courseRepository.findById(courseId).get()
-        val am = Assignment(LocalDateTime.now().plusDays(7), LocalDateTime.now(), name, course)
-        course.addAssignment(am)
-        assignmentRepository.save(am)
+        val assignment = Assignment(LocalDateTime.now().plusDays(7), LocalDateTime.now(), name, course)
+        course.addAssignment(assignment)
+        assignmentRepository.save(assignment)
         
         return true
     }
