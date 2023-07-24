@@ -10,17 +10,18 @@ class Course (
 
     @Column(name = "term", nullable = false)
     val term: Int,
+    
+    @OneToMany(mappedBy = "course")
+    private val videos: MutableList<Video> = mutableListOf(),
+    
+    @OneToMany(mappedBy = "course")
+    private val assignments: MutableList<Assignment> = mutableListOf()
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "course_id", nullable = false)
     val id: Long? = null
     
-    @OneToMany(mappedBy = "course")
-    private val videos: MutableList<Video> = mutableListOf()
-    
-    @OneToMany(mappedBy = "course")
-    private val assignments: MutableList<Assignment> = mutableListOf()
     
     fun addVideo(video: Video) {
         videos.add(video)
