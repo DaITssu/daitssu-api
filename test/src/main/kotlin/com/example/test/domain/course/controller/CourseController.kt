@@ -76,7 +76,7 @@ class CourseController (
         ]
     )
     @PostMapping("/calendar")
-    fun postCalendar(
+    fun postCreateCalendar(
         @RequestBody
         requestCalendar: RequestCalendar
     ) : Boolean = courseService.postCalendar(
@@ -94,7 +94,7 @@ class CourseController (
         ]
     )
     @PostMapping("/video")
-    fun postVideo(
+    fun postCreateVideo(
         @RequestBody
         requestVideo: RequestVideo
     ) : Boolean = courseService.postVideo(
@@ -110,7 +110,7 @@ class CourseController (
         ]
     )
     @PostMapping("/assignment")
-    fun postAssignment(
+    fun postCreateAssignment(
         @RequestBody
         requestAssignemnt: RequestAssignment
     ) : Boolean = courseService.postAssignment(
