@@ -1,5 +1,7 @@
 # Common Module application.yml
 spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
   jpa:
     properties:
       hibernate:
