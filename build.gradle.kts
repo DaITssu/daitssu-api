@@ -71,7 +71,7 @@ subprojects {
         implementation("org.springframework.boot", "spring-boot-starter-batch")
         implementation("org.springframework.boot", "spring-boot-starter-data-jdbc")
         implementation("org.springframework.boot", "spring-boot-starter-data-jpa")
-        implementation("org.springframework.boot", "spring-boot-starter-security")
+//        implementation("org.springframework.boot", "spring-boot-starter-security")
         implementation("org.springframework.boot", "spring-boot-starter-validation")
         implementation("org.springframework.boot", "spring-boot-starter-web")
         implementation("org.springframework.boot", "spring-boot-configuration-processor")
@@ -118,6 +118,8 @@ subprojects {
         implementation("com.auth0", "java-jwt", "4.3.0")
         implementation("org.reflections", "reflections", "0.10.2")
         implementation("com.vladmihalcea", "hibernate-types-60", "2.21.1")
+
+        implementation("com.h2database", "h2")
 
         developmentOnly("org.springframework.boot", "spring-boot-devtools")
         annotationProcessor("org.springframework.boot", "spring-boot-configuration-processor")

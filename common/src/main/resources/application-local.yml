@@ -1,9 +1,0 @@
-spring:
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: "jdbc:postgresql://daitssu-postgres.ccf8zpssvvpc.ap-northeast-2.rds.amazonaws.com:5432/daitssu"
-    username: "dev"
-    password: "1q2w#E$R"
