@@ -17,9 +17,10 @@ class RequestLoggingFilter : OncePerRequestFilter() {
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
         log.info { makeRequestLog(request) }
 
-        filterChain.doFilter(request, response)
+        val wrappedResponse = ContentCachingResponseWrapper(response)
+        filterChain.doFilter(request, wrappedResponse)
 
-        log.info { makeResponseLog(response) }
+        log.info { makeResponseLog(wrappedResponse) }
     }
 
     private fun makeRequestLog(request: HttpServletRequest): String {
@@ -39,16 +40,16 @@ class RequestLoggingFilter : OncePerRequestFilter() {
         """.trimIndent()
     }
 
-    private fun makeResponseLog(response: HttpServletResponse): String {
-        val wrappedResponse = ContentCachingResponseWrapper(response)
+    private fun makeResponseLog(wrappedResponse: ContentCachingResponseWrapper): String {
         val responseHeaders = wrappedResponse.headerNames.toList().associateWith {
             wrappedResponse.getHeader(it)
         }
         val responseBody = getResponseBody(wrappedResponse.contentAsByteArray)
+        wrappedResponse.copyBodyToResponse()
 
         return """
             {
-                "request" : {
+                "response" : {
                     "status" : "${wrappedResponse.status}",
                     "headers" : ${jacksonObjectMapper().writeValueAsString(responseHeaders)},
                     "body" : "$responseBody"
@@ -59,14 +60,18 @@ class RequestLoggingFilter : OncePerRequestFilter() {
 
     private fun getResponseBody(responseBody: ByteArray): String {
         if (responseBody.isEmpty()) {
-            return ""
+            return "Internal Error. responseBody is empty"
         }
 
-        val filteredBody = listOf("code", "message")
+        val filteredBody = listOf("code", "message", "data")
         val readTree = jacksonObjectMapper().readTree(responseBody)
 
         val jsonMap = filteredBody.associateWith {
-            readTree.get(it).toString()
+            when (val body = readTree.get(it).toString()) {
+                "\"\"" -> ""
+                "null" -> null
+                else -> body
+            }
         }
         return jacksonObjectMapper().writeValueAsString(jsonMap)
     }
