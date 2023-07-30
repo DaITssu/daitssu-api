@@ -33,14 +33,12 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Set Yaml
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: ./src/main/resources/application-dev.yml
+      - name: Copy Secret
         env:
-          spring.datasource.url: ${{ secrets.DATASOURCE_URL }}
-          spring.datasource.username: ${{ secrets.DATASOURCE_USERNAME }}
-          spring.datasource.password: ${{ secrets.DATASOURCE_PASSWORD }}
+          CREATE_SECRET: ${{secrets.DAITSSU_DEV_APPLICATION_YML}}
+          CREATE_SECRET_DIR: common/src/main/resources
+          CREATE_SECRET_DIR_FILE_NAME: application-dev.yml
+        run: echo $CREATE_SECRET > $CREATE_SECRET_DIR/$CREATE_SECRET_DIR_FILE_NAME
 
       - name: Build with Gradle
         run: ./gradlew common:bootJar
