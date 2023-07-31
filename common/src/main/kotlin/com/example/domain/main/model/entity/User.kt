@@ -4,7 +4,7 @@ import com.example.common.domain.BaseEntity
 import jakarta.persistence.*
 
 @Entity
-@Table(schema = "main")
+@Table(schema = "main", name = "users")
 class User(
     val studentId: Int,
 
