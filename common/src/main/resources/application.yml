@@ -13,6 +13,8 @@ spring:
         persistence:
           query:
             timeout: 5000
+#    open-in-view: true
+
   servlet:
     multipart:
       # location: c:\\Temp\\upload
