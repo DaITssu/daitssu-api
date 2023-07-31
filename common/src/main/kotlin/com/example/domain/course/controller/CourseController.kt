@@ -13,10 +13,9 @@ import org.springframework.web.bind.annotation.RestController
 class CourseController(
     private val courseService: CourseService
 ) {
-    @PostMapping("")
+    @PostMapping
     fun getDepartment(
-        @RequestParam id: Long,
         @RequestParam userId: Long
     ): Response<CourseResponse> =
-        Response(data = courseService.getCourse(courseId = id, userId = userId))
+        Response(data = courseService.getCourse(userId = userId))
 }
