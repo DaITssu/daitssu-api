@@ -62,17 +62,13 @@ class CourseService (
         val startDateTime = yearMonth.atDay(1).atStartOfDay()
         val endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59)
         val calendars: List<Calendar> = calendarRepository.findByDueAtBetween(startDateTime, endDateTime)
-        val calendarResponse: MutableList<CalendarResponse> = mutableListOf()
         
+
         val groupedCalendars = calendars.groupBy { it.course }
-        val resultMap = mutableMapOf<String, List<CalendarResponse>>()
+        val resultMap = groupedCalendars.mapValues { (_, calendarList) ->
+            calendarList.map { CalendarResponse(it.type, it.dueAt, it.name) }
+        }.toMutableMap()
         
-        for ((course, calendarList) in groupedCalendars) {
-            val gcrList = calendarList.map {
-                CalendarResponse(it.type, it.dueAt, it.name)
-            }
-            resultMap[course] = gcrList
-        }
         
         return resultMap
         
