@@ -98,7 +98,8 @@ class CourseService (
         courseId: Long,
         name: String
     ) : Boolean {
-        val course = courseRepository.findById(courseId).get()
+        val course = courseRepository.findById(courseId)
+            .orElseThrow { IllegalArgumentException("not found course") }
         val vd = Video(LocalDateTime.now().plusDays(7), LocalDateTime.now(), name, course)
         course.addVideo(vd)
         videoRepository.save(vd)
@@ -110,7 +111,8 @@ class CourseService (
         courseId: Long,
         name: String,
     ) : Boolean {
-        val course = courseRepository.findById(courseId).get()
+        val course = courseRepository.findById(courseId)
+            .orElseThrow { IllegalArgumentException("not found course") }
         val assignment = Assignment(LocalDateTime.now().plusDays(7), LocalDateTime.now(), name, course)
         course.addAssignment(assignment)
         assignmentRepository.save(assignment)
