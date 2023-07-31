@@ -38,7 +38,7 @@ jobs:
           CREATE_SECRET: ${{secrets.DAITSSU_DEV_APPLICATION_YML}}
           CREATE_SECRET_DIR: common/src/main/resources
           CREATE_SECRET_DIR_FILE_NAME: application-dev.yml
-        run: echo $CREATE_SECRET > | base64 --decode > $CREATE_SECRET_DIR/$CREATE_SECRET_DIR_FILE_NAME
+        run: echo $CREATE_SECRET | base64 --decode > $CREATE_SECRET_DIR/$CREATE_SECRET_DIR_FILE_NAME
 
       - name: Build with Gradle
         run: ./gradlew common:bootJar
