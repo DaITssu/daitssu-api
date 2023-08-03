@@ -19,7 +19,7 @@ class CourseServiceTest(
     private val userCourseRelationRepository: UserCourseRelationRepository
 ) {
     @Test
-    @DisplayName("성공_올바른 userId를 이용하여 과목 조회 시_1개 이상의 과목을 조회한다")
+    @DisplayName("성공_올바른 userId를 이용하여 과목 조회 시_1개 이상의 과목이 조회될 수 있다")
     fun success_get_course_with_user_id() {
         userRepository.findAll().forEach { user ->
             val courses = userCourseRelationRepository.findByUserId(userId = user.id).filter {
