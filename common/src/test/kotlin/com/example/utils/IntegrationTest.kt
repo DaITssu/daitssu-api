@@ -6,4 +6,4 @@ import org.springframework.boot.test.context.SpringBootTest
 @SpringBootTest
 @Transactional
 @UnitTest
-annotation class IntegrationTest()
+annotation class IntegrationTest
