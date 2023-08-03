@@ -1,3 +1,8 @@
+DELETE FROM main.department;
+DELETE FROM main.users;
+DELETE FROM course.course;
+DELETE FROM course.user_course_relation;
+
 INSERT INTO main.department(name) VALUES
     ('computer'),
     ('media'),
