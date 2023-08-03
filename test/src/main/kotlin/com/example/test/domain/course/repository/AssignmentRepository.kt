@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface AssignmentRepository : JpaRepository<Assignment, Long> {
     
-    fun findByCourseId(courseId: Long): List<Assignment>
+    fun findByCourseId(courseId: Long): List<Assignment?>
 }
