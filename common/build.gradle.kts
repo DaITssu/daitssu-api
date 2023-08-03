@@ -3,7 +3,8 @@ plugins {
 }
 
 dependencies {
-
+    
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 }
 
 allOpen {
@@ -13,11 +14,7 @@ allOpen {
 }
 
 tasks {
-    bootJar {
-        enabled = false
-    }
-
     jar {
-        enabled = true
+        enabled = false
     }
 }

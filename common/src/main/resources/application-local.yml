@@ -1,9 +1,6 @@
 spring:
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: "jdbc:postgresql://localhost:5432/daitssu"
-    username: "daitssu"
-    password: "daitssu"
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
