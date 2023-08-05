@@ -29,7 +29,7 @@ class CourseService (
     fun getCourseList(): List<CourseResponse> {
         val courses: List<Course> = courseRepository.findAll()
         return courses.map { course ->
-            CourseResponse(course.name, course.videos, course.assignments, course.term)
+            CourseResponse(name = course.name, term = course.term)
         }
     }
     
@@ -114,6 +114,6 @@ class CourseService (
         val course = Course(courseRequest.name, courseRequest.term)
         courseRepository.save(course)
         
-        return CourseResponse(courseName = course.name, videos = course.videos, assignments = course.assignments, term = course.term)
+        return CourseResponse(name = course.name, videos = course.videos, assignments = course.assignments, term = course.term)
     }
 }
