@@ -22,6 +22,7 @@ import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import java.time.temporal.TemporalAdjusters
 import kotlin.jvm.optionals.getOrNull
 
 @Service
@@ -62,6 +63,10 @@ class CourseService (
         val date: LocalDateTime
         try {
             date = LocalDateTime.parse(requestDate, formatter)
+            val lastDayOfMonth = date.toLocalDate().with(TemporalAdjusters.lastDayOfMonth())
+            if (date.toLocalDate().isAfter(lastDayOfMonth)) {
+                throw IllegalArgumentException("Invalid date. Date is after the last day of the month.")
+            }
         } catch (e: DateTimeParseException) {
             throw IllegalArgumentException("Invalid date format. Date should be in 'yyyy-MM-dd HH:mm:ss' format.")
         }
@@ -84,6 +89,8 @@ class CourseService (
     
     
     fun postCalendar(calendarRequest: CalendarRequest) : CalendarResponse {
+        
+        
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val dateTime:LocalDateTime
         try {
@@ -92,8 +99,8 @@ class CourseService (
             throw IllegalArgumentException("Invalid date format. Date should be in 'yyyy-MM-dd HH:mm:ss' format.")
         }
         val calendar = Calendar(type = calendarRequest.type, course = calendarRequest.course, dueAt = dateTime, name = calendarRequest.name)
+            .also { calendarRepository.save(it) }
         
-        calendarRepository.save(calendar)
         return CalendarResponse(type = calendar.type, dueAt = calendar.dueAt, name = calendar.name)
     }
     
@@ -105,8 +112,8 @@ class CourseService (
             ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND)
         
         val video = Video(LocalDateTime.now().plusDays(7), LocalDateTime.now(), videoRequest.name)
+            .also { videoRepository.save(it) }
         course.addVideo(video)
-        videoRepository.save(video)
         
         return VideoResponse(id = video.id, name = video.name, dueAt = video.dueAt, startAt = video.startAt)
     }
@@ -119,15 +126,15 @@ class CourseService (
         
         
         val assignment = Assignment(LocalDateTime.now().plusDays(7), LocalDateTime.now(), assignmentRequest.name, course)
+            .also { assignmentRepository.save(it) }
         course.addAssignment(assignment)
-        assignmentRepository.save(assignment)
         
         return AssignmentResponse(id = assignment.id, name = assignment.name, dueAt = assignment.dueAt, startAt = assignment.startAt)
     }
     
     fun postCourse(courseRequest: CourseRequest) : CourseResponse {
         val course = Course(courseRequest.name, courseRequest.term)
-        courseRepository.save(course)
+            .also { courseRepository.save(it) }
         
         return CourseResponse(name = course.name, term = course.term)
     }
