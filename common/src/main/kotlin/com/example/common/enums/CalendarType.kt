@@ -1,5 +1,5 @@
 package com.example.common.enums
 
-enum class CalendarCourseType {
+enum class CalendarType {
     ASSIGNMENT, VIDEO
 }

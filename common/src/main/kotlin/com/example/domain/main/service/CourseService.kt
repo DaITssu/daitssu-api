@@ -1,5 +1,7 @@
 package com.example.domain.main.service
 
+import com.example.common.enums.ErrorCode
+import com.example.common.exception.DefaultException
 import com.example.domain.main.dto.request.AssignmentRequest
 import com.example.domain.main.dto.request.CalendarRequest
 import com.example.domain.main.dto.response.CalendarResponse
@@ -13,11 +15,13 @@ import com.example.domain.main.model.respository.CalendarRepository
 import com.example.domain.main.model.respository.CourseRepository
 import com.example.domain.main.model.respository.VideoRepository
 import com.example.domain.main.model.entity.*
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 class CourseService (
@@ -37,8 +41,8 @@ class CourseService (
     fun getCourse(
         courseId: Long
     ): CourseResponse {
-        val course = courseRepository.findById(courseId)
-            .orElseThrow { IllegalArgumentException("not found course") }
+        val course = courseRepository.findByIdOrNull(courseId)
+            ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND)
         
         
         return CourseResponse(course.name, course.videos, course.assignments, course.term)
@@ -89,7 +93,9 @@ class CourseService (
     fun postVideo(
         videoRequest: VideoRequest
     ) : VideoResponse {
-        val course = courseRepository.findById(videoRequest.courseId).get()
+        val course = courseRepository.findByIdOrNull(videoRequest.courseId)
+            ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND)
+        
         val video = Video(LocalDateTime.now().plusDays(7), LocalDateTime.now(), videoRequest.name)
         course.addVideo(video)
         videoRepository.save(video)
@@ -100,8 +106,10 @@ class CourseService (
     fun postAssignment(
         assignmentRequest: AssignmentRequest
     ) : AssignmentResponse {
-        val course = courseRepository.findById(assignmentRequest.courseId)
-            .orElseThrow { IllegalArgumentException("not found course") }
+        val course = courseRepository.findByIdOrNull(assignmentRequest.courseId)
+            ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND)
+        
+        
         val assignment = Assignment(LocalDateTime.now().plusDays(7), LocalDateTime.now(), assignmentRequest.name, course)
         course.addAssignment(assignment)
         assignmentRepository.save(assignment)
@@ -110,7 +118,6 @@ class CourseService (
     }
     
     fun postCourse(courseRequest: CourseRequest) : CourseResponse {
-        println(courseRequest)
         val course = Course(courseRequest.name, courseRequest.term)
         courseRepository.save(course)
         
