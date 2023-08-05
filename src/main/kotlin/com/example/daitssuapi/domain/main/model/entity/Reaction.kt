@@ -1,19 +1,16 @@
-package com.example.domain.main.model.entity
+package com.example.daitssuapi.domain.main.model.entity
 
-import com.example.common.domain.BaseEntity
-import jakarta.persistence.Entity
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.Table
+import com.example.daitssuapi.common.audit.BaseEntity
+import jakarta.persistence.*
 
 @Entity
-@Table(name = "reaction")
+@Table(schema = "main")
 class Reaction(
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id")
     val article: Article,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     val user: User,
 ): BaseEntity()
