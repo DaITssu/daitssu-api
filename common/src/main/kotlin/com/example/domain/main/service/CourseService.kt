@@ -71,7 +71,7 @@ class CourseService (
     }
     
     
-    fun postCalendar(calendarRequest: CalendarRequest) : Boolean {
+    fun postCalendar(calendarRequest: CalendarRequest) : CalendarResponse {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val dateTime:LocalDateTime
         try {
@@ -79,10 +79,10 @@ class CourseService (
         } catch (e: DateTimeParseException) {
             throw IllegalArgumentException("Invalid date format. Date should be in 'yyyy-MM-dd HH:mm:ss' format.")
         }
-        val cal = Calendar(type = calendarRequest.type, course = calendarRequest.course, dueAt = dateTime, name = calendarRequest.name)
+        val calendar = Calendar(type = calendarRequest.type, course = calendarRequest.course, dueAt = dateTime, name = calendarRequest.name)
         
-        calendarRepository.save(cal)
-        return true
+        calendarRepository.save(calendar)
+        return CalendarResponse(type = calendar.type, dueAt = calendar.dueAt, name = calendar.name)
     }
     
     

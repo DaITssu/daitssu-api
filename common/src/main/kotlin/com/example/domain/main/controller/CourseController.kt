@@ -71,7 +71,7 @@ class CourseController (
     @PostMapping("/calendar")
     fun postCreateCalendar(
         @RequestBody calendarRequest: CalendarRequest
-    ) : Boolean = courseService.postCalendar(calendarRequest = calendarRequest)
+    ) : CalendarResponse = courseService.postCalendar(calendarRequest = calendarRequest)
     
     
     @Operation(
