@@ -3,8 +3,9 @@ package com.example.domain.main.service
 import com.example.common.enums.CalendarCourseType
 import com.example.domain.main.dto.response.CalendarResponse
 import com.example.domain.main.dto.response.CourseResponse
-import com.example.domain.main.dto.AssignmentDto
-import com.example.domain.main.dto.VideoDto
+import com.example.domain.main.dto.request.RequestCourse
+import com.example.domain.main.dto.request.RequestVideo
+import com.example.domain.main.dto.response.VideoResponse
 import com.example.domain.main.model.respository.AssignmentRepository
 import com.example.domain.main.model.respository.CalendarRepository
 import com.example.domain.main.model.respository.CourseRepository
@@ -23,30 +24,22 @@ class CourseService (
     private val videoRepository: VideoRepository,
     private val calendarRepository: CalendarRepository,
 ) {
-    fun getCourseList() : List<Course>{
-        return courseRepository.findAll()
+    fun getCourseList(): List<CourseResponse> {
+        val courses: List<Course> = courseRepository.findAll()
+        return courses.map { course ->
+            CourseResponse(course.name, course.videos, course.assignments, course.term)
+        }
     }
     
     
     fun getCourse(
         courseId: Long
-    ) : CourseResponse {
+    ): CourseResponse {
         val course = courseRepository.findById(courseId)
             .orElseThrow { IllegalArgumentException("not found course") }
-        val courseResponse = CourseResponse(course.name)
         
-
-        for (v in course.videos) {
-            val video = VideoDto(v.dueAt, v.startAt, v.name, v.id)
-            courseResponse.videos.add(video)
-        }
-
-        for (a in course.assignments) {
-            val assignment = AssignmentDto(a.dueAt, a.startAt, a.name, a.id)
-            courseResponse.assignments.add(assignment)
-        }
         
-        return courseResponse
+        return CourseResponse(course.name, course.videos, course.assignments, course.term)
     }
     
     
@@ -96,16 +89,14 @@ class CourseService (
     
     
     fun postVideo(
-        courseId: Long,
-        name: String
-    ) : Boolean {
-        val course = courseRepository.findById(courseId)
-            .orElseThrow { IllegalArgumentException("not found course") }
-        val vd = Video(LocalDateTime.now().plusDays(7), LocalDateTime.now(), name, course)
-        course.addVideo(vd)
-        videoRepository.save(vd)
+        requestVideo: RequestVideo
+    ) : VideoResponse {
+        val course = courseRepository.findById(requestVideo.courseId).get()
+        val video = Video(LocalDateTime.now().plusDays(7), LocalDateTime.now(), requestVideo.name)
+        course.addVideo(video)
+        videoRepository.save(video)
         
-        return true
+        return VideoResponse(id = video.id, name = video.name, dueAt = video.dueAt, startAt = video.startAt)
     }
     
     fun postAssignment(
@@ -118,6 +109,13 @@ class CourseService (
         course.addAssignment(assignment)
         assignmentRepository.save(assignment)
         
+        return true
+    }
+    
+    fun postCourse(requestCourse: RequestCourse) : Boolean {
+        println(requestCourse)
+        val course = Course(requestCourse.name, requestCourse.term)
+        courseRepository.save(course)
         return true
     }
 }

@@ -2,10 +2,13 @@ package com.example.domain.main.controller
 
 import com.example.domain.main.dto.request.RequestAssignment
 import com.example.domain.main.dto.request.RequestCalendar
+import com.example.domain.main.dto.request.RequestCourse
 import com.example.domain.main.dto.request.RequestVideo
 import com.example.domain.main.dto.response.CalendarResponse
 import com.example.domain.main.dto.response.CourseResponse
+import com.example.domain.main.dto.response.VideoResponse
 import com.example.domain.main.model.entity.Course
+import com.example.domain.main.model.entity.Video
 import com.example.domain.main.service.CourseService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -33,7 +36,7 @@ class CourseController (
         ],
     )
     @GetMapping()
-    fun getCourseList() : List<Course> = courseService.getCourseList()
+    fun getCourseList() : List<CourseResponse> = courseService.getCourseList()
     
     
     @Operation(
@@ -92,12 +95,8 @@ class CourseController (
     )
     @PostMapping("/video")
     fun postCreateVideo(
-        @RequestBody
-        requestVideo: RequestVideo
-    ) : Boolean = courseService.postVideo(
-        courseId = requestVideo.courseId,
-        name = requestVideo.name,
-    )
+        @RequestBody requestVideo: RequestVideo
+    ) : VideoResponse = courseService.postVideo(requestVideo)
     
     
     @Operation(
@@ -114,4 +113,7 @@ class CourseController (
         courseId = requestAssignemnt.courseId,
         name = requestAssignemnt.name,
     )
+    
+    @PostMapping("/course")
+    fun postCreateCourse(@RequestBody course: RequestCourse) : Boolean = courseService.postCourse(course)
 }

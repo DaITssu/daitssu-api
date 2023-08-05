@@ -1,5 +1,6 @@
 package com.example.domain.main.model.entity
 
+import com.example.common.domain.BaseEntity
 import jakarta.persistence.*
 
 @Entity
@@ -16,13 +17,7 @@ class Course (
     
     @OneToMany(mappedBy = "course")
     val assignments: MutableList<Assignment> = mutableListOf()
-) {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "course_id", nullable = false)
-    val id: Long? = null
-    
-    
+) : BaseEntity() {
     fun addVideo(video: Video) {
         videos.add(video)
         video.course = this
