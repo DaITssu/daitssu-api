@@ -9,6 +9,5 @@ data class ArticleResponse(
     val content: String,
     val writer: User,
 //    val images // image 데이터
-    val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 )

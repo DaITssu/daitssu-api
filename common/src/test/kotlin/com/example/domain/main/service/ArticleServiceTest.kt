@@ -18,8 +18,8 @@ import kotlin.test.assertEquals
 
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-class CommunityServiceTest(
-    private val communityService: CommunityService,
+class ArticleServiceTest(
+    private val articleService: ArticleService,
     private val userRepository: UserRepository,
     private val articleRepository: ArticleRepository,
     private val departmentRepository: DepartmentRepository
@@ -29,8 +29,11 @@ class CommunityServiceTest(
         val department = Department(name = "xx학부")
         departmentRepository.save(department)
 
-        val user = User(studentId = 20221111, name = "홍길동",
-            department = department)
+        val user = User(
+            studentId = 20221111,
+            name = "홍길동",
+            department = department
+        )
         userRepository.save(user)
     }
 
@@ -45,13 +48,16 @@ class CommunityServiceTest(
     @DisplayName("article 생성 테스트")
     fun article_generation_test() {
         // given
-        val user = userRepository.findByStudentId(20221111)
+        val user: User = userRepository.findByStudentId(20221111)
             ?: throw Error()
 
         // when
-        val articlePostRequest = ArticlePostRequest(title = "테스트 제목",
-            content = "테스트 내용", studentId = user.studentId)
-        val articleResponse = communityService.writeArticle(articlePostRequest)
+        val articlePostRequest = ArticlePostRequest(
+            title = "테스트 제목",
+            content = "테스트 내용",
+            studentId = user.studentId
+        )
+        val articleResponse = articleService.writeArticle(articlePostRequest)
 
         // then
         assertEquals(articlePostRequest.title, articleResponse.title)
@@ -63,12 +69,17 @@ class CommunityServiceTest(
     @DisplayName("article 조회 테스트")
     fun article_find_test() {
         // given
-        val user: User = userRepository.findByStudentId(20221111) ?: throw Error()
-        val article = Article(title = "테스트 제목", content = "테스트 내용", writer = user)
+        val user = userRepository.findByStudentId(20221111)
+            ?: throw Error()
+        val article = Article(
+            title = "테스트 제목",
+            content = "테스트 내용",
+            writer = user
+        )
         val savedArticle = articleRepository.save(article)
 
         // when
-        val selectedArticle: ArticleResponse = communityService.getArticle(savedArticle.id)
+        val selectedArticle: ArticleResponse = articleService.getArticle(savedArticle.id)
 
         // then
         assertEquals(selectedArticle.id, savedArticle.id)

@@ -12,7 +12,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
-class CommunityService(
+class ArticleService(
     private val articleRepository: ArticleRepository,
     private val userRepository: UserRepository
 ) {
@@ -20,22 +20,33 @@ class CommunityService(
         val article: Article = articleRepository.findByIdOrNull(id)
             ?: throw DefaultException(ErrorCode.BAD_REQUEST)
 
-        return ArticleResponse(id = article.id, title = article.title,
-            content = article.content, writer = article.writer,
-            createdAt = article.createdAt, updatedAt = article.updatedAt)
+        return ArticleResponse(
+            id = article.id,
+            title = article.title,
+            content = article.content,
+            writer = article.writer,
+            updatedAt = article.updatedAt
+        )
     }
 
     fun writeArticle(articlePostRequest: ArticlePostRequest): ArticleResponse {
         val user: User = userRepository.findByStudentId(articlePostRequest.studentId)
             ?: throw DefaultException(ErrorCode.USER_NOT_FOUND)
 
-        val article: Article = Article(title = articlePostRequest.title,
-            content = articlePostRequest.content, writer = user)
+        val article: Article = Article(
+            title = articlePostRequest.title,
+            content = articlePostRequest.content,
+            writer = user
+        )
 
         val savedArticle = articleRepository.save(article)
 
-        return ArticleResponse(id=savedArticle.id, title = savedArticle.title,
-            content = savedArticle.content, writer = savedArticle.writer,
-            createdAt = savedArticle.createdAt, updatedAt = savedArticle.updatedAt)
+        return ArticleResponse(
+            id = savedArticle.id,
+            title = savedArticle.title,
+            content = savedArticle.content,
+            writer = savedArticle.writer,
+            updatedAt = savedArticle.updatedAt
+        )
     }
 }
