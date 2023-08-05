@@ -5,7 +5,7 @@ import com.example.domain.main.model.entity.Video
 
 class CourseResponse (
     val name: String,
-    val videos: MutableList<Video>? = null,
-    val assignments: MutableList<Assignment>? = null,
+    val videos: List<VideoResponse>? = null,
+    val assignments: List<AssignmentResponse>? = null,
     val term: Int
 )

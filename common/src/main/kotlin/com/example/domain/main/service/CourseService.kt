@@ -16,6 +16,7 @@ import com.example.domain.main.model.respository.CourseRepository
 import com.example.domain.main.model.respository.VideoRepository
 import com.example.domain.main.model.entity.*
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.expression.spel.ast.Assign
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.YearMonth
@@ -44,8 +45,15 @@ class CourseService (
         val course = courseRepository.findByIdOrNull(courseId)
             ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND)
         
+        val videoResponses = course.videos.map { video ->
+            VideoResponse(id = video.id, name = video.name, dueAt = video.dueAt, startAt = video.startAt)
+        }
         
-        return CourseResponse(course.name, course.videos, course.assignments, course.term)
+        val assignmentResponses = course.assignments.map { assignment ->
+            AssignmentResponse(id = assignment.id , name = assignment.name, dueAt = assignment.dueAt, startAt = assignment.startAt)
+        }
+        
+        return CourseResponse(name = course.name, videos = videoResponses, assignments = assignmentResponses, term = course.term)
     }
     
     
@@ -121,6 +129,6 @@ class CourseService (
         val course = Course(courseRequest.name, courseRequest.term)
         courseRepository.save(course)
         
-        return CourseResponse(name = course.name, videos = course.videos, assignments = course.assignments, term = course.term)
+        return CourseResponse(name = course.name, term = course.term)
     }
 }
