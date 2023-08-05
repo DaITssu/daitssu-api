@@ -1,14 +1,13 @@
 package com.example.domain.main.controller
 
-import com.example.domain.main.dto.request.RequestAssignment
-import com.example.domain.main.dto.request.RequestCalendar
-import com.example.domain.main.dto.request.RequestCourse
-import com.example.domain.main.dto.request.RequestVideo
+import com.example.domain.main.dto.request.AssignmentRequest
+import com.example.domain.main.dto.request.CalendarRequest
+import com.example.domain.main.dto.request.CourseRequest
+import com.example.domain.main.dto.request.VideoRequest
+import com.example.domain.main.dto.response.AssignmentResponse
 import com.example.domain.main.dto.response.CalendarResponse
 import com.example.domain.main.dto.response.CourseResponse
 import com.example.domain.main.dto.response.VideoResponse
-import com.example.domain.main.model.entity.Course
-import com.example.domain.main.model.entity.Video
 import com.example.domain.main.service.CourseService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -47,11 +46,8 @@ class CourseController (
     )
     @GetMapping("{courseId}")
     fun getCourse(
-        @PathVariable
-        courseId: Long
-    ) : CourseResponse = courseService.getCourse(
-        courseId = courseId,
-    )
+        @PathVariable courseId: Long
+    ) : CourseResponse = courseService.getCourse(courseId = courseId)
     
     
     @Operation(
@@ -62,11 +58,8 @@ class CourseController (
     )
     @GetMapping("/calendar/{date}")
     fun getCalendar(
-        @PathVariable("date")
-        date: String
-    ) : MutableMap<String, List<CalendarResponse>> = courseService.getCalendar(
-        requestDate = date
-    )
+        @PathVariable("date") date: String
+    ) : MutableMap<String, List<CalendarResponse>> = courseService.getCalendar(requestDate = date)
     
     
     @Operation(
@@ -77,14 +70,8 @@ class CourseController (
     )
     @PostMapping("/calendar")
     fun postCreateCalendar(
-        @RequestBody
-        requestCalendar: RequestCalendar
-    ) : Boolean = courseService.postCalendar(
-        requestType =  requestCalendar.type,
-        course = requestCalendar.course,
-        dueAt = requestCalendar.dueAt,
-        name = requestCalendar.name
-    )
+        @RequestBody calendarRequest: CalendarRequest
+    ) : Boolean = courseService.postCalendar(calendarRequest = calendarRequest)
     
     
     @Operation(
@@ -95,8 +82,8 @@ class CourseController (
     )
     @PostMapping("/video")
     fun postCreateVideo(
-        @RequestBody requestVideo: RequestVideo
-    ) : VideoResponse = courseService.postVideo(requestVideo)
+        @RequestBody videoRequest: VideoRequest
+    ) : VideoResponse = courseService.postVideo(videoRequest)
     
     
     @Operation(
@@ -107,13 +94,18 @@ class CourseController (
     )
     @PostMapping("/assignment")
     fun postCreateAssignment(
-        @RequestBody
-        requestAssignemnt: RequestAssignment
-    ) : Boolean = courseService.postAssignment(
-        courseId = requestAssignemnt.courseId,
-        name = requestAssignemnt.name,
-    )
+        @RequestBody requestAssignemnt: AssignmentRequest
+    ) : AssignmentResponse = courseService.postAssignment(assignmentRequest = requestAssignemnt)
     
+    
+    @Operation(
+        summary = "과목 추가하기",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
     @PostMapping("/course")
-    fun postCreateCourse(@RequestBody course: RequestCourse) : Boolean = courseService.postCourse(course)
+    fun postCreateCourse(
+        @RequestBody courseRequest: CourseRequest
+    ) : CourseResponse = courseService.postCourse(courseRequest = courseRequest)
 }

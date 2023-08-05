@@ -2,7 +2,7 @@ package com.example.domain.main.dto.request
 
 import org.jetbrains.annotations.NotNull
 
-class RequestCourse (
+class CourseRequest (
     @NotNull
     val name: String,
     

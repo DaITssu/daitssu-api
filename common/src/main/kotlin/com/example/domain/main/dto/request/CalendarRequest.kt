@@ -4,7 +4,7 @@ import com.example.common.enums.CalendarCourseType
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(name = "일정 추가 API Request Body")
-class RequestCalendar (
+class CalendarRequest (
     @Schema(description = "[필수] 일정의 종류입니다. ")
     val type: CalendarCourseType,
     @Schema(description = "[필수] 일정의 분류입니다. ")

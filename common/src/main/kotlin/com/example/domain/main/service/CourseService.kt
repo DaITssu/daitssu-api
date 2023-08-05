@@ -1,10 +1,12 @@
 package com.example.domain.main.service
 
-import com.example.common.enums.CalendarCourseType
+import com.example.domain.main.dto.request.AssignmentRequest
+import com.example.domain.main.dto.request.CalendarRequest
 import com.example.domain.main.dto.response.CalendarResponse
 import com.example.domain.main.dto.response.CourseResponse
-import com.example.domain.main.dto.request.RequestCourse
-import com.example.domain.main.dto.request.RequestVideo
+import com.example.domain.main.dto.request.CourseRequest
+import com.example.domain.main.dto.request.VideoRequest
+import com.example.domain.main.dto.response.AssignmentResponse
 import com.example.domain.main.dto.response.VideoResponse
 import com.example.domain.main.model.respository.AssignmentRepository
 import com.example.domain.main.model.respository.CalendarRepository
@@ -69,19 +71,15 @@ class CourseService (
     }
     
     
-    fun postCalendar(
-        requestType: CalendarCourseType,
-        course: String,
-        dueAt: String,
-        name: String) : Boolean {
+    fun postCalendar(calendarRequest: CalendarRequest) : Boolean {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val dateTime:LocalDateTime
         try {
-            dateTime = LocalDateTime.parse(dueAt, formatter)
+            dateTime = LocalDateTime.parse(calendarRequest.dueAt, formatter)
         } catch (e: DateTimeParseException) {
             throw IllegalArgumentException("Invalid date format. Date should be in 'yyyy-MM-dd HH:mm:ss' format.")
         }
-        val cal = Calendar(requestType, course, dateTime, name)
+        val cal = Calendar(type = calendarRequest.type, course = calendarRequest.course, dueAt = dateTime, name = calendarRequest.name)
         
         calendarRepository.save(cal)
         return true
@@ -89,10 +87,10 @@ class CourseService (
     
     
     fun postVideo(
-        requestVideo: RequestVideo
+        videoRequest: VideoRequest
     ) : VideoResponse {
-        val course = courseRepository.findById(requestVideo.courseId).get()
-        val video = Video(LocalDateTime.now().plusDays(7), LocalDateTime.now(), requestVideo.name)
+        val course = courseRepository.findById(videoRequest.courseId).get()
+        val video = Video(LocalDateTime.now().plusDays(7), LocalDateTime.now(), videoRequest.name)
         course.addVideo(video)
         videoRepository.save(video)
         
@@ -100,22 +98,22 @@ class CourseService (
     }
     
     fun postAssignment(
-        courseId: Long,
-        name: String,
-    ) : Boolean {
-        val course = courseRepository.findById(courseId)
+        assignmentRequest: AssignmentRequest
+    ) : AssignmentResponse {
+        val course = courseRepository.findById(assignmentRequest.courseId)
             .orElseThrow { IllegalArgumentException("not found course") }
-        val assignment = Assignment(LocalDateTime.now().plusDays(7), LocalDateTime.now(), name, course)
+        val assignment = Assignment(LocalDateTime.now().plusDays(7), LocalDateTime.now(), assignmentRequest.name, course)
         course.addAssignment(assignment)
         assignmentRepository.save(assignment)
         
-        return true
+        return AssignmentResponse(id = assignment.id, name = assignment.name, dueAt = assignment.dueAt, startAt = assignment.startAt)
     }
     
-    fun postCourse(requestCourse: RequestCourse) : Boolean {
-        println(requestCourse)
-        val course = Course(requestCourse.name, requestCourse.term)
+    fun postCourse(courseRequest: CourseRequest) : CourseResponse {
+        println(courseRequest)
+        val course = Course(courseRequest.name, courseRequest.term)
         courseRepository.save(course)
-        return true
+        
+        return CourseResponse(courseName = course.name, videos = course.videos, assignments = course.assignments, term = course.term)
     }
 }
