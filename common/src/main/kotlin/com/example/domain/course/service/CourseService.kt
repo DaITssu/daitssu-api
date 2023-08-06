@@ -52,10 +52,20 @@ class CourseService (
         }
         
         val assignmentResponses = course.assignments.map { assignment ->
-            AssignmentResponse(id = assignment.id , name = assignment.name, dueAt = assignment.dueAt, startAt = assignment.startAt)
+            AssignmentResponse(
+                id = assignment.id,
+                name = assignment.name,
+                dueAt = assignment.dueAt,
+                startAt = assignment.startAt
+            )
         }
         
-        return CourseResponse(name = course.name, videos = videoResponses, assignments = assignmentResponses, term = course.term)
+        return CourseResponse(
+            name = course.name,
+            videos = videoResponses,
+            assignments = assignmentResponses,
+            term = course.term
+        )
     }
     
     
@@ -93,7 +103,12 @@ class CourseService (
         } catch (e: DateTimeParseException) {
             throw IllegalArgumentException("Invalid date format. Date should be in 'yyyy-MM-dd HH:mm:ss' format.")
         }
-        val calendar = Calendar(type = calendarRequest.type, course = calendarRequest.course, dueAt = dateTime, name = calendarRequest.name)
+        val calendar = Calendar(
+            type = calendarRequest.type,
+            course = calendarRequest.course,
+            dueAt = dateTime,
+            name = calendarRequest.name
+        )
             .also { calendarRepository.save(it) }
         
         return CalendarResponse(type = calendar.type, dueAt = calendar.dueAt, name = calendar.name)
@@ -120,11 +135,22 @@ class CourseService (
             ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND)
         
         
-        val assignment = Assignment(LocalDateTime.now().plusDays(7), LocalDateTime.now(), assignmentRequest.name, course)
+        val assignment = Assignment(
+            dueAt = LocalDateTime.now().plusDays(7),
+            startAt = LocalDateTime.now(),
+            name = assignmentRequest.name,
+            course = course
+        )
             .also { assignmentRepository.save(it) }
+        
         course.addAssignment(assignment)
         
-        return AssignmentResponse(id = assignment.id, name = assignment.name, dueAt = assignment.dueAt, startAt = assignment.startAt)
+        return AssignmentResponse(
+            id = assignment.id,
+            name = assignment.name,
+            dueAt = assignment.dueAt,
+            startAt = assignment.startAt
+        )
     }
     
     fun postCourse(courseRequest: CourseRequest) : CourseResponse {
