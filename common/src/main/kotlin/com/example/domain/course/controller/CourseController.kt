@@ -61,7 +61,7 @@ class CourseController (
     @GetMapping("/calendar/{date}")
     fun getCalendar(
         @PathVariable("date") date: String
-    ) : MutableMap<String, List<CalendarResponse>> = courseService.getCalendar(requestDate = date)
+    ) : MutableMap<String, List<CalendarResponse>> = courseService.getCalendar(dateRequest = date)
     
     
     @Operation(
@@ -96,8 +96,8 @@ class CourseController (
     )
     @PostMapping("/assignment")
     fun postCreateAssignment(
-        @RequestBody requestAssignemnt: AssignmentRequest
-    ) : AssignmentResponse = courseService.postAssignment(assignmentRequest = requestAssignemnt)
+        @RequestBody assignmentRequest: AssignmentRequest
+    ) : AssignmentResponse = courseService.postAssignment(assignmentRequest = assignmentRequest)
     
     
     @Operation(

@@ -59,11 +59,11 @@ class CourseService (
     }
     
     
-    fun getCalendar(requestDate: String): MutableMap<String, List<CalendarResponse>> {
+    fun getCalendar(dateRequest: String): MutableMap<String, List<CalendarResponse>> {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val date: LocalDateTime
         try {
-            date = LocalDateTime.parse(requestDate, formatter)
+            date = LocalDateTime.parse(dateRequest, formatter)
         } catch (e: DateTimeParseException) {
             throw IllegalArgumentException("Invalid date format. Date should be in 'yyyy-MM-dd HH:mm:ss' format.")
         }
