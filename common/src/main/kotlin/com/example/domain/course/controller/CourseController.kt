@@ -49,7 +49,8 @@ class CourseController (
     @GetMapping("{courseId}")
     fun getCourse(
         @PathVariable courseId: Long
-    ) : CourseResponse = courseService.getCourse(courseId = courseId)
+    ) : Response<CourseResponse> =
+        Response(data = courseService.getCourse(courseId = courseId))
     
     
     @Operation(
@@ -61,7 +62,8 @@ class CourseController (
     @GetMapping("/calendar/{date}")
     fun getCalendar(
         @PathVariable("date") date: String
-    ) : Map<String, List<CalendarResponse>> = courseService.getCalendar(dateRequest = date)
+    ) : Response<Map<String, List<CalendarResponse>>> =
+        Response(data = courseService.getCalendar(dateRequest = date))
     
     
     @Operation(
@@ -73,7 +75,8 @@ class CourseController (
     @PostMapping("/calendar")
     fun postCreateCalendar(
         @RequestBody calendarRequest: CalendarRequest
-    ) : CalendarResponse = courseService.postCalendar(calendarRequest = calendarRequest)
+    ) : Response<CalendarResponse> =
+        Response(data = courseService.postCalendar(calendarRequest = calendarRequest))
     
     
     @Operation(
@@ -85,7 +88,8 @@ class CourseController (
     @PostMapping("/video")
     fun postCreateVideo(
         @RequestBody videoRequest: VideoRequest
-    ) : VideoResponse = courseService.postVideo(videoRequest)
+    ) : Response<VideoResponse> =
+        Response(data = courseService.postVideo(videoRequest))
     
     
     @Operation(
@@ -97,7 +101,8 @@ class CourseController (
     @PostMapping("/assignment")
     fun postCreateAssignment(
         @RequestBody assignmentRequest: AssignmentRequest
-    ) : AssignmentResponse = courseService.postAssignment(assignmentRequest = assignmentRequest)
+    ) : Response<AssignmentResponse> =
+        Response(data = courseService.postAssignment(assignmentRequest = assignmentRequest))
     
     
     @Operation(
@@ -109,5 +114,6 @@ class CourseController (
     @PostMapping("/course")
     fun postCreateCourse(
         @RequestBody courseRequest: CourseRequest
-    ) : CourseResponse = courseService.postCourse(courseRequest = courseRequest)
+    ) : Response<CourseResponse> =
+        Response(data = courseService.postCourse(courseRequest = courseRequest))
 }
