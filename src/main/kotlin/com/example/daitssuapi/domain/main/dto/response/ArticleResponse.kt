@@ -7,7 +7,7 @@ data class ArticleResponse(
     val id: Long,
     val title: String,
     val content: String,
-    val writer: User,
+    val writerNickName: String,
 //    val images // image 데이터
     val updatedAt: LocalDateTime,
 )

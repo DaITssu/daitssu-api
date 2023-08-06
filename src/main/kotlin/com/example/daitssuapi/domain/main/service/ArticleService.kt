@@ -8,6 +8,7 @@ import com.example.daitssuapi.domain.main.model.entity.Article
 import com.example.daitssuapi.domain.main.model.repository.ArticleRepository
 import com.example.daitssuapi.domain.main.model.entity.User
 import com.example.daitssuapi.domain.main.model.repository.UserRepository
+import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -16,6 +17,7 @@ class ArticleService(
     private val articleRepository: ArticleRepository,
     private val userRepository: UserRepository
 ) {
+    @Transactional
     fun getArticle(id: Long): ArticleResponse {
         val article: Article = articleRepository.findByIdOrNull(id)
             ?: throw DefaultException(ErrorCode.BAD_REQUEST)
@@ -24,13 +26,14 @@ class ArticleService(
             id = article.id,
             title = article.title,
             content = article.content,
-            writer = article.writer,
+            writerNickName = article.writer.nickname!!,
             updatedAt = article.updatedAt
         )
     }
 
+    @Transactional
     fun writeArticle(articlePostRequest: ArticlePostRequest): ArticleResponse {
-        val user: User = userRepository.findByStudentId(articlePostRequest.studentId)
+        val user: User = userRepository.findByNickname(articlePostRequest.nickname)
             ?: throw DefaultException(ErrorCode.USER_NOT_FOUND)
 
         val article: Article = Article(
@@ -45,7 +48,7 @@ class ArticleService(
             id = savedArticle.id,
             title = savedArticle.title,
             content = savedArticle.content,
-            writer = savedArticle.writer,
+            writerNickName = user.nickname!!,
             updatedAt = savedArticle.updatedAt
         )
     }
