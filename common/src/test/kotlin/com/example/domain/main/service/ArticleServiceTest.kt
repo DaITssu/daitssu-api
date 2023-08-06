@@ -48,8 +48,7 @@ class ArticleServiceTest(
     @DisplayName("article 생성 테스트")
     fun article_generation_test() {
         // given
-        val user: User = userRepository.findByStudentId(20221111)
-            ?: throw Error()
+        val user = userRepository.findAll()[0]
 
         // when
         val articlePostRequest = ArticlePostRequest(
@@ -69,8 +68,7 @@ class ArticleServiceTest(
     @DisplayName("article 조회 테스트")
     fun article_find_test() {
         // given
-        val user = userRepository.findByStudentId(20221111)
-            ?: throw Error()
+        val user = userRepository.findAll()[0]
         val article = Article(
             title = "테스트 제목",
             content = "테스트 내용",
