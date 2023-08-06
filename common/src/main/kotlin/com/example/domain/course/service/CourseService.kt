@@ -98,8 +98,7 @@ class CourseService (
             course = calendarRequest.course,
             dueAt = dateTime,
             name = calendarRequest.name
-        )
-            .also { calendarRepository.save(it) }
+        ).also { calendarRepository.save(it) }
         
         return CalendarResponse(type = calendar.type, dueAt = calendar.dueAt, name = calendar.name)
     }
@@ -116,8 +115,7 @@ class CourseService (
             startAt = LocalDateTime.now(),
             name = videoRequest.name,
             course = course
-        )
-            .also { videoRepository.save(it) }
+        ).also { videoRepository.save(it) }
         
         course.addVideo(video)
         
@@ -136,8 +134,7 @@ class CourseService (
             startAt = LocalDateTime.now(),
             name = assignmentRequest.name,
             course = course
-        )
-            .also { assignmentRepository.save(it) }
+        ).also { assignmentRepository.save(it) }
         
         course.addAssignment(assignment)
         
