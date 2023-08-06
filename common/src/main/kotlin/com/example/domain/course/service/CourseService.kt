@@ -47,17 +47,13 @@ class CourseService (
         val course = courseRepository.findByIdOrNull(courseId)
             ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND)
         
-        val videoResponses = course.videos.map { video ->
-            VideoResponse(id = video.id, name = video.name, dueAt = video.dueAt, startAt = video.startAt)
+        val videoResponses = course.videos.map {
+            VideoResponse(id = it.id, name = it.name, dueAt = it.dueAt, startAt = it.startAt)
         }
         
-        val assignmentResponses = course.assignments.map { assignment ->
-            AssignmentResponse(
-                id = assignment.id,
-                name = assignment.name,
-                dueAt = assignment.dueAt,
-                startAt = assignment.startAt
-            )
+        
+        val assignmentResponses = course.assignments.map {
+            AssignmentResponse(id = it.id, name = it.name, dueAt = it.dueAt, startAt = it.startAt)
         }
         
         return CourseResponse(
@@ -75,7 +71,7 @@ class CourseService (
         try {
             date = LocalDateTime.parse(dateRequest, formatter)
         } catch (e: DateTimeParseException) {
-            throw IllegalArgumentException("Invalid date format. Date should be in 'yyyy-MM-dd HH:mm:ss' format.")
+            throw DefaultException(errorCode = ErrorCode.INVALID_DATE_FORMAT)
         }
         
         val yearMonth = YearMonth.of(date.year, date.monthValue)
@@ -101,7 +97,7 @@ class CourseService (
         try {
             dateTime = LocalDateTime.parse(calendarRequest.dueAt, formatter)
         } catch (e: DateTimeParseException) {
-            throw IllegalArgumentException("Invalid date format. Date should be in 'yyyy-MM-dd HH:mm:ss' format.")
+            throw DefaultException(errorCode = ErrorCode.INVALID_DATE_FORMAT)
         }
         val calendar = Calendar(
             type = calendarRequest.type,
@@ -121,8 +117,14 @@ class CourseService (
         val course = courseRepository.findByIdOrNull(videoRequest.courseId)
             ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND)
         
-        val video = Video(LocalDateTime.now().plusDays(7), LocalDateTime.now(), videoRequest.name)
+        val video = Video(
+            dueAt = LocalDateTime.now().plusDays(7),
+            startAt = LocalDateTime.now(),
+            name = videoRequest.name,
+            course = course
+        )
             .also { videoRepository.save(it) }
+        
         course.addVideo(video)
         
         return VideoResponse(id = video.id, name = video.name, dueAt = video.dueAt, startAt = video.startAt)
