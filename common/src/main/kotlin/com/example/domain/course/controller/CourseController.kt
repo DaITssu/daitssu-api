@@ -1,5 +1,6 @@
 package com.example.domain.course.controller
 
+import com.example.common.dto.Response
 import com.example.domain.course.dto.request.AssignmentRequest
 import com.example.domain.course.dto.request.CalendarRequest
 import com.example.domain.course.dto.request.CourseRequest
@@ -35,7 +36,8 @@ class CourseController (
         ],
     )
     @GetMapping()
-    fun getCourseList() : List<CourseResponse> = courseService.getCourseList()
+    fun getCourseList() : Response<List<CourseResponse>> =
+        Response(data = courseService.getCourseList())
     
     
     @Operation(

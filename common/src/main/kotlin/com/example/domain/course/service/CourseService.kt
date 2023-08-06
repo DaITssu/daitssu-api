@@ -1,5 +1,6 @@
 package com.example.domain.course.service
 
+import com.example.common.dto.Response
 import com.example.common.enums.ErrorCode
 import com.example.common.exception.DefaultException
 import com.example.domain.course.dto.request.AssignmentRequest
