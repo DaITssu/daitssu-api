@@ -15,7 +15,6 @@ class Video (
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")
-    @JsonIgnore
     var course: Course? = null
     
 ) : BaseEntity()

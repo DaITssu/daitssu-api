@@ -14,7 +14,6 @@ class Assignment (
     val name: String,
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
     @JoinColumn(name = "course_id")
     var course : Course? = null,
 ) : BaseEntity()
