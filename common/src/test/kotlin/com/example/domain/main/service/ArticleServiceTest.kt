@@ -32,6 +32,7 @@ class ArticleServiceTest(
         val user = User(
             studentId = 20221111,
             name = "홍길동",
+            nickname = "의적",
             department = department
         )
         userRepository.save(user)
@@ -54,14 +55,14 @@ class ArticleServiceTest(
         val articlePostRequest = ArticlePostRequest(
             title = "테스트 제목",
             content = "테스트 내용",
-            studentId = user.studentId
+            nickname = user.nickname!!
         )
         val articleResponse = articleService.writeArticle(articlePostRequest)
 
         // then
         assertEquals(articlePostRequest.title, articleResponse.title)
         assertEquals(articlePostRequest.content, articleResponse.content)
-        assertEquals(user.id, articleResponse.writer.id)
+        assertEquals(user.nickname, articleResponse.writerNickName)
     }
 
     @Test
@@ -83,6 +84,6 @@ class ArticleServiceTest(
         assertEquals(selectedArticle.id, savedArticle.id)
         assertEquals(selectedArticle.title, savedArticle.title)
         assertEquals(selectedArticle.content, savedArticle.content)
-        assertEquals(selectedArticle.writer.id, savedArticle.writer.id)
+        assertEquals(selectedArticle.writerNickName, savedArticle.writer.nickname)
     }
 }
