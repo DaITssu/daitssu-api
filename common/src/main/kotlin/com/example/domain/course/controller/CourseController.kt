@@ -61,7 +61,7 @@ class CourseController (
     @GetMapping("/calendar/{date}")
     fun getCalendar(
         @PathVariable("date") date: String
-    ) : MutableMap<String, List<CalendarResponse>> = courseService.getCalendar(dateRequest = date)
+    ) : Map<String, List<CalendarResponse>> = courseService.getCalendar(dateRequest = date)
     
     
     @Operation(

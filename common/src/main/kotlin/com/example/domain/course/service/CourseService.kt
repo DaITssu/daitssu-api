@@ -65,7 +65,7 @@ class CourseService (
     }
     
     
-    fun getCalendar(dateRequest: String): MutableMap<String, List<CalendarResponse>> {
+    fun getCalendar(dateRequest: String): Map<String, List<CalendarResponse>> {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val date: LocalDateTime
         try {
@@ -77,16 +77,10 @@ class CourseService (
         val yearMonth = YearMonth.of(date.year, date.monthValue)
         val startDateTime = yearMonth.atDay(1).atStartOfDay()
         val endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59)
-        val calendars: List<Calendar> = calendarRepository.findByDueAtBetween(startDateTime, endDateTime)
         
-
-        val groupedCalendars = calendars.groupBy { it.course }
-        val resultMap = groupedCalendars.mapValues { (_, calendarList) ->
-            calendarList.map { CalendarResponse(it.type, it.dueAt, it.name) }
-        }.toMutableMap()
-        
-        
-        return resultMap
+        return calendarRepository.findByDueAtBetween(startDateTime, endDateTime).groupBy(
+            { it.course }, { CalendarResponse(it.type, it.dueAt, it.name) }
+        )
         
     }
     
