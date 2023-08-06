@@ -5,12 +5,12 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(name = "일정 추가 API Request Body")
 class CalendarRequest (
-    @Schema(description = "일정의 종류입니다. ")
+    @Schema(description = "일정의 종류")
     val type: CalendarType,
-    @Schema(description = "일정의 분류입니다. ")
+    @Schema(description = "일정의 분류")
     val course: String,
-    @Schema(description = "일정의 마감기한입니다. ")
+    @Schema(description = "일정의 마감기한")
     val dueAt: String,
-    @Schema(description = "일정의 제목입니다. ")
+    @Schema(description = "일정의 제목")
     val name: String,
 )
