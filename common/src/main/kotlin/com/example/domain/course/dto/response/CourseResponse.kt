@@ -1,7 +1,4 @@
-package com.example.domain.main.dto.response
-
-import com.example.domain.main.model.entity.Assignment
-import com.example.domain.main.model.entity.Video
+package com.example.domain.course.dto.response
 
 class CourseResponse (
     val name: String,

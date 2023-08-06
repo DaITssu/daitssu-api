@@ -1,14 +1,14 @@
-package com.example.domain.main.controller
+package com.example.domain.course.controller
 
-import com.example.domain.main.dto.request.AssignmentRequest
-import com.example.domain.main.dto.request.CalendarRequest
-import com.example.domain.main.dto.request.CourseRequest
-import com.example.domain.main.dto.request.VideoRequest
-import com.example.domain.main.dto.response.AssignmentResponse
-import com.example.domain.main.dto.response.CalendarResponse
-import com.example.domain.main.dto.response.CourseResponse
-import com.example.domain.main.dto.response.VideoResponse
-import com.example.domain.main.service.CourseService
+import com.example.domain.course.dto.request.AssignmentRequest
+import com.example.domain.course.dto.request.CalendarRequest
+import com.example.domain.course.dto.request.CourseRequest
+import com.example.domain.course.dto.request.VideoRequest
+import com.example.domain.course.dto.response.AssignmentResponse
+import com.example.domain.course.dto.response.CalendarResponse
+import com.example.domain.course.dto.response.CourseResponse
+import com.example.domain.course.dto.response.VideoResponse
+import com.example.domain.course.service.CourseService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag

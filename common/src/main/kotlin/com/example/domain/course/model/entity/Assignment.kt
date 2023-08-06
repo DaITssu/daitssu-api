@@ -1,4 +1,4 @@
-package com.example.domain.main.model.entity
+package com.example.domain.course.model.entity
 
 import com.example.common.domain.BaseEntity
 import com.fasterxml.jackson.annotation.JsonIgnore

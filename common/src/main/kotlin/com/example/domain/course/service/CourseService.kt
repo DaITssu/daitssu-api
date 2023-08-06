@@ -1,29 +1,29 @@
-package com.example.domain.main.service
+package com.example.domain.course.service
 
 import com.example.common.enums.ErrorCode
 import com.example.common.exception.DefaultException
-import com.example.domain.main.dto.request.AssignmentRequest
-import com.example.domain.main.dto.request.CalendarRequest
-import com.example.domain.main.dto.response.CalendarResponse
-import com.example.domain.main.dto.response.CourseResponse
-import com.example.domain.main.dto.request.CourseRequest
-import com.example.domain.main.dto.request.VideoRequest
-import com.example.domain.main.dto.response.AssignmentResponse
-import com.example.domain.main.dto.response.VideoResponse
-import com.example.domain.main.model.respository.AssignmentRepository
-import com.example.domain.main.model.respository.CalendarRepository
-import com.example.domain.main.model.respository.CourseRepository
-import com.example.domain.main.model.respository.VideoRepository
-import com.example.domain.main.model.entity.*
+import com.example.domain.course.dto.request.AssignmentRequest
+import com.example.domain.course.dto.request.CalendarRequest
+import com.example.domain.course.dto.response.CalendarResponse
+import com.example.domain.course.dto.response.CourseResponse
+import com.example.domain.course.dto.request.CourseRequest
+import com.example.domain.course.dto.request.VideoRequest
+import com.example.domain.course.dto.response.AssignmentResponse
+import com.example.domain.course.dto.response.VideoResponse
+import com.example.domain.course.model.entity.Assignment
+import com.example.domain.course.model.entity.Calendar
+import com.example.domain.course.model.entity.Course
+import com.example.domain.course.model.entity.Video
+import com.example.domain.course.model.repository.AssignmentRepository
+import com.example.domain.course.model.repository.CalendarRepository
+import com.example.domain.course.model.repository.CourseRepository
+import com.example.domain.course.model.repository.VideoRepository
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.expression.spel.ast.Assign
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
-import java.time.temporal.TemporalAdjusters
-import kotlin.jvm.optionals.getOrNull
 
 @Service
 class CourseService (
@@ -63,10 +63,6 @@ class CourseService (
         val date: LocalDateTime
         try {
             date = LocalDateTime.parse(requestDate, formatter)
-            val lastDayOfMonth = date.toLocalDate().with(TemporalAdjusters.lastDayOfMonth())
-            if (date.toLocalDate().isAfter(lastDayOfMonth)) {
-                throw IllegalArgumentException("Invalid date. Date is after the last day of the month.")
-            }
         } catch (e: DateTimeParseException) {
             throw IllegalArgumentException("Invalid date format. Date should be in 'yyyy-MM-dd HH:mm:ss' format.")
         }
@@ -89,8 +85,6 @@ class CourseService (
     
     
     fun postCalendar(calendarRequest: CalendarRequest) : CalendarResponse {
-        
-        
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val dateTime:LocalDateTime
         try {

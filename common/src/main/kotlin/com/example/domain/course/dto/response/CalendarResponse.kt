@@ -1,4 +1,4 @@
-package com.example.domain.main.dto.response
+package com.example.domain.course.dto.response
 
 import com.example.common.enums.CalendarType
 import java.time.LocalDateTime

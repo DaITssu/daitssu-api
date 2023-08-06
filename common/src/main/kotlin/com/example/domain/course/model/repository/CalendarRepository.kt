@@ -1,6 +1,6 @@
-package com.example.domain.main.model.respository
+package com.example.domain.course.model.repository
 
-import com.example.domain.main.model.entity.Calendar
+import com.example.domain.course.model.entity.Calendar
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime

@@ -1,4 +1,4 @@
-package com.example.domain.main.dto.request
+package com.example.domain.course.dto.request
 
 import io.swagger.v3.oas.annotations.media.Schema
 
