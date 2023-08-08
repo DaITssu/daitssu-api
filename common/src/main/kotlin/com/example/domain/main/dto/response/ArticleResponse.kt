@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 
 data class ArticleResponse(
     val id: Long,
+    val topic: String,
     val title: String,
     val content: String,
     val writerNickName: String,

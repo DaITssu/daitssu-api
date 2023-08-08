@@ -3,6 +3,7 @@ package com.example.domain.main.controller
 import com.example.common.dto.Response
 import com.example.domain.main.dto.request.ArticlePostRequest
 import com.example.domain.main.dto.response.ArticleResponse
+import com.example.domain.main.enums.Topic
 import com.example.domain.main.model.entity.Article
 import com.example.domain.main.model.entity.Department
 import com.example.domain.main.model.entity.User
@@ -52,6 +53,7 @@ class ArticleControllerTest(
         // given
         val user = userRepository.findAll()[0]
         val article: Article = Article(
+            topic = Topic.CHAT,
             title = "테스트 제목",
             content = "테스트 내용",
             writer = user
@@ -63,6 +65,7 @@ class ArticleControllerTest(
 
         // then
         assertEquals(savedArticle.id, articleResponse.data?.id)
+        assertEquals(savedArticle.topic.name, articleResponse.data?.topic)
         assertEquals(savedArticle.title, articleResponse.data?.title)
         assertEquals(savedArticle.content, articleResponse.data?.content)
         assertEquals(savedArticle.writer.nickname, articleResponse.data?.writerNickName)
@@ -74,6 +77,7 @@ class ArticleControllerTest(
         // given
         val user = userRepository.findAll()[0]
         val articlePostRequest = ArticlePostRequest(
+            topic = Topic.CHAT.name,
             title = "테스트 제목",
             content = "테스트 내용",
             nickname = user.nickname!!
@@ -83,6 +87,7 @@ class ArticleControllerTest(
         val articleResponse: Response<ArticleResponse> = articleController.writeArticle(articlePostRequest)
 
         // then
+        assertEquals(articlePostRequest.topic, articleResponse.data?.topic)
         assertEquals(articlePostRequest.title, articleResponse.data?.title)
         assertEquals(articlePostRequest.content, articleResponse.data?.content)
         assertEquals(articlePostRequest.nickname, articleResponse.data?.writerNickName)

@@ -4,6 +4,7 @@ import com.example.common.enums.ErrorCode
 import com.example.common.exception.DefaultException
 import com.example.domain.main.dto.request.ArticlePostRequest
 import com.example.domain.main.dto.response.ArticleResponse
+import com.example.domain.main.enums.Topic
 import com.example.domain.main.model.entity.Article
 import com.example.domain.main.model.repository.ArticleRepository
 import com.example.domain.main.model.entity.User
@@ -24,6 +25,7 @@ class ArticleService(
 
         return ArticleResponse(
             id = article.id,
+            topic = article.topic.name,
             title = article.title,
             content = article.content,
             writerNickName = article.writer.nickname!!,
@@ -37,6 +39,7 @@ class ArticleService(
             ?: throw DefaultException(ErrorCode.USER_NOT_FOUND)
 
         val article: Article = Article(
+            topic = Topic[articlePostRequest.topic]!!,
             title = articlePostRequest.title,
             content = articlePostRequest.content,
             writer = user
@@ -46,6 +49,7 @@ class ArticleService(
 
         return ArticleResponse(
             id = savedArticle.id,
+            topic = savedArticle.topic.name,
             title = savedArticle.title,
             content = savedArticle.content,
             writerNickName = user.nickname!!,
