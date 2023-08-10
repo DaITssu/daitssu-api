@@ -27,7 +27,7 @@ class SwaggerConfiguration {
         .`in`(SecurityScheme.In.HEADER)
         .name("Authorization")
     private val securityRequirementName = "bearerAuth"
-
+    
     init {
         SpringDocUtils
             .getConfig()
@@ -72,10 +72,10 @@ class SwaggerConfiguration {
                     ),
             )
     }
-
+    
     @Bean
     fun openApi(): OpenAPI {
-
+        
         return OpenAPI()
             .servers(listOf(Server().apply { url = "/" }))
             .security(
@@ -102,18 +102,18 @@ class SwaggerConfiguration {
                     .description("Spring Boot API"),
             )
     }
-
+    
     private val apiRootUrl = "http://localhost:8080"
     private val description = """
         <h3>요청 헤더</h3>
-         
+        
         필요한 요청 헤더 2개는 다음과 같습니다. <br />
         이때 "{토큰}" 대신 발급된 토큰을 넣어주세요. <br />
         
         * "Authorization: Bearer {토큰}"
         * "Content-Type: application/json"
         
-        <h3>cURL 예시</h3> 
+        <h3>cURL 예시</h3>
         <code>
         curl -X 'POST' <br />
         &nbsp;  '$apiRootUrl/reservation-api/register' <br />
