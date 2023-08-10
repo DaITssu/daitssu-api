@@ -12,6 +12,7 @@ import com.example.daitssuapi.domain.main.model.repository.UserRepository
 import com.example.daitssuapi.domain.main.enums.Topic
 import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 
 @Service
@@ -22,11 +23,11 @@ class ArticleService(
     @Transactional
     fun getArticle(id: Long): ArticleResponse {
         val article: Article = articleRepository.findByIdOrNull(id)
-            ?: throw DefaultException(ErrorCode.BAD_REQUEST)
+            ?: throw DefaultException(ErrorCode.BAD_REQUEST, HttpStatus.NOT_FOUND)
 
         return ArticleResponse(
             id = article.id,
-            topic = article.topic.name,
+            topic = article.topic.value,
             title = article.title,
             content = article.content,
             writerNickName = article.writer.nickname!!,
@@ -36,8 +37,13 @@ class ArticleService(
 
     @Transactional
     fun writeArticle(articlePostRequest: ArticlePostRequest): ArticleResponse {
+        if (articlePostRequest.nickname == null
+            || Topic[articlePostRequest.topic] == null) {
+            throw DefaultException(ErrorCode.BAD_REQUEST, HttpStatus.BAD_REQUEST)
+        }
+
         val user: User = userRepository.findByNickname(articlePostRequest.nickname)
-            ?: throw DefaultException(ErrorCode.USER_NOT_FOUND)
+            ?: throw DefaultException(ErrorCode.USER_NOT_FOUND, HttpStatus.BAD_REQUEST)
 
         val article: Article = Article(
             topic = Topic[articlePostRequest.topic]!!,
@@ -50,7 +56,7 @@ class ArticleService(
 
         return ArticleResponse(
             id = savedArticle.id,
-            topic = savedArticle.topic.name,
+            topic = savedArticle.topic.value,
             title = savedArticle.title,
             content = savedArticle.content,
             writerNickName = user.nickname!!,
