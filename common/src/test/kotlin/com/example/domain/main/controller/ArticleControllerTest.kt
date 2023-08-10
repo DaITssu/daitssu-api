@@ -1,6 +1,7 @@
 package com.example.domain.main.controller
 
 import com.example.common.dto.Response
+import com.example.common.enums.ErrorCode
 import com.example.domain.main.dto.request.ArticlePostRequest
 import com.example.domain.main.dto.response.ArticleResponse
 import com.example.domain.main.enums.Topic
@@ -10,22 +11,33 @@ import com.example.domain.main.model.entity.User
 import com.example.domain.main.model.repository.ArticleRepository
 import com.example.domain.main.model.repository.DepartmentRepository
 import com.example.domain.main.model.repository.UserRepository
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.MediaType
 import org.springframework.test.context.TestConstructor
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import kotlin.test.assertEquals
 
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
+@AutoConfigureMockMvc
 class ArticleControllerTest(
-    private val articleController: ArticleController,
     private val articleRepository: ArticleRepository,
     private val userRepository: UserRepository,
     private val departmentRepository: DepartmentRepository
 ) {
+    @Autowired
+    private lateinit var mockMvc: MockMvc
+
     @BeforeEach
     fun setUser() {
         val department = Department(name = "xx학부")
@@ -51,6 +63,7 @@ class ArticleControllerTest(
     @DisplayName("article get controller test")
     fun article_get_controller_test() {
         // given
+        val baseUri = "/daitssu/community/article"
         val user = userRepository.findAll()[0]
         val article: Article = Article(
             topic = Topic.CHAT,
@@ -60,36 +73,76 @@ class ArticleControllerTest(
         )
         val savedArticle = articleRepository.save(article)
 
-        // when
-        val articleResponse: Response<ArticleResponse> = articleController.getArticle(savedArticle.id)
-
-        // then
-        assertEquals(savedArticle.id, articleResponse.data?.id)
-        assertEquals(savedArticle.topic.name, articleResponse.data?.topic)
-        assertEquals(savedArticle.title, articleResponse.data?.title)
-        assertEquals(savedArticle.content, articleResponse.data?.content)
-        assertEquals(savedArticle.writer.nickname, articleResponse.data?.writerNickName)
+        // when & then
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("$baseUri/${article.id}")
+        ).andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.data.title").value(article.title))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.data.content").value(article.content))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.data.writerNickName").value(user.nickname))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.data.topic").value(article.topic.value))
+            .andDo(MockMvcResultHandlers.print())
     }
 
     @Test
-    @DisplayName("article post controller test")
-    fun article_post_controller_test() {
+    @DisplayName("article post 성공")
+    fun article_post_controller_success() {
         // given
+        val baseUri = "/daitssu/community/article"
         val user = userRepository.findAll()[0]
         val articlePostRequest = ArticlePostRequest(
-            topic = Topic.CHAT.name,
+            topic = Topic.CHAT.value,
             title = "테스트 제목",
             content = "테스트 내용",
-            nickname = user.nickname!!
+            nickname = user.nickname
         )
 
-        // when
-        val articleResponse: Response<ArticleResponse> = articleController.writeArticle(articlePostRequest)
+        val json = jacksonObjectMapper().writeValueAsString(articlePostRequest)
 
-        // then
-        assertEquals(articlePostRequest.topic, articleResponse.data?.topic)
-        assertEquals(articlePostRequest.title, articleResponse.data?.title)
-        assertEquals(articlePostRequest.content, articleResponse.data?.content)
-        assertEquals(articlePostRequest.nickname, articleResponse.data?.writerNickName)
+        // when & then
+        mockMvc.perform(
+            MockMvcRequestBuilders.post(baseUri)
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.content()
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.data.title")
+                .value(articlePostRequest.title))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.data.content")
+                .value(articlePostRequest.content))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.data.writerNickName")
+                .value(user.nickname))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.data.topic")
+                .value(articlePostRequest.topic))
+            .andDo(MockMvcResultHandlers.print())
+    }
+
+    @Test
+    @DisplayName("article post nickname null")
+    fun article_post_nickname_null() {
+        // given
+        val baseUri = "/daitssu/community/article"
+        val articlePostRequest = ArticlePostRequest(
+            topic = Topic.CHAT.value,
+            title = "테스트 제목",
+            content = "테스트 내용",
+            nickname = null
+        )
+
+        val json = jacksonObjectMapper().writeValueAsString(articlePostRequest)
+
+        // when & then
+        mockMvc.perform(
+            MockMvcRequestBuilders.post(baseUri)
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().is4xxClientError)
+            .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                .value(ErrorCode.BAD_REQUEST.message))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.code")
+                .value(ErrorCode.BAD_REQUEST.code))
+            .andDo(MockMvcResultHandlers.print())
     }
 }

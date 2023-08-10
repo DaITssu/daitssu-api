@@ -54,7 +54,7 @@ class ArticleServiceTest(
 
         // when
         val articlePostRequest = ArticlePostRequest(
-            topic = Topic.CHAT.name,
+            topic = Topic.CHAT.value,
             title = "테스트 제목",
             content = "테스트 내용",
             nickname = user.nickname!!
@@ -62,6 +62,7 @@ class ArticleServiceTest(
         val articleResponse = articleService.writeArticle(articlePostRequest)
 
         // then
+        assertEquals(articlePostRequest.topic, articleResponse.topic)
         assertEquals(articlePostRequest.title, articleResponse.title)
         assertEquals(articlePostRequest.content, articleResponse.content)
         assertEquals(user.nickname, articleResponse.writerNickName)
@@ -81,12 +82,13 @@ class ArticleServiceTest(
         val savedArticle = articleRepository.save(article)
 
         // when
-        val selectedArticle: ArticleResponse = articleService.getArticle(savedArticle.id)
+        val articleResponse: ArticleResponse = articleService.getArticle(savedArticle.id)
 
         // then
-        assertEquals(selectedArticle.id, savedArticle.id)
-        assertEquals(selectedArticle.title, savedArticle.title)
-        assertEquals(selectedArticle.content, savedArticle.content)
-        assertEquals(selectedArticle.writerNickName, savedArticle.writer.nickname)
+        assertEquals(articleResponse.id, savedArticle.id)
+        assertEquals(articleResponse.topic, savedArticle.topic.value)
+        assertEquals(articleResponse.title, savedArticle.title)
+        assertEquals(articleResponse.content, savedArticle.content)
+        assertEquals(articleResponse.writerNickName, savedArticle.writer.nickname)
     }
 }

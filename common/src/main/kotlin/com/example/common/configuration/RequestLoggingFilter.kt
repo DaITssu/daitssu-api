@@ -8,6 +8,7 @@ import mu.KLogger
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
+import org.springframework.web.util.ContentCachingRequestWrapper
 import org.springframework.web.util.ContentCachingResponseWrapper
 
 @Component
@@ -15,10 +16,11 @@ class RequestLoggingFilter : OncePerRequestFilter() {
     private val log: KLogger = KotlinLogging.logger {}
 
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
-        log.info { makeRequestLog(request) }
+        val wrappedRequest = ContentCachingRequestWrapper(request)
+        log.info { makeRequestLog(wrappedRequest) }
 
         val wrappedResponse = ContentCachingResponseWrapper(response)
-        filterChain.doFilter(request, wrappedResponse)
+        filterChain.doFilter(wrappedRequest, wrappedResponse)
 
         log.info { makeResponseLog(wrappedResponse) }
     }
@@ -27,17 +29,18 @@ class RequestLoggingFilter : OncePerRequestFilter() {
         val requestHeaders = request.headerNames.toList().associateWith {
             request.getHeader(it)
         }
-        val requestBody = request.reader.lines().toList().joinToString("\n")
+        val contentAsByteArray = (request as ContentCachingRequestWrapper).contentAsByteArray
+        val requestBody = if (contentAsByteArray.isNotEmpty()) String(contentAsByteArray) else ""
 
         return """
-            {
-                "request" : {
-                    "uri" : "${request.requestURI}",
-                    "headers" : ${jacksonObjectMapper().writeValueAsString(requestHeaders)},
-                    "body" : "$requestBody"
-                }
-            }
-        """.trimIndent()
+             {
+                 "request" : {
+                     "uri" : "${request.requestURI}",
+                     "headers" : ${jacksonObjectMapper().writeValueAsString(requestHeaders)},
+                     "body" : "$requestBody"
+                 }
+             }
+         """.trimIndent()
     }
 
     private fun makeResponseLog(wrappedResponse: ContentCachingResponseWrapper): String {
@@ -48,14 +51,14 @@ class RequestLoggingFilter : OncePerRequestFilter() {
         wrappedResponse.copyBodyToResponse()
 
         return """
-            {
-                "response" : {
-                    "status" : "${wrappedResponse.status}",
-                    "headers" : ${jacksonObjectMapper().writeValueAsString(responseHeaders)},
-                    "body" : "$responseBody"
-                }
-            }
-        """.trimIndent()
+             {
+                 "response" : {
+                     "status" : "${wrappedResponse.status}",
+                     "headers" : ${jacksonObjectMapper().writeValueAsString(responseHeaders)},
+                     "body" : "$responseBody"
+                 }
+             }
+         """.trimIndent()
     }
 
     private fun getResponseBody(responseBody: ByteArray): String {
