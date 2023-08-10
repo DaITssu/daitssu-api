@@ -1,5 +1,6 @@
-# Common Module application.yml
 spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
   jpa:
     properties:
       hibernate:
@@ -11,9 +12,9 @@ spring:
         persistence:
           query:
             timeout: 5000
+  #    open-in-view: true
   servlet:
     multipart:
-      # location: c:\\Temp\\upload
       maxFileSize: 10MB
       maxRequestSize: 10MB
     hikari:
@@ -21,6 +22,7 @@ spring:
   mvc:
     log-request-details: true
     log-resolved-exception: true
+
 logging:
   pattern:
     console: "\
@@ -45,6 +47,7 @@ logging:
             CommonsRequestLoggingFilter: DEBUG
       hibernate:
         SQL: DEBUG
+
 springdoc:
   swagger-ui:
     tags-sorter: alpha
