@@ -1,24 +1,18 @@
 package com.example.domain.course.service
 
-import com.example.common.dto.Response
 import com.example.common.enums.ErrorCode
+import com.example.common.enums.RegisterStatus
 import com.example.common.exception.DefaultException
 import com.example.domain.course.dto.request.AssignmentRequest
 import com.example.domain.course.dto.request.CalendarRequest
-import com.example.domain.course.dto.response.CalendarResponse
-import com.example.domain.course.dto.response.CourseResponse
 import com.example.domain.course.dto.request.CourseRequest
 import com.example.domain.course.dto.request.VideoRequest
-import com.example.domain.course.dto.response.AssignmentResponse
-import com.example.domain.course.dto.response.VideoResponse
+import com.example.domain.course.dto.response.*
 import com.example.domain.course.model.entity.Assignment
 import com.example.domain.course.model.entity.Calendar
 import com.example.domain.course.model.entity.Course
 import com.example.domain.course.model.entity.Video
-import com.example.domain.course.model.repository.AssignmentRepository
-import com.example.domain.course.model.repository.CalendarRepository
-import com.example.domain.course.model.repository.CourseRepository
-import com.example.domain.course.model.repository.VideoRepository
+import com.example.domain.course.model.repository.*
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -27,11 +21,12 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
 @Service
-class CourseService (
+class CourseService(
     private val assignmentRepository: AssignmentRepository,
     private val courseRepository: CourseRepository,
     private val videoRepository: VideoRepository,
     private val calendarRepository: CalendarRepository,
+    private val userCourseRelationRepository: UserCourseRelationRepository
 ) {
     fun getCourseList(): List<CourseResponse> {
         val courses: List<Course> = courseRepository.findAll()
@@ -39,23 +34,21 @@ class CourseService (
             CourseResponse(name = course.name, term = course.term)
         }
     }
-    
-    
+
     fun getCourse(
         courseId: Long
     ): CourseResponse {
         val course = courseRepository.findByIdOrNull(courseId)
             ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND)
-        
+
         val videoResponses = course.videos.map {
             VideoResponse(id = it.id, name = it.name, dueAt = it.dueAt, startAt = it.startAt)
         }
-        
-        
+
         val assignmentResponses = course.assignments.map {
             AssignmentResponse(id = it.id, name = it.name, dueAt = it.dueAt, startAt = it.startAt)
         }
-        
+
         return CourseResponse(
             name = course.name,
             videos = videoResponses,
@@ -63,8 +56,7 @@ class CourseService (
             term = course.term
         )
     }
-    
-    
+
     fun getCalendar(dateRequest: String): Map<String, List<CalendarResponse>> {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val date: LocalDateTime
@@ -73,21 +65,19 @@ class CourseService (
         } catch (e: DateTimeParseException) {
             throw DefaultException(errorCode = ErrorCode.INVALID_DATE_FORMAT)
         }
-        
+
         val yearMonth = YearMonth.of(date.year, date.monthValue)
         val startDateTime = yearMonth.atDay(1).atStartOfDay()
         val endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59)
-        
+
         return calendarRepository.findByDueAtBetween(startDateTime, endDateTime).groupBy(
             { it.course }, { CalendarResponse(it.type, it.dueAt, it.name) }
         )
-        
     }
-    
-    
-    fun postCalendar(calendarRequest: CalendarRequest) : CalendarResponse {
+
+    fun postCalendar(calendarRequest: CalendarRequest): CalendarResponse {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        val dateTime:LocalDateTime
+        val dateTime: LocalDateTime
         try {
             dateTime = LocalDateTime.parse(calendarRequest.dueAt, formatter)
         } catch (e: DateTimeParseException) {
@@ -99,45 +89,43 @@ class CourseService (
             dueAt = dateTime,
             name = calendarRequest.name
         ).also { calendarRepository.save(it) }
-        
+
         return CalendarResponse(type = calendar.type, dueAt = calendar.dueAt, name = calendar.name)
     }
-    
-    
+
     fun postVideo(
         videoRequest: VideoRequest
-    ) : VideoResponse {
+    ): VideoResponse {
         val course = courseRepository.findByIdOrNull(videoRequest.courseId)
             ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND)
-        
+
         val video = Video(
             dueAt = LocalDateTime.now().plusDays(7),
             startAt = LocalDateTime.now(),
             name = videoRequest.name,
             course = course
         ).also { videoRepository.save(it) }
-        
+
         course.addVideo(video)
-        
+
         return VideoResponse(id = video.id, name = video.name, dueAt = video.dueAt, startAt = video.startAt)
     }
-    
+
     fun postAssignment(
         assignmentRequest: AssignmentRequest
-    ) : AssignmentResponse {
+    ): AssignmentResponse {
         val course = courseRepository.findByIdOrNull(assignmentRequest.courseId)
             ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND)
-        
-        
+
         val assignment = Assignment(
             dueAt = LocalDateTime.now().plusDays(7),
             startAt = LocalDateTime.now(),
             name = assignmentRequest.name,
             course = course
         ).also { assignmentRepository.save(it) }
-        
+
         course.addAssignment(assignment)
-        
+
         return AssignmentResponse(
             id = assignment.id,
             name = assignment.name,
@@ -145,11 +133,22 @@ class CourseService (
             startAt = assignment.startAt
         )
     }
-    
-    fun postCourse(courseRequest: CourseRequest) : CourseResponse {
+
+    fun postCourse(courseRequest: CourseRequest): CourseResponse {
         val course = Course(courseRequest.name, courseRequest.term)
             .also { courseRepository.save(it) }
-        
+
         return CourseResponse(name = course.name, term = course.term)
     }
+
+    fun getUserCourse(userId: Long): List<UserCourseResponse> =
+        userCourseRelationRepository.findByUserIdOrderByCreatedAtDesc(userId = userId).filter {
+            RegisterStatus.ACTIVE == it.registerStatus
+        }.map {
+            UserCourseResponse(
+                name = it.course.name,
+                term = it.course.term,
+                updatedAt = it.course.updatedAt
+            )
+        }
 }

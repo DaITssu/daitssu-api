@@ -11,6 +11,7 @@ enum class ErrorCode(val code: Int, val message: String) {
     DEPARTMENT_NOT_FOUND(MAIN_NUMBERING + 2, "학과를 찾을 수 없습니다"),
     
     COURSE_NOT_FOUND(COURSE_NUMBERING + 1, "과목을 찾을 수 없습니다."),
+    USER_COURSE_RELATION_NOT_FOUND(COURSE_NUMBERING + 2, "유저가 수강중인 강의를 찾을 수 없습니다."),
     
     INVALID_DATE_FORMAT(CALENDAR_NUMBERING + 1, "잘못된 날짜 형식입니다. yyyy-MM-dd HH:mm:ss 형식으로 요청바랍니다."),
     INVALID_DATE(CALENDAR_NUMBERING + 2, "잘못된 날짜입니다."),
