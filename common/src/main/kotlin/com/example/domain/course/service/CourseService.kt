@@ -9,13 +9,14 @@ import org.springframework.stereotype.Service
 class CourseService(
     private val userCourseRelationRepository: UserCourseRelationRepository
 ) {
-    fun getCourse(userId: Long): CourseResponse {
-        val courses = userCourseRelationRepository.findByUserId(userId = userId).filter {
+    fun getCourse(userId: Long): List<CourseResponse> =
+        userCourseRelationRepository.findByUserIdOrderByCreatedAtDesc(userId = userId).filter {
             RegisterStatus.ACTIVE == it.registerStatus
         }.map {
-            it.course
-        }.sortedByDescending { it.createdAt }
-
-        return CourseResponse(courses = courses)
-    }
+            CourseResponse(
+                name = it.course.name,
+                term = it.course.term,
+                updatedAt = it.course.updatedAt
+            )
+        }
 }
