@@ -8,10 +8,7 @@ import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.boot.test.system.OutputCaptureExtension
 
-@ExtendWith(OutputCaptureExtension::class)
 @IntegrationTest
 class CourseServiceTest(
     private val courseService: CourseService,
@@ -22,11 +19,11 @@ class CourseServiceTest(
     @DisplayName("성공_올바른 userId를 이용하여 과목 조회 시_1개 이상의 과목이 조회될 수 있다")
     fun success_get_course_with_user_id() {
         userRepository.findAll().forEach { user ->
-            val courses = userCourseRelationRepository.findByUserId(userId = user.id).filter {
+            val courses = userCourseRelationRepository.findByUserIdOrderByCreatedAtDesc(userId = user.id).filter {
                 RegisterStatus.ACTIVE == it.registerStatus
             }
 
-            val findCourses = courseService.getCourse(userId = user.id).courses
+            val findCourses = courseService.getCourse(userId = user.id)
 
             assertAll(
                 { assertThat(findCourses).isNotEmpty },
@@ -39,11 +36,8 @@ class CourseServiceTest(
     @DisplayName("성공_잘못된 userId를 이용하여 과목 조회 시_빈 List를 받는다")
     fun success_get_empty_course_with_wrong_user_id() {
         val wrongUserId = 0L
-        userCourseRelationRepository.findByUserId(userId = wrongUserId).filter {
-            RegisterStatus.ACTIVE == it.registerStatus
-        }
 
-        val findCourses = courseService.getCourse(userId = wrongUserId).courses
+        val findCourses = courseService.getCourse(userId = wrongUserId)
 
         assertAll(
             { assertThat(findCourses).isEmpty() }

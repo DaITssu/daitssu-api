@@ -30,9 +30,9 @@ class CourseServiceUnitTest() {
         val department = Department("computer")
         val user = User(studentId = 20230803, name = "user", department = department)
         val course = Course("eat anything", 16)
-        every { userCourseRelationRepository.findByUserId(any()) }.returns(listOf(UserCourseRelation(user, course, RegisterStatus.ACTIVE)))
+        every { userCourseRelationRepository.findByUserIdOrderByCreatedAtDesc(any()) }.returns(listOf(UserCourseRelation(user, course, RegisterStatus.ACTIVE)))
 
-        val findCourses = courseService.getCourse(userId = user.id).courses
+        val findCourses = courseService.getCourse(userId = user.id)
 
         assertAll(
             { assertThat(findCourses).isNotEmpty },
@@ -44,9 +44,9 @@ class CourseServiceUnitTest() {
     @DisplayName("성공_잘못된 userId를 이용하여 과목 조회 시_빈 List를 받는다")
     fun success_get_empty_course_with_wrong_user_id() {
         val wrongUserId = 0L
-        every { userCourseRelationRepository.findByUserId(any()) }.returns(emptyList())
+        every { userCourseRelationRepository.findByUserIdOrderByCreatedAtDesc(any()) }.returns(emptyList())
 
-        val findCourses = courseService.getCourse(userId = wrongUserId).courses
+        val findCourses = courseService.getCourse(userId = wrongUserId)
 
         assertAll(
             { assertThat(findCourses).isEmpty() }

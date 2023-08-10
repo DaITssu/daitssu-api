@@ -1,15 +1,15 @@
-CREATE SCHEMA main;
-CREATE SCHEMA notice;
-CREATE SCHEMA course;
+CREATE SCHEMA IF NOT EXISTS main;
+CREATE SCHEMA IF NOT EXISTS notice;
+CREATE SCHEMA IF NOT EXISTS course;
 
-CREATE TABLE main.department (
+CREATE TABLE IF NOT EXISTS main.department (
     id SERIAL PRIMARY KEY,
     name VARCHAR(32) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT current_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT current_TIMESTAMP
 );
 
-CREATE TABLE main.users (
+CREATE TABLE IF NOT EXISTS main.users (
     id SERIAL PRIMARY KEY,
     student_id INT NOT NULL,
     name VARCHAR(32) NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE main.users (
     FOREIGN KEY (department_id) REFERENCES main.department (id)
 );
 
-CREATE TABLE main.article (
+CREATE TABLE IF NOT EXISTS main.article (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
     title VARCHAR(256) NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE main.article (
     FOREIGN KEY (user_id) REFERENCES main.users (id)
 );
 
-CREATE TABLE main.comment (
+CREATE TABLE IF NOT EXISTS main.comment (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
     article_id INT NOT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE main.comment (
     FOREIGN KEY (article_id) REFERENCES main.article (id)
 );
 
-CREATE TABLE main.reaction (
+CREATE TABLE IF NOT EXISTS main.reaction (
     id SERIAL PRIMARY KEY,
     article_id INT NOT NULL,
     user_id INT NOT NULL,
@@ -53,7 +53,7 @@ CREATE TABLE main.reaction (
     FOREIGN KEY (user_id) REFERENCES main.users (id)
 );
 
-CREATE TABLE main.scrap (
+CREATE TABLE IF NOT EXISTS main.scrap (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
     article_id INT NOT NULL,
@@ -63,7 +63,7 @@ CREATE TABLE main.scrap (
     FOREIGN KEY (article_id) REFERENCES main.article (id)
 );
 
-CREATE TABLE notice.notice (
+CREATE TABLE IF NOT EXISTS notice.notice (
     id SERIAL PRIMARY KEY,
     title VARCHAR(1024) NOT NULL,
     department_id INT NOT NULL,
@@ -75,7 +75,7 @@ CREATE TABLE notice.notice (
     updated_at TIMESTAMP NOT NULL DEFAULT current_TIMESTAMP
 );
 
-CREATE TABLE notice.notice_fs (
+CREATE TABLE IF NOT EXISTS notice.notice_fs (
     id SERIAL PRIMARY KEY,
     title VARCHAR(256) NOT NULL,
     content VARCHAR(2048) NOT NULL,
@@ -85,7 +85,7 @@ CREATE TABLE notice.notice_fs (
     updated_at TIMESTAMP NOT NULL DEFAULT current_TIMESTAMP
 );
 
-CREATE TABLE course.course (
+CREATE TABLE IF NOT EXISTS course.course (
     id SERIAL PRIMARY KEY,
     name VARCHAR(32) NOT NULL,
     term INT NOT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE course.course (
     updated_at TIMESTAMP NOT NULL DEFAULT current_TIMESTAMP
 );
 
-CREATE TABLE course.video (
+CREATE TABLE IF NOT EXISTS course.video (
     id SERIAL PRIMARY KEY,
     course_id INT NOT NULL,
     due_at TIMESTAMP NOT NULL DEFAULT current_TIMESTAMP,
@@ -103,7 +103,7 @@ CREATE TABLE course.video (
     FOREIGN KEY (course_id) REFERENCES course.course (id)
 );
 
-CREATE TABLE course.assignment (
+CREATE TABLE IF NOT EXISTS course.assignment (
     id SERIAL PRIMARY KEY,
     course_id INT NOT NULL,
     due_at TIMESTAMP NOT NULL DEFAULT current_TIMESTAMP,
@@ -113,7 +113,7 @@ CREATE TABLE course.assignment (
     FOREIGN KEY (course_id) REFERENCES course.course (id)
 );
 
-CREATE TABLE course.user_course_relation (
+CREATE TABLE IF NOT EXISTS course.user_course_relation (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
     course_id INT NOT NULL,
