@@ -1,0 +1,31 @@
+# docker-compose.yml
+version: '3.7'
+
+services:
+  db:
+    image: postgres:10-alpine
+    container_name: daitssu_postgres
+    hostname: daitssu_postgres
+    # 서비스 배포 및 실행 옵션
+    deploy:
+      # 조건을 만족하는 Node에서만 실행
+      placement:
+        constraints:
+          - node.role==manager
+    environment:
+      TZ: Asia/Seoul
+      POSTGRES_USER: daitssu
+      POSTGRES_PASSWORD: daitssu
+    # 컨테이너 상태 체크
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    volumes:
+      - daitssu_mysql_volume:/var/lib/postgresql/data
+      # - ./table.sql:/docker-entrypoint-initdb.d/init-database.sql
+
+# 도커 볼륨
+volumes:
+  daitssu_mysql_volume:
