@@ -1,3 +1,3 @@
 FROM openjdk:17
-COPY common/build/libs/common.jar /
+COPY build/libs/daitssu-api.jar /
 ENTRYPOINT ["java", "-Dspring.profiles.active=dev", "-jar","/common.jar"]
