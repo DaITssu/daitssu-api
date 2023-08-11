@@ -1,0 +1,47 @@
+# Common Module application.yml
+spring:
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+        default_batch_fetch_size: 100
+      jakarta:
+        persistence:
+          query:
+            timeout: 5000
+  servlet:
+    multipart:
+      # location: c:\\Temp\\upload
+      maxFileSize: 10MB
+      maxRequestSize: 10MB
+    hikari:
+      leak-detection-threshold: 20000
+  mvc:
+    log-request-details: true
+    log-resolved-exception: true
+logging:
+  pattern:
+    console: "\
+      %clr(%d{${LOG_DATEFORMAT_PATTERN}}){faint} \
+      %clr(${LOG_LEVEL_PATTERN:%5p}) \
+      %clr(${PID:- }){magenta} \
+      %clr(---){faint} \
+      %clr([%15.15t]){faint} \
+      %clr(%-40.40logger{39}){cyan} \
+      %clr(:){faint} \
+      %m${LOG_EXCEPTION_CONVERSION_WORD}%n"
+    dateformat: "yyyy-MM-dd HH:mm:ss.SSS"
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+  exception-conversion-word: "%replace(%wEx){'\n','\u2028'}%nopex"
+  level:
+    com:
+      example: TRACE
+    org:
+      springframework:
+        web:
+          filter:
+            CommonsRequestLoggingFilter: DEBUG
+      hibernate:
+        SQL: DEBUG
