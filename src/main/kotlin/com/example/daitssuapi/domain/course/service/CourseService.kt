@@ -1,23 +1,18 @@
 package com.example.daitssuapi.domain.course.service
 
+import com.example.daitssuapi.common.enums.ErrorCode
+import com.example.daitssuapi.common.enums.RegisterStatus
+import com.example.daitssuapi.common.exception.DefaultException
 import com.example.daitssuapi.domain.course.dto.request.AssignmentRequest
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
 import com.example.daitssuapi.domain.course.dto.request.CourseRequest
 import com.example.daitssuapi.domain.course.dto.request.VideoRequest
-import com.example.daitssuapi.domain.course.dto.response.AssignmentResponse
-import com.example.daitssuapi.domain.course.dto.response.CalendarResponse
-import com.example.daitssuapi.domain.course.dto.response.CourseResponse
-import com.example.daitssuapi.domain.course.dto.response.VideoResponse
+import com.example.daitssuapi.domain.course.dto.response.*
 import com.example.daitssuapi.domain.course.model.entity.Assignment
 import com.example.daitssuapi.domain.course.model.entity.Calendar
 import com.example.daitssuapi.domain.course.model.entity.Course
 import com.example.daitssuapi.domain.course.model.entity.Video
-import com.example.daitssuapi.domain.course.model.repository.AssignmentRepository
-import com.example.daitssuapi.domain.course.model.repository.CalendarRepository
-import com.example.daitssuapi.domain.course.model.repository.CourseRepository
-import com.example.daitssuapi.domain.course.model.repository.VideoRepository
-import com.example.daitssuapi.common.enums.ErrorCode
-import com.example.daitssuapi.common.exception.DefaultException
+import com.example.daitssuapi.domain.course.model.repository.*
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -31,6 +26,7 @@ class CourseService(
     private val courseRepository: CourseRepository,
     private val videoRepository: VideoRepository,
     private val calendarRepository: CalendarRepository,
+    private val userCourseRelationRepository: UserCourseRelationRepository
 ) {
     fun getCourseList(): List<CourseResponse> {
         val courses: List<Course> = courseRepository.findAll()
@@ -88,13 +84,7 @@ class CourseService(
         val endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59)
 
         return calendarRepository.findByDueAtBetween(startDateTime, endDateTime).groupBy(
-            { it.course }, {
-                CalendarResponse(
-                    it.type,
-                    it.dueAt,
-                    it.name
-                )
-            }
+            { it.course }, { CalendarResponse(it.type, it.dueAt, it.name) }
         )
 
     }
@@ -176,4 +166,15 @@ class CourseService(
 
         return CourseResponse(name = course.name, term = course.term)
     }
+
+    fun getUserCourse(userId: Long): List<UserCourseResponse> =
+        userCourseRelationRepository.findByUserIdOrderByCreatedAtDesc(userId = userId).filter {
+            RegisterStatus.ACTIVE == it.registerStatus
+        }.map {
+            UserCourseResponse(
+                name = it.course.name,
+                term = it.course.term,
+                updatedAt = it.course.updatedAt
+            )
+        }
 }
