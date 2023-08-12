@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.*
 class ArticleController(
     private val articleService: ArticleService
 ) {
-    @GetMapping("/{id}")
+    @GetMapping("/{articleId}")
     fun getArticle(
-        @PathVariable id: Long
+        @PathVariable articleId: Long
     ): Response<ArticleResponse>
-        = Response(data = articleService.getArticle(id))
+        = Response(data = articleService.getArticle(articleId))
 
     @PostMapping
     fun writeArticle(

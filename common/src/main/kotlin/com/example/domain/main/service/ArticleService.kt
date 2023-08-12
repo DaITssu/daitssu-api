@@ -22,7 +22,7 @@ class ArticleService(
     @Transactional
     fun getArticle(id: Long): ArticleResponse {
         val article: Article = articleRepository.findByIdOrNull(id)
-            ?: throw DefaultException(ErrorCode.BAD_REQUEST, HttpStatus.NOT_FOUND)
+            ?: throw DefaultException(ErrorCode.BAD_REQUEST)
 
         return ArticleResponse(
             id = article.id,
@@ -36,16 +36,15 @@ class ArticleService(
 
     @Transactional
     fun writeArticle(articlePostRequest: ArticlePostRequest): ArticleResponse {
-        if (articlePostRequest.nickname == null
-            || Topic[articlePostRequest.topic] == null) {
-            throw DefaultException(ErrorCode.BAD_REQUEST, HttpStatus.BAD_REQUEST)
+        if (articlePostRequest.nickname == null) {
+            throw DefaultException(ErrorCode.BAD_REQUEST)
         }
 
         val user: User = userRepository.findByNickname(articlePostRequest.nickname)
-            ?: throw DefaultException(ErrorCode.USER_NOT_FOUND, HttpStatus.BAD_REQUEST)
+            ?: throw DefaultException(ErrorCode.USER_NOT_FOUND)
 
         val article: Article = Article(
-            topic = Topic[articlePostRequest.topic]!!,
+            topic = articlePostRequest.topic,
             title = articlePostRequest.title,
             content = articlePostRequest.content,
             writer = user
