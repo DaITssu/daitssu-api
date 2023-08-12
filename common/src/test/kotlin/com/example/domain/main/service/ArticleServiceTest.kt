@@ -54,7 +54,7 @@ class ArticleServiceTest(
 
         // when
         val articlePostRequest = ArticlePostRequest(
-            topic = Topic.CHAT.value,
+            topic = Topic.CHAT,
             title = "테스트 제목",
             content = "테스트 내용",
             nickname = user.nickname!!
@@ -62,7 +62,7 @@ class ArticleServiceTest(
         val articleResponse = articleService.writeArticle(articlePostRequest)
 
         // then
-        assertEquals(articlePostRequest.topic, articleResponse.topic)
+        assertEquals(articlePostRequest.topic.value, articleResponse.topic)
         assertEquals(articlePostRequest.title, articleResponse.title)
         assertEquals(articlePostRequest.content, articleResponse.content)
         assertEquals(user.nickname, articleResponse.writerNickName)

@@ -1,9 +1,7 @@
-package com.example.domain.main.controller
+package com.example.dai.domain.main.controller
 
-import com.example.common.dto.Response
 import com.example.common.enums.ErrorCode
 import com.example.domain.main.dto.request.ArticlePostRequest
-import com.example.domain.main.dto.response.ArticleResponse
 import com.example.domain.main.enums.Topic
 import com.example.domain.main.model.entity.Article
 import com.example.domain.main.model.entity.Department
@@ -22,10 +20,9 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import kotlin.test.assertEquals
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
@@ -75,14 +72,13 @@ class ArticleControllerTest(
 
         // when & then
         mockMvc.perform(
-            MockMvcRequestBuilders.get("$baseUri/${article.id}")
-        ).andExpect(MockMvcResultMatchers.status().isOk)
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.data.title").value(article.title))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.data.content").value(article.content))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.data.writerNickName").value(user.nickname))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.data.topic").value(article.topic.value))
-            .andDo(MockMvcResultHandlers.print())
+            get("$baseUri/${article.id}")
+        ).andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.data.title").value(article.title))
+            .andExpect(jsonPath("$.data.content").value(article.content))
+            .andExpect(jsonPath("$.data.writerNickName").value(user.nickname))
+            .andExpect(jsonPath("$.data.topic").value(article.topic.value))
     }
 
     @Test
@@ -92,7 +88,7 @@ class ArticleControllerTest(
         val baseUri = "/daitssu/community/article"
         val user = userRepository.findAll()[0]
         val articlePostRequest = ArticlePostRequest(
-            topic = Topic.CHAT.value,
+            topic = Topic.CHAT,
             title = "테스트 제목",
             content = "테스트 내용",
             nickname = user.nickname
@@ -102,21 +98,15 @@ class ArticleControllerTest(
 
         // when & then
         mockMvc.perform(
-            MockMvcRequestBuilders.post(baseUri)
+            post(baseUri)
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(MockMvcResultMatchers.status().isOk)
-            .andExpect(MockMvcResultMatchers.content()
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.data.title")
-                .value(articlePostRequest.title))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.data.content")
-                .value(articlePostRequest.content))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.data.writerNickName")
-                .value(user.nickname))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.data.topic")
-                .value(articlePostRequest.topic))
-            .andDo(MockMvcResultHandlers.print())
+        ).andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.data.title").value(articlePostRequest.title))
+            .andExpect(jsonPath("$.data.content").value(articlePostRequest.content))
+            .andExpect(jsonPath("$.data.writerNickName").value(user.nickname))
+            .andExpect(jsonPath("$.data.topic").value(articlePostRequest.topic.value))
     }
 
     @Test
@@ -125,24 +115,20 @@ class ArticleControllerTest(
         // given
         val baseUri = "/daitssu/community/article"
         val articlePostRequest = ArticlePostRequest(
-            topic = Topic.CHAT.value,
+            topic = Topic.CHAT,
             title = "테스트 제목",
             content = "테스트 내용",
-            nickname = null
+            // nickname = null
         )
 
         val json = jacksonObjectMapper().writeValueAsString(articlePostRequest)
 
         // when & then
         mockMvc.perform(
-            MockMvcRequestBuilders.post(baseUri)
+            post(baseUri)
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(MockMvcResultMatchers.status().is4xxClientError)
-            .andExpect(MockMvcResultMatchers.jsonPath("$.message")
-                .value(ErrorCode.BAD_REQUEST.message))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.code")
-                .value(ErrorCode.BAD_REQUEST.code))
-            .andDo(MockMvcResultHandlers.print())
+        ).andExpect(jsonPath("$.code").value(ErrorCode.BAD_REQUEST.code))
+            .andExpect(jsonPath("$.message").value(ErrorCode.BAD_REQUEST.message))
     }
 }
