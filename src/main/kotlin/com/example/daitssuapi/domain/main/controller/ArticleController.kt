@@ -1,9 +1,9 @@
 package com.example.daitssuapi.domain.main.controller
 
 import com.example.daitssuapi.common.dto.Response
-import com.example.daitssuapi.domain.main.dto.request.ArticlePostRequest
 import com.example.daitssuapi.domain.main.dto.response.ArticleResponse
 import com.example.daitssuapi.domain.main.service.ArticleService
+import com.example.daitssuapi.domain.main.dto.request.ArticleWritingRequest
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -19,7 +19,7 @@ class ArticleController(
 
     @PostMapping
     fun writeArticle(
-        @RequestBody articlePostRequest: ArticlePostRequest
+        @RequestBody articleWritingRequest: ArticleWritingRequest
     ): Response<ArticleResponse>
-        = Response(data = articleService.writeArticle(articlePostRequest))
+        = Response(data = articleService.writeArticle(articleWritingRequest))
 }

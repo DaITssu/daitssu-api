@@ -1,7 +1,7 @@
 package com.example.dai.domain.main.controller
 
 import com.example.common.enums.ErrorCode
-import com.example.domain.main.dto.request.ArticlePostRequest
+import com.example.domain.main.dto.request.ArticleWritingRequest
 import com.example.domain.main.enums.Topic
 import com.example.domain.main.model.entity.Article
 import com.example.domain.main.model.entity.Department
@@ -87,14 +87,14 @@ class ArticleControllerTest(
         // given
         val baseUri = "/daitssu/community/article"
         val user = userRepository.findAll()[0]
-        val articlePostRequest = ArticlePostRequest(
+        val articleWritingRequest = ArticleWritingRequest(
             topic = Topic.CHAT,
             title = "테스트 제목",
             content = "테스트 내용",
             nickname = user.nickname
         )
 
-        val json = jacksonObjectMapper().writeValueAsString(articlePostRequest)
+        val json = jacksonObjectMapper().writeValueAsString(articleWritingRequest)
 
         // when & then
         mockMvc.perform(
@@ -103,10 +103,10 @@ class ArticleControllerTest(
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.data.title").value(articlePostRequest.title))
-            .andExpect(jsonPath("$.data.content").value(articlePostRequest.content))
+            .andExpect(jsonPath("$.data.title").value(articleWritingRequest.title))
+            .andExpect(jsonPath("$.data.content").value(articleWritingRequest.content))
             .andExpect(jsonPath("$.data.writerNickName").value(user.nickname))
-            .andExpect(jsonPath("$.data.topic").value(articlePostRequest.topic.value))
+            .andExpect(jsonPath("$.data.topic").value(articleWritingRequest.topic.value))
     }
 
     @Test
@@ -114,21 +114,21 @@ class ArticleControllerTest(
     fun article_post_nickname_null() {
         // given
         val baseUri = "/daitssu/community/article"
-        val articlePostRequest = ArticlePostRequest(
+        val articleWritingRequest = ArticleWritingRequest(
             topic = Topic.CHAT,
             title = "테스트 제목",
             content = "테스트 내용",
             // nickname = null
         )
 
-        val json = jacksonObjectMapper().writeValueAsString(articlePostRequest)
+        val json = jacksonObjectMapper().writeValueAsString(articleWritingRequest)
 
         // when & then
         mockMvc.perform(
             post(baseUri)
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(jsonPath("$.code").value(ErrorCode.BAD_REQUEST.code))
-            .andExpect(jsonPath("$.message").value(ErrorCode.BAD_REQUEST.message))
+        ).andExpect(jsonPath("$.code").value(ErrorCode.NO_NICKNAME.code))
+            .andExpect(jsonPath("$.message").value(ErrorCode.NO_NICKNAME.message))
     }
 }
