@@ -101,6 +101,7 @@ dependencies {
     testImplementation("org.springframework.batch", "spring-batch-test")
     testImplementation("org.springframework.graphql", "spring-graphql-test")
     testImplementation("org.springframework.security", "spring-security-test")
+    testImplementation("io.mockk", "mockk", "1.13.4")
 }
 
 tasks.withType<KotlinCompile> {
