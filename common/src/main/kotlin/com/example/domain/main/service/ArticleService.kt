@@ -1,13 +1,13 @@
-package com.example.daitssuapi.domain.main.service
+package com.example.domain.main.service
 
-import com.example.daitssuapi.common.enums.ErrorCode
-import com.example.daitssuapi.common.exception.DefaultException
-import com.example.daitssuapi.domain.main.dto.request.ArticleWritingRequest
-import com.example.daitssuapi.domain.main.dto.response.ArticleResponse
-import com.example.daitssuapi.domain.main.model.entity.Article
-import com.example.daitssuapi.domain.main.model.repository.ArticleRepository
-import com.example.daitssuapi.domain.main.model.entity.User
-import com.example.daitssuapi.domain.main.model.repository.UserRepository
+import com.example.common.enums.ErrorCode
+import com.example.common.exception.DefaultException
+import com.example.domain.main.dto.request.ArticleWritingRequest
+import com.example.domain.main.dto.response.ArticleResponse
+import com.example.domain.main.model.entity.Article
+import com.example.domain.main.model.repository.ArticleRepository
+import com.example.domain.main.model.entity.User
+import com.example.domain.main.model.repository.UserRepository
 import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service

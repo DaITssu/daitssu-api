@@ -1,4 +1,4 @@
-package com.example.dai.domain.main.controller
+package com.example.domain.main.controller
 
 import com.example.common.enums.ErrorCode
 import com.example.domain.main.dto.request.ArticleWritingRequest
@@ -128,7 +128,7 @@ class ArticleControllerTest(
             post(baseUri)
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(jsonPath("$.code").value(ErrorCode.NO_NICKNAME.code))
-            .andExpect(jsonPath("$.message").value(ErrorCode.NO_NICKNAME.message))
+        ).andExpect(jsonPath("$.code").value(ErrorCode.NICKNAME_REQUIRED.code))
+            .andExpect(jsonPath("$.message").value(ErrorCode.NICKNAME_REQUIRED.message))
     }
 }
