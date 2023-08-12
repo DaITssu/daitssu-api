@@ -5,10 +5,7 @@ import com.example.daitssuapi.domain.course.dto.request.AssignmentRequest
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
 import com.example.daitssuapi.domain.course.dto.request.CourseRequest
 import com.example.daitssuapi.domain.course.dto.request.VideoRequest
-import com.example.daitssuapi.domain.course.dto.response.AssignmentResponse
-import com.example.daitssuapi.domain.course.dto.response.CalendarResponse
-import com.example.daitssuapi.domain.course.dto.response.CourseResponse
-import com.example.daitssuapi.domain.course.dto.response.VideoResponse
+import com.example.daitssuapi.domain.course.dto.response.*
 import com.example.daitssuapi.domain.course.service.CourseService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -105,4 +102,10 @@ class CourseController(
         @RequestBody courseRequest: CourseRequest
     ): Response<CourseResponse> =
         Response(data = courseService.postCourse(courseRequest = courseRequest))
+
+    @GetMapping("/user/{userId}")
+    fun getUserCourse(
+        @PathVariable userId: Long
+    ): Response<List<UserCourseResponse>> =
+        Response(data = courseService.getUserCourse(userId = userId))
 }
