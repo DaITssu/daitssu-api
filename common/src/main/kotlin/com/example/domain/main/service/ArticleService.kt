@@ -2,16 +2,14 @@ package com.example.domain.main.service
 
 import com.example.common.enums.ErrorCode
 import com.example.common.exception.DefaultException
-import com.example.domain.main.dto.request.ArticlePostRequest
+import com.example.domain.main.dto.request.ArticleWritingRequest
 import com.example.domain.main.dto.response.ArticleResponse
-import com.example.domain.main.enums.Topic
 import com.example.domain.main.model.entity.Article
 import com.example.domain.main.model.repository.ArticleRepository
 import com.example.domain.main.model.entity.User
 import com.example.domain.main.model.repository.UserRepository
 import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 
 @Service
@@ -35,18 +33,18 @@ class ArticleService(
     }
 
     @Transactional
-    fun writeArticle(articlePostRequest: ArticlePostRequest): ArticleResponse {
-        if (articlePostRequest.nickname == null) {
-            throw DefaultException(ErrorCode.BAD_REQUEST)
+    fun writeArticle(articleWritingRequest: ArticleWritingRequest): ArticleResponse {
+        if (articleWritingRequest.nickname == null) {
+            throw DefaultException(ErrorCode.NO_NICKNAME)
         }
 
-        val user: User = userRepository.findByNickname(articlePostRequest.nickname)
+        val user: User = userRepository.findByNickname(articleWritingRequest.nickname)
             ?: throw DefaultException(ErrorCode.USER_NOT_FOUND)
 
         val article: Article = Article(
-            topic = articlePostRequest.topic,
-            title = articlePostRequest.title,
-            content = articlePostRequest.content,
+            topic = articleWritingRequest.topic,
+            title = articleWritingRequest.title,
+            content = articleWritingRequest.content,
             writer = user
         )
 

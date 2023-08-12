@@ -1,7 +1,7 @@
 package com.example.domain.main.controller
 
 import com.example.common.dto.Response
-import com.example.domain.main.dto.request.ArticlePostRequest
+import com.example.domain.main.dto.request.ArticleWritingRequest
 import com.example.domain.main.dto.response.ArticleResponse
 import com.example.domain.main.service.ArticleService
 import org.springframework.web.bind.annotation.*
@@ -19,7 +19,7 @@ class ArticleController(
 
     @PostMapping
     fun writeArticle(
-        @RequestBody articlePostRequest: ArticlePostRequest
+        @RequestBody articleWritingRequest: ArticleWritingRequest
     ): Response<ArticleResponse>
-        = Response(data = articleService.writeArticle(articlePostRequest))
+        = Response(data = articleService.writeArticle(articleWritingRequest))
 }
