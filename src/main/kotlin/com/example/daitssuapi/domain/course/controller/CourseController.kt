@@ -1,5 +1,6 @@
 package com.example.daitssuapi.domain.course.controller
 
+import com.example.daitssuapi.common.dto.Response
 import com.example.daitssuapi.domain.course.dto.request.AssignmentRequest
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
 import com.example.daitssuapi.domain.course.dto.request.CourseRequest
@@ -9,7 +10,6 @@ import com.example.daitssuapi.domain.course.dto.response.CalendarResponse
 import com.example.daitssuapi.domain.course.dto.response.CourseResponse
 import com.example.daitssuapi.domain.course.dto.response.VideoResponse
 import com.example.daitssuapi.domain.course.service.CourseService
-import com.example.daitssuapi.dto.Response
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -34,7 +34,6 @@ class CourseController(
     fun getCourseList(): Response<List<CourseResponse>> =
         Response(data = courseService.getCourseList())
 
-
     @Operation(
         summary = "강의 단일 조회",
         responses = [
@@ -46,7 +45,6 @@ class CourseController(
         @PathVariable courseId: Long
     ): Response<CourseResponse> =
         Response(data = courseService.getCourse(courseId = courseId))
-
 
     @Operation(
         summary = "월 단위로 일정 가져오기",
@@ -60,7 +58,6 @@ class CourseController(
     ): Response<Map<String, List<CalendarResponse>>> =
         Response(data = courseService.getCalendar(dateRequest = date))
 
-
     @Operation(
         summary = "일정 추가하기",
         responses = [
@@ -72,7 +69,6 @@ class CourseController(
         @RequestBody calendarRequest: CalendarRequest
     ): Response<CalendarResponse> =
         Response(data = courseService.postCalendar(calendarRequest = calendarRequest))
-
 
     @Operation(
         summary = "강의 추가하기",
@@ -86,7 +82,6 @@ class CourseController(
     ): Response<VideoResponse> =
         Response(data = courseService.postVideo(videoRequest))
 
-
     @Operation(
         summary = "과제 추가하기",
         responses = [
@@ -98,7 +93,6 @@ class CourseController(
         @RequestBody assignmentRequest: AssignmentRequest
     ): Response<AssignmentResponse> =
         Response(data = courseService.postAssignment(assignmentRequest = assignmentRequest))
-
 
     @Operation(
         summary = "과목 추가하기",

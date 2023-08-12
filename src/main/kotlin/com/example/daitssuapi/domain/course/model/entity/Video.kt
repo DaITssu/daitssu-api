@@ -1,6 +1,6 @@
 package com.example.daitssuapi.domain.course.model.entity
 
-import com.example.daitssuapi.audit.BaseEntity
+import com.example.daitssuapi.common.audit.BaseEntity
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
 import jakarta.persistence.JoinColumn

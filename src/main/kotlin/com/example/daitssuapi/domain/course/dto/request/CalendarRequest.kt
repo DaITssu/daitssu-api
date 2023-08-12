@@ -1,6 +1,6 @@
 package com.example.daitssuapi.domain.course.dto.request
 
-import com.example.daitssuapi.enums.CalendarType
+import com.example.daitssuapi.common.enums.CalendarType
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(name = "일정 추가 API Request Body")

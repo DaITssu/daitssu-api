@@ -1,3 +1,0 @@
-CREATE SCHEMA main;
-CREATE SCHEMA notice;
-CREATE SCHEMA course;

@@ -16,8 +16,8 @@ import com.example.daitssuapi.domain.course.model.repository.AssignmentRepositor
 import com.example.daitssuapi.domain.course.model.repository.CalendarRepository
 import com.example.daitssuapi.domain.course.model.repository.CourseRepository
 import com.example.daitssuapi.domain.course.model.repository.VideoRepository
-import com.example.daitssuapi.enums.ErrorCode
-import com.example.daitssuapi.exception.DefaultException
+import com.example.daitssuapi.common.enums.ErrorCode
+import com.example.daitssuapi.common.exception.DefaultException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
