@@ -1,7 +1,7 @@
 package com.example.domain.main.controller
 
 import com.example.common.dto.Response
-import com.example.domain.main.dto.request.ArticleWritingRequest
+import com.example.domain.main.dto.request.ArticleWriteRequest
 import com.example.domain.main.dto.response.ArticleResponse
 import com.example.domain.main.service.ArticleService
 import io.swagger.v3.oas.annotations.Operation
@@ -43,7 +43,7 @@ class ArticleController(
     )
     @PostMapping
     fun writeArticle(
-        @RequestBody articleWritingRequest: ArticleWritingRequest
+        @RequestBody articleWriteRequest: ArticleWriteRequest
     ): Response<ArticleResponse>
-        = Response(data = articleService.writeArticle(articleWritingRequest))
+        = Response(data = articleService.writeArticle(articleWriteRequest))
 }

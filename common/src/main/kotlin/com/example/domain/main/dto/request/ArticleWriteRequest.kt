@@ -4,7 +4,7 @@ import com.example.domain.main.enums.Topic
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "커뮤니티 게시글 작성 API request body")
-data class ArticleWritingRequest(
+data class ArticleWriteRequest(
     @Schema(
         description = "게시글 주제",
         allowableValues = ["CHAT", "INFORMATION", "QUESTION"]

@@ -2,7 +2,7 @@ package com.example.domain.main.service
 
 import com.example.common.enums.ErrorCode
 import com.example.common.exception.DefaultException
-import com.example.domain.main.dto.request.ArticleWritingRequest
+import com.example.domain.main.dto.request.ArticleWriteRequest
 import com.example.domain.main.dto.response.ArticleResponse
 import com.example.domain.main.model.entity.Article
 import com.example.domain.main.model.repository.ArticleRepository
@@ -33,18 +33,18 @@ class ArticleService(
     }
 
     @Transactional
-    fun writeArticle(articleWritingRequest: ArticleWritingRequest): ArticleResponse {
-        if (articleWritingRequest.nickname == null) {
+    fun writeArticle(articleWriteRequest: ArticleWriteRequest): ArticleResponse {
+        if (articleWriteRequest.nickname == null) {
             throw DefaultException(ErrorCode.NICKNAME_REQUIRED)
         }
 
-        val user: User = userRepository.findByNickname(articleWritingRequest.nickname)
+        val user: User = userRepository.findByNickname(articleWriteRequest.nickname)
             ?: throw DefaultException(ErrorCode.USER_NOT_FOUND)
 
         val article: Article = Article(
-            topic = articleWritingRequest.topic,
-            title = articleWritingRequest.title,
-            content = articleWritingRequest.content,
+            topic = articleWriteRequest.topic,
+            title = articleWriteRequest.title,
+            content = articleWriteRequest.content,
             writer = user
         )
 

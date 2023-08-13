@@ -1,6 +1,6 @@
 package com.example.domain.main.service
 
-import com.example.domain.main.dto.request.ArticleWritingRequest
+import com.example.domain.main.dto.request.ArticleWriteRequest
 import com.example.domain.main.dto.response.ArticleResponse
 import com.example.domain.main.enums.Topic
 import com.example.domain.main.model.entity.Article
@@ -53,18 +53,18 @@ class ArticleServiceTest(
         val user = userRepository.findAll()[0]
 
         // when
-        val articleWritingRequest = ArticleWritingRequest(
+        val articleWriteRequest = ArticleWriteRequest(
             topic = Topic.CHAT,
             title = "테스트 제목",
             content = "테스트 내용",
             nickname = user.nickname!!
         )
-        val articleResponse = articleService.writeArticle(articleWritingRequest)
+        val articleResponse = articleService.writeArticle(articleWriteRequest)
 
         // then
-        assertEquals(articleWritingRequest.topic.value, articleResponse.topic)
-        assertEquals(articleWritingRequest.title, articleResponse.title)
-        assertEquals(articleWritingRequest.content, articleResponse.content)
+        assertEquals(articleWriteRequest.topic.value, articleResponse.topic)
+        assertEquals(articleWriteRequest.title, articleResponse.title)
+        assertEquals(articleWriteRequest.content, articleResponse.content)
         assertEquals(user.nickname, articleResponse.writerNickName)
     }
 
