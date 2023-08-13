@@ -2,8 +2,8 @@ package com.example.daitssuapi.domain.main.controller
 
 import com.example.daitssuapi.common.dto.Response
 import com.example.daitssuapi.domain.main.dto.response.ArticleResponse
+import com.example.daitssuapi.domain.main.dto.request.ArticleWriteRequest
 import com.example.daitssuapi.domain.main.service.ArticleService
-import com.example.daitssuapi.domain.main.dto.request.ArticleWritingRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -43,7 +43,7 @@ class ArticleController(
     )
     @PostMapping
     fun writeArticle(
-        @RequestBody articleWritingRequest: ArticleWritingRequest
+        @RequestBody articleWriteRequest: ArticleWriteRequest
     ): Response<ArticleResponse>
-        = Response(data = articleService.writeArticle(articleWritingRequest))
+        = Response(data = articleService.writeArticle(articleWriteRequest))
 }
