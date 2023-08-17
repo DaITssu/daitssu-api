@@ -17,7 +17,6 @@ class ArticleService(
     private val articleRepository: ArticleRepository,
     private val userRepository: UserRepository
 ) {
-    @Transactional
     fun getArticle(id: Long): ArticleResponse {
         val article: Article = articleRepository.findByIdOrNull(id)
             ?: throw DefaultException(ErrorCode.ARTICLE_NOT_FOUND)
