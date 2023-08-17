@@ -8,6 +8,8 @@ private const val SERVER_NUMBERING = 4000
 enum class ErrorCode(val code: Int, val message: String) {
     USER_NOT_FOUND(MAIN_NUMBERING + 1, "유저를 찾을 수 없습니다"),
     DEPARTMENT_NOT_FOUND(MAIN_NUMBERING + 2, "학과를 찾을 수 없습니다"),
+    ARTICLE_NOT_FOUND(MAIN_NUMBERING + 3, "게시글을 찾을 수 없습니다."),
+    NICKNAME_REQUIRED(MAIN_NUMBERING + 4, "닉네임이 필요한 작업입니다."),
 
     COURSE_NOT_FOUND(COURSE_NUMBERING + 1, "과목을 찾을 수 없습니다."),
 
