@@ -14,10 +14,10 @@ import org.springframework.web.util.ContentCachingResponseWrapper
 @Component
 class RequestLoggingFilter : OncePerRequestFilter() {
     private val log: KLogger = KotlinLogging.logger {}
-    private val SWAGGER_URLS = listOf("/swagger", "/api-docs")
+    private val SWAGGER_URLS = listOf("swagger", "api-docs")
 
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
-        if (null != request.requestURI.find { request.requestURI.startsWith(it) }) {
+        if (SWAGGER_URLS.any { request.requestURI.contains(it) }) {
             filterChain.doFilter(request, response)
             return
         }
