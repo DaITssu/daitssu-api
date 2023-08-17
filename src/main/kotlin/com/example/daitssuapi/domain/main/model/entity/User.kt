@@ -1,7 +1,6 @@
 package com.example.daitssuapi.domain.main.model.entity
 
 import com.example.daitssuapi.common.audit.BaseEntity
-import com.example.daitssuapi.domain.main.model.entity.Department
 import jakarta.persistence.*
 
 @Entity
