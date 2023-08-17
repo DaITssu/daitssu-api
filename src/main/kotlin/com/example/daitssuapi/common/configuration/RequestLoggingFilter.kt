@@ -17,14 +17,11 @@ class RequestLoggingFilter : OncePerRequestFilter() {
     private val SWAGGER_URLS = listOf("/swagger", "/api-docs")
 
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
-<<<<<<< HEAD:src/main/kotlin/com/example/daitssuapi/common/configuration/RequestLoggingFilter.kt
         if (null != request.requestURI.find { request.requestURI.startsWith(it) }) {
             filterChain.doFilter(request, response)
             return
         }
 
-=======
->>>>>>> e3f44fc (fix: Topic enum 수정, ArticleControllerTest MockMvc 사용하여 수정):common/src/main/kotlin/com/example/common/configuration/RequestLoggingFilter.kt
         val wrappedRequest = ContentCachingRequestWrapper(request)
         log.info { makeRequestLog(wrappedRequest) }
 

@@ -1,21 +1,21 @@
-package com.example.domain.main.service
+package com.example.daitssuapi.domain.main.service
 
-import com.example.domain.main.dto.request.ArticleWriteRequest
-import com.example.domain.main.dto.response.ArticleResponse
-import com.example.domain.main.enums.Topic
-import com.example.domain.main.model.entity.Article
-import com.example.domain.main.model.entity.Department
-import com.example.domain.main.model.entity.User
-import com.example.domain.main.model.repository.ArticleRepository
-import com.example.domain.main.model.repository.DepartmentRepository
-import com.example.domain.main.model.repository.UserRepository
+import com.example.daitssuapi.domain.main.dto.request.ArticleWriteRequest
+import com.example.daitssuapi.domain.main.dto.response.ArticleResponse
+import com.example.daitssuapi.domain.main.enums.Topic
+import com.example.daitssuapi.domain.main.model.entity.Article
+import com.example.daitssuapi.domain.main.model.entity.Department
+import com.example.daitssuapi.domain.main.model.entity.User
+import com.example.daitssuapi.domain.main.model.repository.ArticleRepository
+import com.example.daitssuapi.domain.main.model.repository.DepartmentRepository
+import com.example.daitssuapi.domain.main.model.repository.UserRepository
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.TestConstructor
-import kotlin.test.assertEquals
 
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
