@@ -1,5 +1,7 @@
 package com.example.daitssuapi.common.configuration
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
@@ -23,65 +25,67 @@ class RequestLoggingFilter : OncePerRequestFilter() {
         }
 
         val wrappedRequest = ContentCachingRequestWrapper(request)
-        log.info { makeRequestLog(wrappedRequest) }
-
         val wrappedResponse = ContentCachingResponseWrapper(response)
+
         filterChain.doFilter(wrappedRequest, wrappedResponse)
 
-        log.info { makeResponseLog(wrappedResponse) }
+        val requestInfo = makeRequestInfo(wrappedRequest)
+        val responseInfo = makeResponseInfo(wrappedResponse)
+
+        log.info {
+            """
+            {
+                "request" : $requestInfo,
+                "response" : $responseInfo
+            }
+        """.trimIndent()
+        }
     }
 
-    private fun makeRequestLog(request: HttpServletRequest): String {
+    fun makeRequestInfo(request: ContentCachingRequestWrapper): String {
         val requestHeaders = request.headerNames.toList().associateWith {
             request.getHeader(it)
         }
-        val contentAsByteArray = (request as ContentCachingRequestWrapper).contentAsByteArray
-        val requestBody = if (contentAsByteArray.isNotEmpty()) String(contentAsByteArray) else ""
+        val requestBody = getBody(request.contentAsByteArray)
 
         return """
-             {
-                 "request" : {
-                     "uri" : "${request.requestURI}",
-                     "headers" : ${jacksonObjectMapper().writeValueAsString(requestHeaders)},
-                     "body" : "$requestBody"
-                 }
-             }
-         """.trimIndent()
+                {
+                    "client ip" : "${request.remoteAddr}",
+                    "uri" : "${request.requestURI}",
+                    "headers" : ${jacksonObjectMapper().writeValueAsString(requestHeaders)},
+                    "body" : $requestBody
+                }
+             """.trimIndent()
     }
 
-    private fun makeResponseLog(wrappedResponse: ContentCachingResponseWrapper): String {
-        val responseHeaders = wrappedResponse.headerNames.toList().associateWith {
-            wrappedResponse.getHeader(it)
+    fun makeResponseInfo(response: ContentCachingResponseWrapper): String {
+        val responseHeaders = response.headerNames.toList().associateWith {
+            response.getHeader(it)
         }
-        val responseBody = getResponseBody(wrappedResponse.contentAsByteArray)
-        wrappedResponse.copyBodyToResponse()
+        val responseBody = getBody(response.contentAsByteArray)
+        response.copyBodyToResponse()
 
         return """
-             {
-                 "response" : {
-                     "status" : "${wrappedResponse.status}",
+                 {
+                     "status" : "${response.status}",
                      "headers" : ${jacksonObjectMapper().writeValueAsString(responseHeaders)},
-                     "body" : "$responseBody"
+                     "body" : $responseBody
                  }
-             }
-         """.trimIndent()
+             """.trimIndent()
     }
 
-    private fun getResponseBody(responseBody: ByteArray): String {
-        if (responseBody.isEmpty()) {
-            return "Internal Error. responseBody is empty"
+    private fun getBody(body: ByteArray): String {
+        if (body.isEmpty()) {
+            return "{}"
         }
 
-        val filteredBody = listOf("code", "message", "data")
-        val readTree = jacksonObjectMapper().readTree(responseBody)
+        val readTree = jacksonObjectMapper().readTree(body)
+        val filteredJson: ObjectNode = jacksonObjectMapper().createObjectNode()
 
-        val jsonMap = filteredBody.associateWith {
-            when (val body = readTree.get(it).toString()) {
-                "\"\"" -> ""
-                "null" -> null
-                else -> body
-            }
+        readTree.fields().forEach { (key, value) ->
+            filteredJson.set<JsonNode>(key, value)
         }
-        return jacksonObjectMapper().writeValueAsString(jsonMap)
+
+        return jacksonObjectMapper().writeValueAsString(filteredJson)
     }
 }
