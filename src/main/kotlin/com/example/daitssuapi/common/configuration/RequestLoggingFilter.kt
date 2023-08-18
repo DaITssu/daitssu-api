@@ -24,31 +24,36 @@ class RequestLoggingFilter : OncePerRequestFilter() {
             return
         }
 
+        request.setAttribute("isLogged", false)
+
         val wrappedRequest = ContentCachingRequestWrapper(request)
         val wrappedResponse = ContentCachingResponseWrapper(response)
 
         filterChain.doFilter(wrappedRequest, wrappedResponse)
 
-        val requestInfo = makeRequestInfo(wrappedRequest)
-        val responseInfo = makeResponseInfo(wrappedResponse)
+        if (!(request.getAttribute("isLogged") as Boolean)) {
+            val requestInfo = makeRequestInfo(wrappedRequest)
+            val responseInfo = makeResponseInfo(wrappedResponse)
 
-        log.info {
-            """
-            {
-                "request" : $requestInfo,
-                "response" : $responseInfo
+            log.info {
+                """
+                    {
+                        "request" : $requestInfo,
+                        "response" : $responseInfo
+                    }
+                """.trimIndent()
             }
-        """.trimIndent()
         }
     }
 
-    fun makeRequestInfo(request: ContentCachingRequestWrapper): String {
-        val requestHeaders = request.headerNames.toList().associateWith {
-            request.getHeader(it)
-        }
-        val requestBody = getBody(request.contentAsByteArray)
+    companion object {
+        fun makeRequestInfo(request: ContentCachingRequestWrapper): String {
+            val requestHeaders = request.headerNames.toList().associateWith {
+                request.getHeader(it)
+            }
+            val requestBody = getBody(request.contentAsByteArray)
 
-        return """
+            return """
                 {
                     "client ip" : "${request.remoteAddr}",
                     "uri" : "${request.requestURI}",
@@ -56,36 +61,37 @@ class RequestLoggingFilter : OncePerRequestFilter() {
                     "body" : $requestBody
                 }
              """.trimIndent()
-    }
-
-    fun makeResponseInfo(response: ContentCachingResponseWrapper): String {
-        val responseHeaders = response.headerNames.toList().associateWith {
-            response.getHeader(it)
         }
-        val responseBody = getBody(response.contentAsByteArray)
-        response.copyBodyToResponse()
 
-        return """
+        fun makeResponseInfo(response: ContentCachingResponseWrapper): String {
+            val responseHeaders = response.headerNames.toList().associateWith {
+                response.getHeader(it)
+            }
+            val responseBody = getBody(response.contentAsByteArray)
+            response.copyBodyToResponse()
+
+            return """
                  {
                      "status" : "${response.status}",
                      "headers" : ${jacksonObjectMapper().writeValueAsString(responseHeaders)},
                      "body" : $responseBody
                  }
              """.trimIndent()
-    }
-
-    private fun getBody(body: ByteArray): String {
-        if (body.isEmpty()) {
-            return "{}"
         }
 
-        val readTree = jacksonObjectMapper().readTree(body)
-        val filteredJson: ObjectNode = jacksonObjectMapper().createObjectNode()
+        private fun getBody(body: ByteArray): String {
+            if (body.isEmpty()) {
+                return "{}"
+            }
 
-        readTree.fields().forEach { (key, value) ->
-            filteredJson.set<JsonNode>(key, value)
+            val readTree = jacksonObjectMapper().readTree(body)
+            val filteredJson: ObjectNode = jacksonObjectMapper().createObjectNode()
+
+            readTree.fields().forEach { (key, value) ->
+                filteredJson.set<JsonNode>(key, value)
+            }
+
+            return jacksonObjectMapper().writeValueAsString(filteredJson)
         }
-
-        return jacksonObjectMapper().writeValueAsString(filteredJson)
     }
 }
