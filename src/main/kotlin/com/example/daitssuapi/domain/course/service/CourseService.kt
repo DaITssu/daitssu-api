@@ -172,6 +172,7 @@ class CourseService(
             RegisterStatus.ACTIVE == it.registerStatus
         }.map {
             UserCourseResponse(
+                courseId = it.course.id,
                 name = it.course.name,
                 term = it.course.term,
                 updatedAt = it.course.updatedAt
