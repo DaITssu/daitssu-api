@@ -1,4 +1,4 @@
-package com.example.daitssuapi.common.configuration
+package com.example.daitssuapi.common.filter
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode

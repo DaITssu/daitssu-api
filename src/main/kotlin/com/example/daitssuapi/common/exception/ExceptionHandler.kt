@@ -1,6 +1,6 @@
 package com.example.daitssuapi.common.exception
 
-import com.example.daitssuapi.common.configuration.RequestLoggingFilter
+import com.example.daitssuapi.common.filter.RequestLoggingFilter
 import com.example.daitssuapi.common.dto.Response
 import jakarta.servlet.http.HttpServletRequest
 import mu.KLogger
