@@ -6,5 +6,5 @@ import org.springframework.http.HttpStatus
 open class BaseException(
     val errorCode: ErrorCode = ErrorCode.BAD_REQUEST,
     override val message: String = "",
-    val httpStatus: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR
+    val httpStatus: HttpStatus = HttpStatus.BAD_REQUEST
 ) : Exception()
