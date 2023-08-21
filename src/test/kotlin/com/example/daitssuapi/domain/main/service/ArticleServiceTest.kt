@@ -34,7 +34,8 @@ class ArticleServiceTest(
             studentId = 20221111,
             name = "홍길동",
             nickname = "의적",
-            department = department
+            department = department,
+            term = 1
         )
         userRepository.save(user)
     }
