@@ -31,6 +31,7 @@ class RequestLoggingFilter : OncePerRequestFilter() {
 
         filterChain.doFilter(wrappedRequest, wrappedResponse)
 
+        wrappedResponse.copyBodyToResponse()
         if (!(request.getAttribute("isLogged") as Boolean)) {
             val requestInfo = makeRequestInfo(wrappedRequest)
             val responseInfo = makeResponseInfo(wrappedResponse)

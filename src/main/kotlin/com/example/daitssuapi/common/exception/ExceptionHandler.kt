@@ -31,7 +31,7 @@ class ExceptionHandler() {
                     """
                         {
                             "request" : $requestInfo,
-                            "code" : "${exception.errorCode}",
+                            "code" : "${exception.errorCode.code}",
                             "message" : "${exception.errorCode.message}",
                             "status" : "$httpStatus"
                         }

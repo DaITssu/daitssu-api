@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/daitssu/community/article")
+@RequestMapping("/community/article")
 @Tag(name = "article", description = "커뮤니티 게시글 API")
 class ArticleController(
     private val articleService: ArticleService
