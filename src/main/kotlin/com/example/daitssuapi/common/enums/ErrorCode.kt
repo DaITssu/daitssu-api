@@ -12,6 +12,7 @@ enum class ErrorCode(val code: Int, val message: String) {
     NICKNAME_REQUIRED(MAIN_NUMBERING + 4, "닉네임이 필요한 작업입니다."),
 
     COURSE_NOT_FOUND(COURSE_NUMBERING + 1, "과목을 찾을 수 없습니다."),
+    USER_COURSE_RELATION_NOT_FOUND(COURSE_NUMBERING + 2, "유저가 수강중인 강의를 찾을 수 없습니다."),
 
     BAD_REQUEST(SERVER_NUMBERING + 1, "잘못된 요청입니다."),
     INVALID_FORMAT(SERVER_NUMBERING + 2, "잘못된 형식입니다."),

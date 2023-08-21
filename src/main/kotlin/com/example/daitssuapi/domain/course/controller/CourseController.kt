@@ -5,10 +5,7 @@ import com.example.daitssuapi.domain.course.dto.request.AssignmentRequest
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
 import com.example.daitssuapi.domain.course.dto.request.CourseRequest
 import com.example.daitssuapi.domain.course.dto.request.VideoRequest
-import com.example.daitssuapi.domain.course.dto.response.AssignmentResponse
-import com.example.daitssuapi.domain.course.dto.response.CalendarResponse
-import com.example.daitssuapi.domain.course.dto.response.CourseResponse
-import com.example.daitssuapi.domain.course.dto.response.VideoResponse
+import com.example.daitssuapi.domain.course.dto.response.*
 import com.example.daitssuapi.domain.course.service.CourseService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -105,4 +102,11 @@ class CourseController(
         @RequestBody courseRequest: CourseRequest
     ): Response<CourseResponse> =
         Response(data = courseService.postCourse(courseRequest = courseRequest))
+
+    //TODO : 유저 토큰 기능 구현 후 토큰에서 userId 가져오도록 변경
+    @GetMapping("/user/{userId}")
+    fun getUserCourse(
+        @PathVariable userId: Long
+    ): Response<List<UserCourseResponse>> =
+        Response(data = courseService.getUserCourses(userId = userId))
 }
