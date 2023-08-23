@@ -1,4 +1,4 @@
-package com.example.daitssuapi.domain.main.controller
+package com.example.daitssuapi.domain.course.controller
 
 import com.example.daitssuapi.domain.course.model.repository.UserCourseRelationRepository
 import com.example.daitssuapi.utils.ControllerTest
