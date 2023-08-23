@@ -2,6 +2,7 @@ package com.example.daitssuapi.domain.course.service
 
 import com.example.daitssuapi.common.enums.RegisterStatus
 import com.example.daitssuapi.domain.course.model.repository.UserCourseRelationRepository
+import com.example.daitssuapi.domain.main.model.repository.UserRepository
 import com.example.daitssuapi.utils.IntegrationTest
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Assertions.*
@@ -11,7 +12,7 @@ import org.junit.jupiter.api.Test
 @IntegrationTest
 class CourseServiceTest(
     private val courseService: CourseService,
-    private val userRepository: UserCourseRelationRepository,
+    private val userRepository: UserRepository,
     private val userCourseRelationRepository: UserCourseRelationRepository
 ) {
     @Test
