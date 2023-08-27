@@ -4,59 +4,27 @@ import com.example.daitssuapi.common.enums.ErrorCode
 import com.example.daitssuapi.domain.main.dto.request.ArticleWriteRequest
 import com.example.daitssuapi.domain.main.enums.Topic
 import com.example.daitssuapi.domain.main.model.entity.Article
-import com.example.daitssuapi.domain.main.model.entity.Department
-import com.example.daitssuapi.domain.main.model.entity.User
 import com.example.daitssuapi.domain.main.model.repository.ArticleRepository
-import com.example.daitssuapi.domain.main.model.repository.DepartmentRepository
 import com.example.daitssuapi.domain.main.model.repository.UserRepository
+import com.example.daitssuapi.utils.ControllerTest
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
-@SpringBootTest
-@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-@AutoConfigureMockMvc
+@ControllerTest
 class ArticleControllerTest(
     private val articleRepository: ArticleRepository,
-    private val userRepository: UserRepository,
-    private val departmentRepository: DepartmentRepository
+    private val userRepository: UserRepository
 ) {
     @Autowired
     private lateinit var mockMvc: MockMvc
-
-    @BeforeEach
-    fun setUser() {
-        val department = Department(name = "xx학부")
-        departmentRepository.save(department)
-
-        val user = User(
-            studentId = 20221111,
-            name = "홍길동",
-            nickname = "의적",
-            department = department,
-            term = 1
-        )
-        userRepository.save(user)
-    }
-
-    @AfterEach
-    fun deleteDB() {
-        articleRepository.deleteAll()
-        userRepository.deleteAll()
-        departmentRepository.deleteAll()
-    }
 
     @Test
     @DisplayName("article get controller test")
