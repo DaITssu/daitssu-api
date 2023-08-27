@@ -1,7 +1,7 @@
-DELETE FROM main.department;
-DELETE FROM main.users;
-DELETE FROM course.course;
 DELETE FROM course.user_course_relation;
+DELETE FROM course.course;
+DELETE FROM main.users;
+DELETE FROM main.department;
 
 INSERT INTO main.department(id, name) VALUES
     (1, 'computer'),
