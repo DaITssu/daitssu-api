@@ -21,7 +21,7 @@ class ArticleServiceTest(
     @DisplayName("article 생성 테스트")
     fun article_generation_test() {
         // given
-        val user = userRepository.findAll()[0]
+        val user = userRepository.findAll().filter { null != it.nickname }[0]
 
         // when
         val articleWriteRequest = ArticleWriteRequest(
@@ -43,7 +43,7 @@ class ArticleServiceTest(
     @DisplayName("article 조회 테스트")
     fun article_find_test() {
         // given
-        val user = userRepository.findAll()[0]
+        val user = userRepository.findAll().filter { null != it.nickname }[0]
         val article = Article(
             topic = Topic.CHAT,
             title = "테스트 제목",

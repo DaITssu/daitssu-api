@@ -31,25 +31,24 @@ class ArticleControllerTest(
     fun article_get_controller_test() {
         // given
         val baseUri = "/community/article"
-        val user = userRepository.findAll()[0]
-        val article: Article = Article(
+        val user = userRepository.findAll().filter { null != it.nickname }[0]
+        val savedArticle = articleRepository.save(Article(
             topic = Topic.CHAT,
             title = "테스트 제목",
             content = "테스트 내용",
             writer = user
-        )
-        val savedArticle = articleRepository.save(article)
+        ))
 
         // when & then
         mockMvc.perform(
-            get("$baseUri/${article.id}")
+            get("$baseUri/${savedArticle.id}")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer test")
         ).andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.data.title").value(article.title))
-            .andExpect(jsonPath("$.data.content").value(article.content))
+            .andExpect(jsonPath("$.data.title").value(savedArticle.title))
+            .andExpect(jsonPath("$.data.content").value(savedArticle.content))
             .andExpect(jsonPath("$.data.writerNickName").value(user.nickname))
-            .andExpect(jsonPath("$.data.topic").value(article.topic.value))
+            .andExpect(jsonPath("$.data.topic").value(savedArticle.topic.value))
     }
 
     @Test
@@ -57,7 +56,7 @@ class ArticleControllerTest(
     fun article_post_controller_success() {
         // given
         val baseUri = "/community/article"
-        val user = userRepository.findAll()[0]
+        val user = userRepository.findAll().filter { null != it.nickname }[0]
         val articleWriteRequest = ArticleWriteRequest(
             topic = Topic.CHAT,
             title = "테스트 제목",

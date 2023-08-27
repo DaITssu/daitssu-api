@@ -18,12 +18,12 @@ class CourseServiceTest(
     @Test
     @DisplayName("성공_올바른 userId를 이용하여 과목 조회 시_1개 이상의 과목이 조회될 수 있다")
     fun success_get_course_with_user_id() {
-        userRepository.findAll().forEach { user ->
-            val courses = userCourseRelationRepository.findByUserIdOrderByCreatedAtDesc(userId = user.id).filter {
+        userCourseRelationRepository.findAll().map { it.user.id }.forEach { userId ->
+            val courses = userCourseRelationRepository.findByUserIdOrderByCreatedAtDesc(userId = userId).filter {
                 RegisterStatus.ACTIVE == it.registerStatus
             }
 
-            val findCourses = courseService.getUserCourses(userId = user.id)
+            val findCourses = courseService.getUserCourses(userId = userId)
 
             assertAll(
                 { assertThat(findCourses).isNotEmpty },

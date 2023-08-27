@@ -161,22 +161,12 @@ class CourseService(
         return CourseResponse(name = course.name, term = course.term)
     }
 
-//    fun getUserCourses(userId: Long): List<UserCourseResponse> =
-//        userCourseRelationRepository.findByUserIdOrderByCreatedAtDesc(userId = userId).filter {
-//            RegisterStatus.ACTIVE == it.registerStatus
-//        }.map {
-//            UserCourseResponse(
-//                courseId = it.course.id,
-//                name = it.course.name,
-//                term = it.course.term,
-//                updatedAt = it.course.updatedAt
-//            )
-//        }
-
-    fun getUserCourses(userId: Long): List<UserCourseResponse> =
-        userCourseRelationRepository.findByUserIdOrderByCreatedAtDesc(userId = userId).filter {
+    fun getUserCourses(userId: Long): List<UserCourseResponse> {
+        val findByUserIdOrderByCreatedAtDesc = userCourseRelationRepository.findByUserIdOrderByCreatedAtDesc(userId = userId)
+        val filter = findByUserIdOrderByCreatedAtDesc.filter {
             RegisterStatus.ACTIVE == it.registerStatus
-        }.map {
+        }
+        return filter.map {
             UserCourseResponse(
                 courseId = it.course.id,
                 name = it.course.name,
@@ -184,4 +174,5 @@ class CourseService(
                 updatedAt = it.course.updatedAt
             )
         }
+    }
 }

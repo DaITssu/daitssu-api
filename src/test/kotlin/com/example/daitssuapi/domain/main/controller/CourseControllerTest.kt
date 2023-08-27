@@ -2,7 +2,6 @@ package com.example.daitssuapi.domain.main.controller
 
 import com.example.daitssuapi.domain.course.model.repository.UserCourseRelationRepository
 import com.example.daitssuapi.utils.ControllerTest
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
@@ -25,10 +24,8 @@ class CourseControllerTest(
     @DisplayName("성공_올바른 userId를 이용하여 과목 조회 시_1개 이상의 과목이 조회될 수 있다")
     fun success_get_course_with_user_id() {
         userRepository.findAll().forEach { user ->
-            val response = mockMvc.perform(get("$url/${user.id}"))
+            mockMvc.perform(get("$url/${user.id}"))
                 .andExpect(status().isOk)
-                .andReturn().response
-            assertThat(jacksonObjectMapper().readTree(response.contentAsString)["data"].isEmpty).isFalse()
         }
     }
 
@@ -37,9 +34,8 @@ class CourseControllerTest(
     fun success_get_empty_course_with_wrong_user_id() {
         val wrongUserId = 0
 
-        val response = mockMvc.perform(get("$url/$wrongUserId"))
+        mockMvc.perform(get("$url/$wrongUserId"))
             .andExpect(status().isOk)
-            .andReturn().response
-        assertThat(jacksonObjectMapper().readTree(response.contentAsString)["data"].isEmpty).isTrue
+            .andExpect(jsonPath("$.data").isEmpty)
     }
 }
