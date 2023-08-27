@@ -99,6 +99,7 @@ CREATE TABLE IF NOT EXISTS course.video (
     course_id INT NOT NULL,
     due_at TIMESTAMP NOT NULL DEFAULT current_TIMESTAMP,
     start_at TIMESTAMP NOT NULL DEFAULT current_TIMESTAMP,
+    name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT current_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT current_TIMESTAMP,
     FOREIGN KEY (course_id) REFERENCES course.course (id)
@@ -109,6 +110,7 @@ CREATE TABLE IF NOT EXISTS course.assignment (
     course_id INT NOT NULL,
     due_at TIMESTAMP NOT NULL DEFAULT current_TIMESTAMP,
     start_at TIMESTAMP NOT NULL DEFAULT current_TIMESTAMP,
+    name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT current_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT current_TIMESTAMP,
     FOREIGN KEY (course_id) REFERENCES course.course (id)
@@ -123,4 +125,14 @@ CREATE TABLE IF NOT EXISTS course.user_course_relation (
     updated_at TIMESTAMP NOT NULL DEFAULT current_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES main.users (id),
     FOREIGN KEY (course_id) REFERENCES course.course (id)
+);
+
+CREATE TABLE IF NOT EXISTS course.calendar (
+    id SERIAL PRIMARY KEY,
+    type VARCHAR(32) NOT NULL,
+    course VARCHAR(32) NOT NULL,
+    due_at TIMESTAMP NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT current_timestamp,
+    updated_at TIMESTAMP NOT NULL DEFAULT current_timestamp
 );
