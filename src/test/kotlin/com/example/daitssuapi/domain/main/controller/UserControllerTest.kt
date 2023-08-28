@@ -1,8 +1,7 @@
 package com.example.daitssuapi.domain.main.controller
 
-import com.example.daitssuapi.domain.course.model.repository.UserCourseRelationRepository
+import com.example.daitssuapi.domain.main.model.repository.UserRepository
 import com.example.daitssuapi.utils.ControllerTest
-import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -12,30 +11,30 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @ControllerTest
-class CourseControllerTest(
-    private val userRepository: UserCourseRelationRepository
+class UserControllerTest(
+    private val userRepository: UserRepository
 ) {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
-    private val url = "/course/user"
+    private val url = "/user"
 
     @Test
-    @DisplayName("성공_올바른 userId를 이용하여 과목 조회 시_1개 이상의 과목이 조회될 수 있다")
+    @DisplayName("성공_올바른 userId를 이용하여 유저 조회 시_유저가 조회된다")
     fun success_get_course_with_user_id() {
-        userRepository.findAll().forEach { user ->
+        userRepository.findAll().filter { null != it.nickname }.forEach { user ->
             mockMvc.perform(get("$url/${user.id}"))
                 .andExpect(status().isOk)
         }
     }
 
     @Test
-    @DisplayName("성공_잘못된 userId를 이용하여 과목 조회 시_빈 List를 받는다")
+    @DisplayName("실패_잘못된 userId를 이용하여 유저 조회 시_404를 받는다")
     fun success_get_empty_course_with_wrong_user_id() {
         val wrongUserId = 0
 
         mockMvc.perform(get("$url/$wrongUserId"))
-            .andExpect(status().isOk)
+            .andExpect(status().isNotFound)
             .andExpect(jsonPath("$.data").isEmpty)
     }
 }
