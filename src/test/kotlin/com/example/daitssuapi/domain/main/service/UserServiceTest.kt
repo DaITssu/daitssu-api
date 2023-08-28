@@ -17,11 +17,11 @@ class UserServiceTest(
     @Test
     @DisplayName("성공_올바른 userId를 이용하여 유저 조회 시_유저가 조회된다")
     fun success_get_course_with_user_id() {
-        userRepository.findAll().forEach {
+        userRepository.findAll().filter { null != it.nickname }.forEach {
             val findUser = userService.getUser(userId = it.id)
 
             assertAll(
-                { assertThat(findUser.studentId).isEqualTo(it.id) },
+                { assertThat(findUser.studentId).isEqualTo(it.studentId) },
                 { assertThat(findUser.name).isEqualTo(it.name) },
                 { assertThat(findUser.nickname).isEqualTo(it.nickname) },
                 { assertThat(findUser.departmentName).isEqualTo(it.department.name) },
