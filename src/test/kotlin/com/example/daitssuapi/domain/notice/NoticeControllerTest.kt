@@ -71,7 +71,7 @@ class NoticeControllerTest {
     @WithMockUser
     @DisplayName("Notice 페이징 확인")
     fun getNoticePage(){
-        val result = mockMvc.get("/notice/1")
+        val result = mockMvc.get("/notice/page/1")
             .andExpect {
                 status { isOk() }
 
