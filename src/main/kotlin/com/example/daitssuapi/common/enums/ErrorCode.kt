@@ -11,6 +11,10 @@ enum class ErrorCode(val code: Int, val message: String) {
     ARTICLE_NOT_FOUND(MAIN_NUMBERING + 3, "게시글을 찾을 수 없습니다."),
     NICKNAME_REQUIRED(MAIN_NUMBERING + 4, "닉네임이 필요한 작업입니다."),
     USER_NICKNAME_MISSING(MAIN_NUMBERING + 5, "유저의 닉네임이 없습니다"),
+    PASSWORD_INCORRECT(MAIN_NUMBERING + 6, "패스워드가 일치하지 않습니다."),
+    USER_ALREADY_EXISTS(MAIN_NUMBERING + 7, "이미 존재하는 유저입니다."),
+    REFRESH_TOKEN_NOT_FOUND(MAIN_NUMBERING + 8, "토큰을 리프레시 할 수 없습니다."),
+    TOKEN_INVALID(MAIN_NUMBERING + 9, "유효하지 않은 토큰입니다."),
 
     COURSE_NOT_FOUND(COURSE_NUMBERING + 1, "과목을 찾을 수 없습니다."),
     USER_COURSE_RELATION_NOT_FOUND(COURSE_NUMBERING + 2, "유저가 수강중인 강의를 찾을 수 없습니다."),
