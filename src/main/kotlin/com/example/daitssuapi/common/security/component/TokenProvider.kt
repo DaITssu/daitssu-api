@@ -15,8 +15,10 @@ class TokenProvider(
 ) {
     private fun createToken(
         id: Long,
-        expiredIn: Long,
+        tokenValidMilSecond: Long,
     ): AuthTokenDto {
+        val expiredIn = Date().time + tokenValidMilSecond
+
         val token = JWT.create()
             .withClaim("userId", id)
             .withClaim("userRole", "STUDENT")   // TODO: 추후 개발 요소: UserRole
@@ -27,7 +29,7 @@ class TokenProvider(
 
         return AuthTokenDto(
             token = token,
-            expiredIn = expiredIn,
+            expiredIn = tokenValidMilSecond,
         )
     }
 

@@ -1,3 +1,9 @@
+app:
+  jwt:
+    accessTokenValidMS: 3600000
+    refreshTokenValidMS: 604800000
+    secret: ${APP_JWT_SECRET}
+
 spring:
   jpa:
     properties:
@@ -10,6 +16,12 @@ spring:
         persistence:
           query:
             timeout: 5000
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://daitssu-postgres.ccf8zpssvvpc.ap-northeast-2.rds.amazonaws.com/dev_daitssu
+    username: dev_user_hope_it_is_last
+    password: NO!YU#CHUL(PL@EA%SE.ADMIN_N$O$T
 
   servlet:
     multipart:

@@ -24,7 +24,13 @@ class CourseServiceUnitTest {
     private val calendarRepository: CalendarRepository = mockk(relaxed = true)
     private val userCourseRelationRepository: UserCourseRelationRepository = mockk(relaxed = true)
     private val courseService: CourseService = spyk(
-        objToCopy = CourseService(assignmentRepository, courseRepository, videoRepository, calendarRepository, userCourseRelationRepository),
+        objToCopy = CourseService(
+            assignmentRepository,
+            courseRepository,
+            videoRepository,
+            calendarRepository,
+            userCourseRelationRepository
+        ),
         recordPrivateCalls = true
     )
 
@@ -32,9 +38,25 @@ class CourseServiceUnitTest {
     @DisplayName("성공_올바른 userId를 이용하여 과목 조회 시_1개 이상의 과목이 조회될 수 있다")
     fun success_get_course_with_user_id() {
         val department = Department("computer")
-        val user = User(studentId = 20230803, name = "user", department = department, term = 1)
+        val user = User(
+            studentId = "20230803",
+            name = "user",
+            department = department,
+            term = 1,
+            password = "",
+            refreshToken = "",
+            ssuToken = ""
+        )
         val course = Course("eat anything", 16)
-        every { userCourseRelationRepository.findByUserIdOrderByCreatedAtDesc(any()) }.returns(listOf(UserCourseRelation(user, course, RegisterStatus.ACTIVE)))
+        every { userCourseRelationRepository.findByUserIdOrderByCreatedAtDesc(any()) }.returns(
+            listOf(
+                UserCourseRelation(
+                    user,
+                    course,
+                    RegisterStatus.ACTIVE
+                )
+            )
+        )
 
         val findCourses = courseService.getUserCourses(userId = user.id)
 

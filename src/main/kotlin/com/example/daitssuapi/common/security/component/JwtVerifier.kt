@@ -15,8 +15,6 @@ class JwtVerifier(
     private val tokenAlgorithm: Algorithm,
     @Value("\${spring.profiles.active}") private val profile: String
 ) {
-    private val alwaysAllowProfiles = listOf("dev", "local")
-
     val tokenVerifier: JWTVerifier = JWT
         .require(tokenAlgorithm)
         .withClaimPresence("userId")

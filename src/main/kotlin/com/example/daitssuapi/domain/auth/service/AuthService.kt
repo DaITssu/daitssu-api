@@ -2,7 +2,6 @@ package com.example.daitssuapi.domain.auth.service
 
 import com.example.daitssuapi.common.enums.ErrorCode
 import com.example.daitssuapi.common.exception.DefaultException
-import com.example.daitssuapi.common.security.component.CustomPasswordEncoder
 import com.example.daitssuapi.common.security.component.TokenProvider
 import com.example.daitssuapi.domain.auth.controller.response.AuthResponse
 import com.example.daitssuapi.domain.main.model.entity.User
@@ -10,6 +9,7 @@ import com.example.daitssuapi.domain.main.model.repository.DepartmentRepository
 import com.example.daitssuapi.domain.main.model.repository.UserRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -18,7 +18,7 @@ class AuthService(
     private val tokenProvider: TokenProvider,
     private val userRepository: UserRepository,
     private val departmentRepository: DepartmentRepository,
-    private val passwordEncoder: CustomPasswordEncoder,
+    private val passwordEncoder: PasswordEncoder,
 ) {
     @Transactional
     fun signIn(
@@ -30,7 +30,7 @@ class AuthService(
             studentId = studentId,
         ) ?: throw DefaultException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND)
 
-        if (!passwordEncoder.matches(rawPassword = password, encodedPassword = user.password))
+        if (!passwordEncoder.matches(password, user.password))
             throw DefaultException(ErrorCode.PASSWORD_INCORRECT, HttpStatus.BAD_REQUEST)
 
         // TODO: 람다 스캠 로그인 검증 or exception(비밀번호 오류 혹은 변경) -> 비밀번호가 변경 됐다면 비밀번호 재설정 요청
@@ -58,7 +58,7 @@ class AuthService(
         val department = departmentRepository.findByIdOrNull(departmentId)
             ?: throw DefaultException(ErrorCode.DEPARTMENT_NOT_FOUND)
 
-        val encryptedPassword = passwordEncoder.encode(rawPassword = password)
+        val encryptedPassword = passwordEncoder.encode(password)
 
         var user = userRepository.findByStudentId(
             studentId = studentId,
@@ -122,7 +122,7 @@ class AuthService(
         val user = userRepository.findByIdOrNull(userId)
             ?: throw DefaultException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND)
 
-        if (!passwordEncoder.matches(rawPassword = previousPassword, encodedPassword = user.password))
+        if (!passwordEncoder.matches(previousPassword, user.password))
             throw DefaultException(ErrorCode.PASSWORD_INCORRECT, HttpStatus.BAD_REQUEST)
 
         // TODO: 스캠 로그인 람다 호출 및 토큰 발급 or exception(비밀번호 오류)
@@ -130,7 +130,7 @@ class AuthService(
         val accessToken = tokenProvider.createAccessToken(user.id)
         val refreshToken = tokenProvider.createRefreshToken(user.id)
 
-        user.password = passwordEncoder.encode(rawPassword = newPassword)
+        user.password = passwordEncoder.encode(newPassword)
         user.refreshToken = refreshToken.token
 
         return AuthResponse(
