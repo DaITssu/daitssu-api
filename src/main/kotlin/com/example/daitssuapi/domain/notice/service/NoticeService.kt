@@ -15,14 +15,14 @@ class NoticeService (
     fun getNoticeList(
         category: String
     ):List<NoticeResponse> {
-        if(category == "전체"){
-            val notices :List<Notice> = noticeRepository.findAll()
-            return notices.map { NoticeResponse.fromNotice(it) }
-        }else{
-            val notices :List<Notice> = noticeRepository.findByCategory(category)
-            return notices.map { NoticeResponse.fromNotice(it) }
-        }
+        val notices:List<Notice>
 
+        if(category == "전체")
+            notices= noticeRepository.findAll()
+        else
+            notices = noticeRepository.findByCategory(category)
+
+        return notices.map { NoticeResponse.fromNotice(it) }
 
     }
     fun getNoticePage(
