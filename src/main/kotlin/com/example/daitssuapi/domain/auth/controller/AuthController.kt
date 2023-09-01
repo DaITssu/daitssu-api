@@ -2,7 +2,6 @@ package com.example.daitssuapi.domain.auth.controller
 
 import com.example.daitssuapi.common.dto.Response
 import com.example.daitssuapi.common.security.component.ArgumentResolver
-import com.example.daitssuapi.domain.auth.controller.request.ChangePasswordRequest
 import com.example.daitssuapi.domain.auth.controller.request.SignInRequest
 import com.example.daitssuapi.domain.auth.controller.request.SignUpRequest
 import com.example.daitssuapi.domain.auth.controller.response.AuthResponse
@@ -58,30 +57,25 @@ class AuthController(
         return Response(
             data = authService.signIn(
                 studentId = signInRequest.studentId,
-                password = signInRequest.password,
             )
         )
     }
 
     @Operation(
-        summary = "비밀번호 변경",
-        description = "비밀번호 변경 API입니다. 이 API는 비밀번호 분실이 아닌 스마트캠퍼스 비밀번호의 변경 시 사용됩니다.",
+        summary = "토큰 리프레쉬",
+        description = "토큰 리프레쉬 API입니다.",
         responses = [
             ApiResponse(responseCode = "200", description = "OK"),
         ],
     )
-    @PatchMapping("/change-password")
-    fun changePassword(
+    @PostMapping("/refresh")
+    fun signIn(
         @RequestBody
-        changePasswordRequest: ChangePasswordRequest
+        refreshToken: String,
     ): Response<AuthResponse> {
-        val userId = argumentResolver.resolveUserId()
-
         return Response(
-            data = authService.changePassword(
-                userId = userId,
-                previousPassword = changePasswordRequest.previousPassword,
-                newPassword = changePasswordRequest.newPassword,
+            data = authService.refresh(
+                refreshToken = refreshToken,
             )
         )
     }

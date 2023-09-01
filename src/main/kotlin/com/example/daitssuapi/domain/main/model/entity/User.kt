@@ -19,9 +19,7 @@ class User(
     var imageUrl: String? = null,
 
     var term: Int,
-
-    var password: String,
-
+    
     var ssuToken: String,
 
     var refreshToken: String,
