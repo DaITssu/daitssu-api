@@ -11,7 +11,7 @@ import java.util.*
 class TokenProvider(
     private val tokenAlgorithm: Algorithm,
     @Value("\${app.jwt.accessTokenValidMS}") private val accessTokenValidMS: Long = 0,
-    @Value("\${app.jwt.refreshTokenValidMS}") private val refreshTokenValidMiS: Long = 0
+    @Value("\${app.jwt.refreshTokenValidMS}") private val refreshTokenValidMS: Long = 0
 ) {
     private fun createToken(
         id: Long,
@@ -42,6 +42,6 @@ class TokenProvider(
     fun createRefreshToken(
         id: Long,
     ): AuthTokenDto {
-        return createToken(id, refreshTokenValidMiS)
+        return createToken(id, refreshTokenValidMS)
     }
 }

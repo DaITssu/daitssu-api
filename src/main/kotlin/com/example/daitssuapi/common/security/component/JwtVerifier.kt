@@ -32,7 +32,7 @@ class JwtVerifier(
 
     fun verifyToken(bearerToken: String): TokenDto {
         try {
-            val verification = when (val token = bearerToken.substring(7)) {
+            return when (val token = bearerToken.substring(7)) {
                 "daitssu" ->
                     TokenDto(userId = 1, userRole = "STUDENT")
 
@@ -45,8 +45,6 @@ class JwtVerifier(
                     )
                 }
             }
-
-            return verification
         } catch (e: TokenExpiredException) {
             throw RuntimeException("토큰이 만료되었습니다.") // JwtTokenExpiredException()
         } catch (e: JWTVerificationException) {
