@@ -1,5 +1,6 @@
 package com.example.daitssuapi.domain.notice.model.entity
 
+import com.example.daitssuapi.common.audit.BaseEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
@@ -11,10 +12,6 @@ import java.time.LocalDateTime
 @Entity
 @Table(schema = "notice")
 class FunSystem (
-
-    @Id
-    @Column(name = "id")
-    val id: Long? =null,
 
     @Column(name = "title", length= 1024, nullable = false)
     val title:String,
@@ -31,13 +28,5 @@ class FunSystem (
     @Column(name = "url", nullable = false)
     val url : String,
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false)
-    val createdAt : LocalDateTime,
-
-    @UpdateTimestamp
-    @Column(name = "updated_at" , nullable= false)
-    val updatedAt : LocalDateTime,
-
     // view 빠짐
-)
+):BaseEntity()
