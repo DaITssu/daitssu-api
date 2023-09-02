@@ -17,7 +17,7 @@ import org.springframework.data.repository.findByIdOrNull
 @IntegrationTest
 class CourseServiceTest(
     private val courseService: CourseService,
-    private val userRepository: UserRepository,
+    private val courseRepository: CourseRepository,
     private val userCourseRelationRepository: UserCourseRelationRepository
 ) {
     @Test
