@@ -1,10 +1,13 @@
 package com.example.daitssuapi.domain.notice.service
 
+import com.example.daitssuapi.common.enums.ErrorCode
+import com.example.daitssuapi.common.exception.DefaultException
 import com.example.daitssuapi.domain.notice.dto.NoticeResponse
 import com.example.daitssuapi.domain.notice.model.entity.Notice
 import com.example.daitssuapi.domain.notice.model.repository.FunSystemRepository
 import com.example.daitssuapi.domain.notice.model.repository.NoticeRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -28,7 +31,9 @@ class NoticeService (
     fun getNoticePage(
         id: Long
     ):NoticeResponse{
-        val notice :Notice = noticeRepository.findById(id).get() // 예외처리 필요
+        val notice :Notice = noticeRepository.findByIdOrNull(id)
+            ?: throw DefaultException(errorCode= ErrorCode.COURSE_NOT_FOUND)
+
         return NoticeResponse.fromNotice(notice)
     }
 
