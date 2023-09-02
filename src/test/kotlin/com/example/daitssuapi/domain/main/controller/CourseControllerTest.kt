@@ -5,6 +5,7 @@ import com.example.daitssuapi.common.enums.ErrorCode
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
 import com.example.daitssuapi.domain.course.model.repository.UserCourseRelationRepository
 import com.example.daitssuapi.utils.ControllerTest
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
