@@ -1,4 +1,4 @@
-package com.example.daitssuapi.domain.main.service
+package com.example.daitssuapi.domain.course.service
 
 import com.example.daitssuapi.common.enums.CalendarType
 import com.example.daitssuapi.common.enums.RegisterStatus
@@ -6,7 +6,7 @@ import com.example.daitssuapi.common.exception.DefaultException
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
 import com.example.daitssuapi.domain.course.model.repository.CourseRepository
 import com.example.daitssuapi.domain.course.model.repository.UserCourseRelationRepository
-import com.example.daitssuapi.domain.course.service.CourseService
+import com.example.daitssuapi.domain.main.model.repository.UserRepository
 import com.example.daitssuapi.utils.IntegrationTest
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Assertions.*
@@ -17,20 +17,20 @@ import org.springframework.data.repository.findByIdOrNull
 @IntegrationTest
 class CourseServiceTest(
     private val courseService: CourseService,
-    private val userRepository: UserCourseRelationRepository,
-    private val userCourseRelationRepository: UserCourseRelationRepository,
     private val courseRepository: CourseRepository,
+    private val userRepository: UserRepository,
+    private val userCourseRelationRepository: UserCourseRelationRepository
 ) {
     @Test
     @DisplayName("성공_올바른 userId를 이용하여 과목 조회 시_1개 이상의 과목이 조회될 수 있다")
     fun success_get_course_with_user_id() {
-        userRepository.findAll().forEach { user ->
-            val courses = userCourseRelationRepository.findByUserIdOrderByCreatedAtDesc(userId = user.id).filter {
+        userCourseRelationRepository.findAll().map { it.user.id }.forEach { userId ->
+            val courses = userCourseRelationRepository.findByUserIdOrderByCreatedAtDesc(userId = userId).filter {
                 RegisterStatus.ACTIVE == it.registerStatus
             }
-            
-            val findCourses = courseService.getUserCourses(userId = user.id)
-            println(findCourses)
+
+            val findCourses = courseService.getUserCourses(userId = userId)
+
             assertAll(
                 { assertThat(findCourses).isNotEmpty },
                 { assertThat(findCourses.size).isEqualTo(courses.size) }
@@ -44,7 +44,7 @@ class CourseServiceTest(
         val wrongUserId = 0L
 
         val findCourses = courseService.getUserCourses(userId = wrongUserId)
-        
+
         assertAll(
             { assertThat(findCourses).isEmpty() }
         )

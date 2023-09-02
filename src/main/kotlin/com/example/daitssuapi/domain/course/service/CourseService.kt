@@ -161,18 +161,6 @@ class CourseService(
         return CourseResponse(name = course.name, term = course.term)
     }
 
-//    fun getUserCourses(userId: Long): List<UserCourseResponse> =
-//        userCourseRelationRepository.findByUserIdOrderByCreatedAtDesc(userId = userId).filter {
-//            RegisterStatus.ACTIVE == it.registerStatus
-//        }.map {
-//            UserCourseResponse(
-//                courseId = it.course.id,
-//                name = it.course.name,
-//                term = it.course.term,
-//                updatedAt = it.course.updatedAt
-//            )
-//        }
-
     fun getUserCourses(userId: Long): List<UserCourseResponse> =
         userCourseRelationRepository.findByUserIdOrderByCreatedAtDesc(userId = userId).filter {
             RegisterStatus.ACTIVE == it.registerStatus
