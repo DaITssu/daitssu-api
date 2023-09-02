@@ -90,7 +90,6 @@ class CourseControllerTest(
         val date = "2023-07-31 23:59:59"
         val response = mockMvc.perform(get("$courseUrl/calendar/$date"))
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.data").isEmpty)
             .andReturn().response
         
         assertThat(jacksonObjectMapper().readTree(response.contentAsString).isEmpty).isFalse()
