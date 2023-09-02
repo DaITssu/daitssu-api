@@ -1,4 +1,4 @@
-package com.example.daitssuapi.domain.main.service
+package com.example.daitssuapi.domain.course.service
 
 import com.example.daitssuapi.common.enums.CalendarType
 import com.example.daitssuapi.common.enums.RegisterStatus
@@ -6,7 +6,7 @@ import com.example.daitssuapi.common.exception.DefaultException
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
 import com.example.daitssuapi.domain.course.model.repository.CourseRepository
 import com.example.daitssuapi.domain.course.model.repository.UserCourseRelationRepository
-import com.example.daitssuapi.domain.course.service.CourseService
+import com.example.daitssuapi.domain.main.model.repository.UserRepository
 import com.example.daitssuapi.utils.IntegrationTest
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Assertions.*
@@ -17,9 +17,8 @@ import org.springframework.data.repository.findByIdOrNull
 @IntegrationTest
 class CourseServiceTest(
     private val courseService: CourseService,
-    private val userRepository: UserCourseRelationRepository,
-    private val userCourseRelationRepository: UserCourseRelationRepository,
-    private val courseRepository: CourseRepository,
+    private val userRepository: UserRepository,
+    private val userCourseRelationRepository: UserCourseRelationRepository
 ) {
     @Test
     @DisplayName("성공_올바른 userId를 이용하여 과목 조회 시_1개 이상의 과목이 조회될 수 있다")

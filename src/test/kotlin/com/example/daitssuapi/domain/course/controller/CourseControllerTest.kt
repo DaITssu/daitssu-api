@@ -1,4 +1,4 @@
-package com.example.daitssuapi.domain.main.controller
+package com.example.daitssuapi.domain.course.controller
 
 import com.example.daitssuapi.common.enums.CalendarType
 import com.example.daitssuapi.common.enums.ErrorCode
@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
@@ -40,6 +39,7 @@ class CourseControllerTest(
     fun success_get_empty_course_with_wrong_user_id() {
         val wrongUserId = 0
 
+        mockMvc.perform(get("$url/$wrongUserId"))
         mockMvc.perform(get("$url/$wrongUserId"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.data").isEmpty)
@@ -89,6 +89,7 @@ class CourseControllerTest(
         val date = "2023-07-31 23:59:59"
         val response = mockMvc.perform(get("$courseUrl/calendar/$date"))
             .andExpect(status().isOk)
+            .andExpect(jsonPath("$.data").isEmpty)
             .andReturn().response
         
         assertThat(jacksonObjectMapper().readTree(response.contentAsString).isEmpty).isFalse()
