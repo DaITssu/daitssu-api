@@ -6,7 +6,6 @@ import com.example.daitssuapi.domain.notice.dto.NoticeResponse
 import com.example.daitssuapi.domain.notice.model.entity.Notice
 import com.example.daitssuapi.domain.notice.model.repository.FunSystemRepository
 import com.example.daitssuapi.domain.notice.model.repository.NoticeRepository
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -32,7 +31,7 @@ class NoticeService (
         id: Long
     ):NoticeResponse{
         val notice :Notice = noticeRepository.findByIdOrNull(id)
-            ?: throw DefaultException(errorCode= ErrorCode.COURSE_NOT_FOUND)
+            ?: throw DefaultException(errorCode= ErrorCode.NOTICE_NOT_FOUND)
 
         return NoticeResponse.fromNotice(notice)
     }
