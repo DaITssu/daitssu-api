@@ -18,7 +18,6 @@ import org.springframework.data.repository.findByIdOrNull
 class CourseServiceTest(
     private val courseService: CourseService,
     private val courseRepository: CourseRepository,
-    private val userRepository: UserRepository,
     private val userCourseRelationRepository: UserCourseRelationRepository
 ) {
     @Test

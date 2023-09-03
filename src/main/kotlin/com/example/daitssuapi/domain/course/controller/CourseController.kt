@@ -109,4 +109,11 @@ class CourseController(
         @PathVariable userId: Long
     ): Response<List<UserCourseResponse>> =
         Response(data = courseService.getUserCourses(userId = userId))
+    
+    @PutMapping("/calendar/{calendarId}")
+    fun updateCalendar(
+        @RequestBody calendarRequest: CalendarRequest,
+        @PathVariable calendarId: Long
+    ) : Response<CalendarResponse> =
+        Response(data = courseService.updateCalendar(calendarRequest = calendarRequest, calendarId = calendarId))
 }

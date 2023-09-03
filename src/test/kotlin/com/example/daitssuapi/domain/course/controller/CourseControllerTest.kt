@@ -5,6 +5,7 @@ import com.example.daitssuapi.common.enums.ErrorCode
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
 import com.example.daitssuapi.domain.course.model.repository.UserCourseRelationRepository
 import com.example.daitssuapi.utils.ControllerTest
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
@@ -39,6 +40,7 @@ class CourseControllerTest(
     fun success_get_empty_course_with_wrong_user_id() {
         val wrongUserId = 0
 
+        mockMvc.perform(get("$url/$wrongUserId"))
         mockMvc.perform(get("$url/$wrongUserId"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.data").isEmpty)

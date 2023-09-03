@@ -172,4 +172,28 @@ class CourseService(
                 updatedAt = it.course.updatedAt
             )
         }
+    
+    fun updateCalendar(calendarRequest: CalendarRequest, calendarId : Long) : CalendarResponse {
+        val calendar = calendarRepository.findByIdOrNull(calendarId)
+            ?: throw DefaultException(ErrorCode.CALENDAR_NOT_FOUND)
+        
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val dateTime: LocalDateTime
+        try {
+            dateTime = LocalDateTime.parse(calendarRequest.dueAt, formatter)
+        } catch (e: DateTimeParseException) {
+            throw DefaultException(errorCode = ErrorCode.INVALID_DATE_FORMAT)
+        }
+        
+        calendar.updateCalendar(calendarRequest = calendarRequest, dueAt = dateTime)
+            .also { calendarRepository.save(it) }
+        
+        println(calendar.id)
+        
+        return CalendarResponse(
+            type = calendar.type,
+            dueAt = calendar.dueAt,
+            name = calendar.name
+        )
+    }
 }
