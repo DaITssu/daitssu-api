@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*
 @Tag(name = "Auth", description = "인증 관련 API")
 class AuthController(
     private val authService: AuthService,
-    private val argumentResolver: ArgumentResolver,
 ) {
     @Operation(
         summary = "회원가입",
