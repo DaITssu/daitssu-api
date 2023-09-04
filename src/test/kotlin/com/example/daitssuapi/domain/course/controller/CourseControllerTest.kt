@@ -41,7 +41,6 @@ class CourseControllerTest(
         val wrongUserId = 0
 
         mockMvc.perform(get("$url/$wrongUserId"))
-        mockMvc.perform(get("$url/$wrongUserId"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.data").isEmpty)
     }
