@@ -3,6 +3,7 @@ package com.example.daitssuapi.domain.auth.service
 import com.example.daitssuapi.common.enums.ErrorCode
 import com.example.daitssuapi.common.exception.DefaultException
 import com.example.daitssuapi.common.security.component.TokenProvider
+import com.example.daitssuapi.domain.auth.controller.request.SignUpRequest
 import com.example.daitssuapi.domain.auth.controller.response.AuthResponse
 import com.example.daitssuapi.domain.main.model.entity.User
 import com.example.daitssuapi.domain.main.model.repository.DepartmentRepository
@@ -44,18 +45,13 @@ class AuthService(
 
     @Transactional
     fun signUp(
-        nickname: String,
-        name: String,
-        departmentId: Long,
-        studentId: String,
-        term: Int,
-        password: String,
+        signUpRequest: SignUpRequest,
     ): AuthResponse {
-        val department = departmentRepository.findByIdOrNull(departmentId)
+        val department = departmentRepository.findByIdOrNull(signUpRequest.departmentId)
             ?: throw DefaultException(ErrorCode.DEPARTMENT_NOT_FOUND)
 
         var user = userRepository.findByStudentId(
-            studentId = studentId,
+            studentId = signUpRequest.studentId,
         )
 
         if (user != null)
@@ -66,12 +62,12 @@ class AuthService(
 
         user = userRepository.save(
             User(
-                nickname = nickname,
-                name = name,
+                nickname = signUpRequest.nickname,
+                name = signUpRequest.name,
                 department = department,
-                studentId = studentId,
+                studentId = signUpRequest.studentId,
                 imageUrl = null,
-                term = term,
+                term = signUpRequest.term,
                 ssuToken = ssuToken,
                 refreshToken = "",
             )

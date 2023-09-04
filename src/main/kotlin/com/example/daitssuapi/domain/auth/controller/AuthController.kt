@@ -31,14 +31,7 @@ class AuthController(
         signUpRequest: SignUpRequest,
     ): Response<AuthResponse> {
         return Response(
-            data = authService.signUp(
-                nickname = signUpRequest.nickname,
-                password = signUpRequest.password,
-                name = signUpRequest.name,
-                studentId = signUpRequest.studentId,
-                departmentId = signUpRequest.departmentId,
-                term = signUpRequest.term,
-            )
+            data = authService.signUp(signUpRequest)
         )
     }
 
