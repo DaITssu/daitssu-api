@@ -2,7 +2,7 @@ package com.example.daitssuapi.domain.course.dto.request
 
 import org.jetbrains.annotations.NotNull
 
-class CourseRequest(
+data class CourseRequest(
     @NotNull
     val name: String,
 

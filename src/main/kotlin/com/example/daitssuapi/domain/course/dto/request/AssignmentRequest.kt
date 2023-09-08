@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 
 @Schema(name = "과제 등록 API Request Body")
-class AssignmentRequest(
+data class AssignmentRequest(
     @Schema(description = "강의 id")
     val courseId: Long,
     @Schema(description = "과제 이름")
