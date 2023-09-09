@@ -31,7 +31,7 @@ class CourseService(
     fun getCourseList(): List<CourseResponse> {
         val courses: List<Course> = courseRepository.findAll()
         return courses.map { course ->
-            CourseResponse(name = course.name, term = course.term)
+            CourseResponse(name = course.name, term = course.term, id = course.id)
         }
     }
 
@@ -60,6 +60,7 @@ class CourseService(
         }
 
         return CourseResponse(
+            id = course.id,
             name = course.name,
             videos = videoResponses,
             assignments = assignmentResponses,
@@ -68,31 +69,20 @@ class CourseService(
     }
 
     fun getCalendar(dateRequest: String): Map<String, List<CalendarResponse>> {
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        val date: LocalDateTime
-        try {
-            date = LocalDateTime.parse(dateRequest, formatter)
-        } catch (e: DateTimeParseException) {
-            throw DefaultException(errorCode = ErrorCode.INVALID_DATE_FORMAT)
-        }
+        val date = checkDate(dateRequest)
 
         val yearMonth = YearMonth.of(date.year, date.monthValue)
         val startDateTime = yearMonth.atDay(1).atStartOfDay()
         val endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59)
 
         return calendarRepository.findByDueAtBetween(startDateTime, endDateTime).groupBy(
-            { it.course }, { CalendarResponse(it.type, it.dueAt, it.name) }
+            { it.course }, { CalendarResponse(it.id, it.type, it.dueAt, it.name) }
         )
     }
 
     fun postCalendar(calendarRequest: CalendarRequest): CalendarResponse {
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        val dateTime: LocalDateTime
-        try {
-            dateTime = LocalDateTime.parse(calendarRequest.dueAt, formatter)
-        } catch (e: DateTimeParseException) {
-            throw DefaultException(errorCode = ErrorCode.INVALID_DATE_FORMAT)
-        }
+        val dateTime = checkDate(calendarRequest.dueAt)
+        
         val calendar = Calendar(
             type = calendarRequest.type,
             course = calendarRequest.course,
@@ -101,6 +91,7 @@ class CourseService(
         ).also { calendarRepository.save(it) }
 
         return CalendarResponse(
+            id = calendar.id,
             type = calendar.type,
             dueAt = calendar.dueAt,
             name = calendar.name
@@ -158,7 +149,7 @@ class CourseService(
         val course = Course(courseRequest.name, courseRequest.term)
             .also { courseRepository.save(it) }
 
-        return CourseResponse(name = course.name, term = course.term)
+        return CourseResponse(name = course.name, term = course.term, id = course.id)
     }
 
     fun getUserCourses(userId: Long): List<UserCourseResponse> =
@@ -177,23 +168,28 @@ class CourseService(
         val calendar = calendarRepository.findByIdOrNull(calendarId)
             ?: throw DefaultException(ErrorCode.CALENDAR_NOT_FOUND)
         
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        val dateTime: LocalDateTime
-        try {
-            dateTime = LocalDateTime.parse(calendarRequest.dueAt, formatter)
-        } catch (e: DateTimeParseException) {
-            throw DefaultException(errorCode = ErrorCode.INVALID_DATE_FORMAT)
-        }
+        val dateTime = checkDate(calendarRequest.dueAt)
         
         calendar.updateCalendar(calendarRequest = calendarRequest, dueAt = dateTime)
-            .also { calendarRepository.save(it) }
-        
-        println(calendar.id)
+            .also { calendarRepository.save(calendar) }
         
         return CalendarResponse(
+            id = calendar.id,
             type = calendar.type,
             dueAt = calendar.dueAt,
             name = calendar.name
         )
+    }
+    
+    fun checkDate(dueAt: String) : LocalDateTime {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val dateTime: LocalDateTime
+        try {
+            dateTime = LocalDateTime.parse(dueAt, formatter)
+        } catch (e: DateTimeParseException) {
+            throw DefaultException(errorCode = ErrorCode.INVALID_DATE_FORMAT)
+        }
+        
+        return dateTime
     }
 }

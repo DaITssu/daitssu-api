@@ -13,17 +13,15 @@ import java.time.LocalDateTime
 @Table(schema = "course")
 class Calendar(
     @Enumerated(EnumType.STRING)
-    val type: CalendarType,
-    val course: String,
-    val dueAt: LocalDateTime,
-    val name: String
+    var type: CalendarType,
+    var course: String,
+    var dueAt: LocalDateTime,
+    var name: String
 ) : BaseEntity() {
-    fun updateCalendar(calendarRequest: CalendarRequest, dueAt: LocalDateTime) : Calendar {
-        return Calendar (
-            type = calendarRequest.type,
-            course = calendarRequest.course,
-            dueAt = dueAt,
-            name = calendarRequest.name
-        )
+    fun updateCalendar(calendarRequest: CalendarRequest, dueAt: LocalDateTime) {
+        this.type = calendarRequest.type
+        this.course = calendarRequest.course
+        this.name = calendarRequest.name
+        this.dueAt = dueAt
     }
 }

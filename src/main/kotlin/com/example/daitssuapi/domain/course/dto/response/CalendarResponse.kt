@@ -4,6 +4,7 @@ import com.example.daitssuapi.common.enums.CalendarType
 import java.time.LocalDateTime
 
 data class CalendarResponse(
+    val id: Long,
     val type: CalendarType,
     val dueAt: LocalDateTime,
     val name: String,
