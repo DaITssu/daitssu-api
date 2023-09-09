@@ -78,7 +78,7 @@ class CourseServiceUnitTest {
         every { courseRepository.findAll() } returns courses
         
         val getCourses = courseService.getCourseList()
-        val expectedCourses = courses.map { CourseResponse(name = it.name, term =  it.term) }
+        val expectedCourses = courses.map { CourseResponse(name = it.name, term =  it.term, id = it.id) }
         
         assertThat(expectedCourses).isEqualTo(getCourses)
     }
@@ -86,7 +86,7 @@ class CourseServiceUnitTest {
     @Test
     @DisplayName("올바른 courseId로 조회 시 course에 대한 정보가 올바르게 전달된다")
     fun get_course_with_course_id() {
-        val courseId = 1L
+        val courseId = 0L
         val video =  mutableListOf(Video(
             name = "kotlin-1강",
             startAt = LocalDateTime.of(2023, 8, 18, 10, 0),
@@ -118,7 +118,8 @@ class CourseServiceUnitTest {
             name = "kotlin",
             term = 8,
             videos = expectedVideo,
-            assignments = expectedAssignment
+            assignments = expectedAssignment,
+            id = courseId
         )
         
         
@@ -152,7 +153,7 @@ class CourseServiceUnitTest {
         
         val result = courseService.getCalendar("2023-02-30 09:30:00")
         val expectedCalendar = mapOf("kotlin" to
-            calendar.map { CalendarResponse(name = it.name, dueAt = it.dueAt, type = it.type) }
+            calendar.map { CalendarResponse(name = it.name, dueAt = it.dueAt, type = it.type, id = it.id) }
         )
         
         assertThat(expectedCalendar).isEqualTo(result)
@@ -183,7 +184,8 @@ class CourseServiceUnitTest {
         val expectedCalendar = CalendarResponse (
             type = calendarRequest.type,
             dueAt = LocalDateTime.of(2023,2,28,23,59,59),
-            name = calendarRequest.name)
+            name = calendarRequest.name,
+            id = 0L)
         
         every{ calendarRepository.save(any()) } answers {
             Calendar(type = calendarRequest.type,
@@ -310,7 +312,7 @@ class CourseServiceUnitTest {
         }
         
         val result = courseService.postCourse(courseRequest)
-        val expectedCourse = CourseResponse (name = courseRequest.name, term = courseRequest.term)
+        val expectedCourse = CourseResponse (name = courseRequest.name, term = courseRequest.term, id =  0)
         
         assertThat(expectedCourse).isEqualTo(result)
     }
