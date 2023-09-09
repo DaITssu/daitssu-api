@@ -158,4 +158,68 @@ class CourseControllerTest(
         )
         
     }
+    
+    @Test
+    @DisplayName("올바른 date가 포함된 calendarRequest로 put 요청시_캘린더가 수정된다")
+    fun put_update_calendar_with_calendar_request() {
+        val calendarId = 13L
+        val calendarRequest = CalendarRequest(
+            name = "숙제 마감일",
+            type = CalendarType.ASSIGNMENT,
+            course = "do it",
+            dueAt = "2023-07-27 23:59:59"
+        )
+        
+        val response = mockMvc.perform(
+            put("$courseUrl/calendar/$calendarId")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jacksonObjectMapper().writeValueAsString(calendarRequest))
+        )
+            .andExpect(status().isOk)
+            .andReturn().response
+        
+        assertThat(jacksonObjectMapper().readTree(response.contentAsString)["data"].isEmpty).isFalse()
+    }
+    
+    @Test
+    @DisplayName("잘못된 date가 포함된 calendarRequest, 잘못된 calendarId로 put 요청시_에러가 발생한다")
+    fun put_update_calendar_with_wrong_calendar_request_or() {
+        val courseId = 13L
+        val wrongCourseId = 999L
+        val calendarRequest = CalendarRequest(
+            name = "강의 출석 마감일",
+            type = CalendarType.VIDEO,
+            course = "choco",
+            dueAt = "2023-07-27"
+        )
+        
+        val response = mockMvc.perform(
+            put("$courseUrl/calendar/$courseId")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jacksonObjectMapper().writeValueAsString(calendarRequest))
+        )
+            .andExpect(status().isBadRequest)
+            .andReturn().response
+        
+        val responseWrongId = mockMvc.perform(
+            put("$courseUrl/calendar/$wrongCourseId")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jacksonObjectMapper().writeValueAsString(calendarRequest))
+        )
+            .andExpect(status().isBadRequest)
+            .andReturn().response
+        
+        val responseBody = jacksonObjectMapper().readTree(response.contentAsByteArray)
+        val responseBodyWrongId = jacksonObjectMapper().readTree(responseWrongId.contentAsByteArray)
+        
+        assertAll(
+            { assertThat(responseBody["code"].intValue()).isEqualTo(ErrorCode.INVALID_DATE_FORMAT.code) },
+            { assertThat(responseBody["message"].textValue()).isEqualTo(ErrorCode.INVALID_DATE_FORMAT.message) },
+            { assertThat(responseBody["data"].isNull).isTrue() },
+            { assertThat(responseBodyWrongId["code"].intValue()).isEqualTo(ErrorCode.CALENDAR_NOT_FOUND.code) },
+            { assertThat(responseBodyWrongId["message"].textValue()).isEqualTo(ErrorCode.CALENDAR_NOT_FOUND.message)},
+            { assertThat(responseBodyWrongId["data"].isNull).isTrue() }
+        )
+        
+    }
 }

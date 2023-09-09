@@ -154,4 +154,45 @@ class CourseServiceTest(
         }
     }
     
+    @Test
+    @DisplayName("올바른 calendarRequest로 수정 요청시_캘린더가 출력된다")
+    fun put_update_calendar_with_calendar_request() {
+        val calendarRequestUpdate = CalendarRequest(
+            type = CalendarType.ASSIGNMENT,
+            course = "JAVA",
+            dueAt = "2023-08-27 23:59:59",
+            name = "과제"
+        )
+        
+        val updateCalendar = courseService.updateCalendar(calendarRequestUpdate, 13L)
+        
+        assertAll(
+            { assertThat(updateCalendar.name).isEqualTo(calendarRequestUpdate.name) },
+            { assertThat(updateCalendar.type).isEqualTo(calendarRequestUpdate.type) },
+            { assertThat(updateCalendar.dueAt).isEqualTo("2023-08-27T23:59:59") },
+            { assertThat(updateCalendar.id).isEqualTo(13L) }
+        )
+    }
+    
+    @Test
+    @DisplayName("잘못된 calendarRequest, courseId 요청시_에러가 발생한다")
+    fun update_create_calendar_with_wrong_calendar_request() {
+        val calendarRequest = CalendarRequest(
+            type = CalendarType.VIDEO,
+            course = "do it",
+            dueAt = "2023-07-27",
+            name = "과제 꼭 하기"
+        )
+        
+        assertAll(
+            { org.junit.jupiter.api.assertThrows<DefaultException> {
+                    courseService.updateCalendar(calendarRequest, 13L)
+                } },
+            { org.junit.jupiter.api.assertThrows<DefaultException> {
+                courseService.updateCalendar(calendarRequest, 1L)
+            } }
+        )
+        
+    }
+    
 }
