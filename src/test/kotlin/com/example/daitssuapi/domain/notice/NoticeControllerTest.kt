@@ -2,6 +2,7 @@ package com.example.daitssuapi.domain.notice
 
 import com.example.daitssuapi.domain.notice.model.repository.NoticeRepository
 import com.example.daitssuapi.domain.notice.service.NoticeService
+import org.bouncycastle.math.raw.Nat.equalTo
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -14,6 +15,7 @@ import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
@@ -66,23 +68,21 @@ class NoticeControllerTest {
     @DisplayName("Notice 리스트 카테고리별 검색 확인")
     fun getSomeNoticeList() {
 
-        val result = mockMvc.get("/notice/국제교류")
+        mockMvc.get("/notice/구독")
             .andExpect {
                 status { isOk() }
-
+                content {
+                    jsonPath("$.data[0].id").value(2)
+                    jsonPath("$.data[0].title").value("공지사항2")
+                    jsonPath("$.data[0].departmentId").value(2)
+                    jsonPath("$.data[0].content").value("2번 공지 내용입니다!!")
+                    jsonPath("$.data[0].category").value("SUBSCRIPTION")
+                    jsonPath("$.data[0].imageUrl").doesNotExist()
+                    jsonPath("$.data[0].fileUrl").doesNotExist()
+                    jsonPath("$.data[0].createdAt").value("0999-12-27T00:32:08")
+                    jsonPath("$.data[0].updatedAt").value("0999-12-27T00:32:08")
+                }
             }
-            .andReturn()
-
-        assertEquals(result.response.contentAsString,
-            "{\"code\":0,\"message\":\"\",\"data\":[{\"id\":4," +
-                    "\"title\":\"공지사항4\"," +
-                    "\"departmentId\":4," +
-                    "\"content\":\"4번 공지 내용입니다!!\"," +
-                    "\"category\":\"국제교류\"," +
-                    "\"imageUrl\":null," +
-                    "\"fileUrl\":null," +
-                    "\"createdAt\":\"0999-12-27T00:32:08\"," +
-                    "\"updatedAt\":\"0999-12-27T00:32:08\"}]}")
     }
 
     @Sql("classpath:schema.sql")
@@ -90,23 +90,21 @@ class NoticeControllerTest {
     @Test
     @WithMockUser
     @DisplayName("Notice 페이징 확인")
-    fun getNoticePage(){
-        val result = mockMvc.get("/notice/page/1")
+    fun getNoticePage() {
+        mockMvc.get("/notice/page/1")
             .andExpect {
                 status { isOk() }
-
+                content {
+                    jsonPath("$.data[0].id").value(1)
+                    jsonPath("$.data[0].title").value("공지사항1")
+                    jsonPath("$.data[0].departmentId").value(1)
+                    jsonPath("$.data[0].content").value("1번 공지 내용입니다!!")
+                    jsonPath("$.data[0].category").value("ACADEMICS")
+                    jsonPath("$.data[0].imageUrl").doesNotExist()
+                    jsonPath("$.data[0].fileUrl").doesNotExist()
+                    jsonPath("$.data[0].createdAt").value("0999-12-27T00:32:08")
+                    jsonPath("$.data[0].updatedAt").value("0999-12-27T00:32:08")
+                }
             }
-            .andReturn()
-        assertEquals(result.response.contentAsString,
-            "{\"code\":0,\"message\":\"\",\"data\":{\"id\":1," +
-                    "\"title\":\"공지사항1\"," +
-                    "\"departmentId\":1," +
-                    "\"content\":\"1번 공지 내용입니다!!\"," +
-                    "\"category\":\"학사\"," +
-                    "\"imageUrl\":null," +
-                    "\"fileUrl\":null," +
-                    "\"createdAt\":\"0999-12-27T00:32:08\"," +
-                    "\"updatedAt\":\"0999-12-27T00:32:08\"}}" )
     }
-
 }
