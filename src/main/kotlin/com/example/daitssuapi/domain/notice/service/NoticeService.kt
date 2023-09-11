@@ -6,6 +6,7 @@ import com.example.daitssuapi.domain.notice.dto.NoticeResponse
 import com.example.daitssuapi.domain.notice.model.entity.Notice
 import com.example.daitssuapi.domain.notice.model.repository.FunSystemRepository
 import com.example.daitssuapi.domain.notice.model.repository.NoticeRepository
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -28,7 +29,11 @@ class NoticeService (
 
     }
     fun getNoticePage(
-        id: Long
+        id: Long,
+        pageable : Pageable,
+        nowPage : Long,
+        startPage : Long,
+        endPage : Long
     ):NoticeResponse{
         val notice :Notice = noticeRepository.findByIdOrNull(id)
             ?: throw DefaultException(errorCode= ErrorCode.NOTICE_NOT_FOUND)
