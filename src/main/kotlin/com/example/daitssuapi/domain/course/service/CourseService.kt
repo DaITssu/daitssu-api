@@ -69,7 +69,7 @@ class CourseService(
     }
 
     fun getCalendar(dateRequest: String): Map<String, List<CalendarResponse>> {
-        val date = checkDate(dateRequest)
+        val date = checkDateReturnLocalDateTime(dateRequest)
 
         val yearMonth = YearMonth.of(date.year, date.monthValue)
         val startDateTime = yearMonth.atDay(1).atStartOfDay()
@@ -81,7 +81,7 @@ class CourseService(
     }
 
     fun postCalendar(calendarRequest: CalendarRequest): CalendarResponse {
-        val dateTime = checkDate(calendarRequest.dueAt)
+        val dateTime = checkDateReturnLocalDateTime(calendarRequest.dueAt)
         
         val calendar = Calendar(
             type = calendarRequest.type,
@@ -168,7 +168,7 @@ class CourseService(
         val calendar = calendarRepository.findByIdOrNull(calendarId)
             ?: throw DefaultException(ErrorCode.CALENDAR_NOT_FOUND)
         
-        val dateTime = checkDate(calendarRequest.dueAt)
+        val dateTime = checkDateReturnLocalDateTime(calendarRequest.dueAt)
         
         calendar.updateCalendar(calendarRequest = calendarRequest, dueAt = dateTime)
             .also { calendarRepository.save(calendar) }
@@ -181,7 +181,7 @@ class CourseService(
         )
     }
     
-    fun checkDate(dueAt: String) : LocalDateTime {
+    fun checkDateReturnLocalDateTime(dueAt: String) : LocalDateTime {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val dateTime: LocalDateTime
         try {
