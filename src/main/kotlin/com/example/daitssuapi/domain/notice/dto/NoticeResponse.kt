@@ -1,5 +1,6 @@
 package com.example.daitssuapi.domain.notice.dto
 
+import com.example.daitssuapi.common.enums.NoticeCategory
 import com.example.daitssuapi.domain.notice.model.entity.Notice
 import java.time.LocalDateTime
 
@@ -8,7 +9,7 @@ data class NoticeResponse(
     val title: String,
     val departmentId: Int,
     val content: String,
-    val category: String,
+    val category: NoticeCategory?,
     val imageUrl: String?,
     val fileUrl: String?,
     val createdAt: LocalDateTime,

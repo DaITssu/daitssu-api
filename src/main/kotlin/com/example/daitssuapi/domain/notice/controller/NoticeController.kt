@@ -1,6 +1,7 @@
 package com.example.daitssuapi.domain.notice.controller
 
 import com.example.daitssuapi.common.dto.Response
+import com.example.daitssuapi.common.enums.NoticeCategory
 import com.example.daitssuapi.domain.notice.dto.NoticeResponse
 import com.example.daitssuapi.domain.notice.service.NoticeService
 import org.springframework.web.bind.annotation.GetMapping

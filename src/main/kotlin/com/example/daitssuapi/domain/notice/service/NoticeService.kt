@@ -1,6 +1,7 @@
 package com.example.daitssuapi.domain.notice.service
 
 import com.example.daitssuapi.common.enums.ErrorCode
+import com.example.daitssuapi.common.enums.NoticeCategory
 import com.example.daitssuapi.common.exception.DefaultException
 import com.example.daitssuapi.domain.notice.dto.NoticeResponse
 import com.example.daitssuapi.domain.notice.model.entity.Notice
@@ -17,12 +18,20 @@ class NoticeService (
     fun getNoticeList(
         category: String
     ):List<NoticeResponse> {
+
         val notices:List<Notice>
 
         if(category == "전체")
             notices= noticeRepository.findAll()
-        else
-            notices = noticeRepository.findByCategory(category)
+        else{
+            val noticeCategory = NoticeCategory.fromCode(category)
+            if(noticeCategory != null){ // 카테고리 enum 값이 존재함
+                notices = noticeRepository.findByCategory(noticeCategory)
+            }else{ // 없는 카테고리
+                throw DefaultException(errorCode = ErrorCode.INVALID_CATEGORY)
+            }
+        }
+
 
         return notices.map { NoticeResponse.fromNotice(it) }
 

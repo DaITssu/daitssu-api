@@ -11,6 +11,8 @@ enum class ErrorCode(val code: Int, val message: String) {
 
     NOTICE_NOT_FOUND(NOTICE_NUMBERING + 1, "공지사항 내용을 찾을 수 없습니다"),
     FUNSYSTEM_NOT_FOUND(NOTICE_NUMBERING + 2, "펀시스템 내용을 찾을 수 없습니다"),
+    INVALID_CATEGORY(NOTICE_NUMBERING + 3, "존재하지 않는 카테고리입니다"),
+
 
     COURSE_NOT_FOUND(COURSE_NUMBERING + 1, "과목을 찾을 수 없습니다."),
 
