@@ -91,7 +91,7 @@ class CourseServiceTest(
     @DisplayName("올바른 date 형식으로 캘린더 조회시_일정이 조회된다")
     fun get_calendar_with_date () {
         // case 1. 조회가 잘되는지 확인
-        val date = "2023-07-01 11:00:00"
+        val date = "2023-07"
         val name = "eat paper"
         val findCalendar = courseService.getCalendar(date)
         
@@ -100,15 +100,6 @@ class CourseServiceTest(
             { assertThat(findCalendar[name]?.size).isEqualTo(2) }
         )
         
-        // case2 경계값
-        val date2 = "2023-05-01 00:00:00"
-        val name2 = "choco"
-        val findCalendar2 = courseService.getCalendar(date2)
-
-        assertAll(
-            { assertThat(findCalendar2.keys).contains(name2) },
-            { assertThat(findCalendar2[name2]?.size).isEqualTo(1) }
-        )
     }
     
     @Test

@@ -140,7 +140,7 @@ class CourseServiceUnitTest {
     }
     
     @Test
-    @DisplayName("날짜와 시간으로 해당 월 캘린더 조회하면 캘린더 리스트가 출력된다")
+    @DisplayName("날짜로 해당 월 캘린더 조회하면 캘린더 리스트가 출력된다")
     fun get_calendar_with_local_date_time () {
         val calendar = listOf(Calendar(
             course = "kotlin",
@@ -152,7 +152,7 @@ class CourseServiceUnitTest {
         
         every { calendarRepository.findByDueAtBetween(any(), any()) } returns calendar
         
-        val result = courseService.getCalendar("2023-02-30 09:30:00")
+        val result = courseService.getCalendar("2023-02")
         val expectedCalendar = mapOf("kotlin" to
             calendar.map {
                 CalendarResponse(
@@ -171,8 +171,8 @@ class CourseServiceUnitTest {
     @Test
     @DisplayName("잘못된 날짜 포맷으로 캘린더 조회하면 에러가 발생한다")
     fun get_calendar_with_invalidate_local_date_time() {
-        val date = "2023 02 30"
-        val expectedErrorCode = ErrorCode.INVALID_DATE_FORMAT
+        val date = "2023 02"
+        val expectedErrorCode = ErrorCode.INVALID_GET_DATE_FORMAT
         
         val result = assertThrows<DefaultException> {
             courseService.getCalendar(date)

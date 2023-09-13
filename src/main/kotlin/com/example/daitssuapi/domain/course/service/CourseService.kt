@@ -15,6 +15,7 @@ import com.example.daitssuapi.domain.course.model.entity.Video
 import com.example.daitssuapi.domain.course.model.repository.*
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
@@ -69,9 +70,16 @@ class CourseService(
     }
 
     fun getCalendar(dateRequest: String): Map<String, List<CalendarResponse>> {
-        val date = checkDateReturnDate(dateRequest)
+        val date = "$dateRequest-01"
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val dateTime: LocalDate
+        try {
+            dateTime = LocalDate.parse(date, formatter)
+        } catch (e: DateTimeParseException) {
+            throw DefaultException(errorCode = ErrorCode.INVALID_GET_DATE_FORMAT)
+        }
 
-        val yearMonth = YearMonth.of(date.year, date.monthValue)
+        val yearMonth = YearMonth.of(dateTime.year, dateTime.monthValue)
         val startDateTime = yearMonth.atDay(1).atStartOfDay()
         val endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59)
 

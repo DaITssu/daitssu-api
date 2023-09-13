@@ -86,7 +86,7 @@ class CourseControllerTest(
     @Test
     @DisplayName("올바른 date로 캘린더 조회시_캘린더에 대한 정보가 조회된다")
     fun get_calendar_with_date() {
-        val date = "2023-07-31 23:59:59"
+        val date = "2023-07"
         val response = mockMvc.perform(get("$courseUrl/calendar/$date"))
             .andExpect(status().isOk)
             .andReturn().response
@@ -105,8 +105,8 @@ class CourseControllerTest(
         val responseBody = jacksonObjectMapper().readTree(response.contentAsByteArray)
         
         assertAll(
-            { assertThat(responseBody["code"].intValue()).isEqualTo(ErrorCode.INVALID_DATE_FORMAT.code) },
-            { assertThat(responseBody["message"].textValue()).isEqualTo(ErrorCode.INVALID_DATE_FORMAT.message) },
+            { assertThat(responseBody["code"].intValue()).isEqualTo(ErrorCode.INVALID_GET_DATE_FORMAT.code) },
+            { assertThat(responseBody["message"].textValue()).isEqualTo(ErrorCode.INVALID_GET_DATE_FORMAT.message) },
             { assertThat(responseBody["data"].isNull).isTrue() }
         )
     }
