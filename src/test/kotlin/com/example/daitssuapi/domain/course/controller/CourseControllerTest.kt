@@ -118,7 +118,8 @@ class CourseControllerTest(
             name = "숙제 마감일",
             type = CalendarType.ASSIGNMENT,
             course = "do it",
-            dueAt = "2023-07-27 23:59:59"
+            dueAt = "2023-07-27 23:59:59",
+            isCompleted = false
         )
         val response = mockMvc.perform(
             post("$courseUrl/calendar")
@@ -138,7 +139,8 @@ class CourseControllerTest(
             name = "강의 출석 마감일",
             type = CalendarType.VIDEO,
             course = "choco",
-            dueAt = "2023-07-27"
+            dueAt = "2023-07-27",
+            isCompleted = false
         )
         val response = mockMvc.perform(
             post("$courseUrl/calendar")
@@ -166,7 +168,8 @@ class CourseControllerTest(
             name = "숙제 마감일",
             type = CalendarType.ASSIGNMENT,
             course = "do it",
-            dueAt = "2023-07-27 23:59:59"
+            dueAt = "2023-07-27 23:59:59",
+            isCompleted = true
         )
         
         val response = mockMvc.perform(
@@ -189,7 +192,8 @@ class CourseControllerTest(
             name = "강의 출석 마감일",
             type = CalendarType.VIDEO,
             course = "choco",
-            dueAt = "2023-07-27"
+            dueAt = "2023-07-27",
+            isCompleted = true
         )
         
         val response = mockMvc.perform(

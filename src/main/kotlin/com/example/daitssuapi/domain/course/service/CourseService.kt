@@ -76,7 +76,7 @@ class CourseService(
         val endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59)
 
         return calendarRepository.findByDueAtBetween(startDateTime, endDateTime).groupBy(
-            { it.course }, { CalendarResponse(it.id, it.type, it.dueAt, it.name) }
+            { it.course }, { CalendarResponse(it.id, it.type, it.dueAt, it.name, it.isCompleted) }
         )
     }
 
@@ -87,14 +87,16 @@ class CourseService(
             type = calendarRequest.type,
             course = calendarRequest.course,
             dueAt = dateTime,
-            name = calendarRequest.name
+            name = calendarRequest.name,
+            isCompleted = calendarRequest.isCompleted
         ).also { calendarRepository.save(it) }
 
         return CalendarResponse(
             id = calendar.id,
             type = calendar.type,
             dueAt = calendar.dueAt,
-            name = calendar.name
+            name = calendar.name,
+            isCompleted = calendar.isCompleted
         )
     }
 
@@ -177,7 +179,8 @@ class CourseService(
             id = calendar.id,
             type = calendar.type,
             dueAt = calendar.dueAt,
-            name = calendar.name
+            name = calendar.name,
+            isCompleted = calendar.isCompleted
         )
     }
     

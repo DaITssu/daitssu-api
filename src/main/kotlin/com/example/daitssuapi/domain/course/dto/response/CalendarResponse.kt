@@ -8,4 +8,5 @@ data class CalendarResponse(
     val type: CalendarType,
     val dueAt: LocalDateTime,
     val name: String,
+    val isCompleted: Boolean
 )

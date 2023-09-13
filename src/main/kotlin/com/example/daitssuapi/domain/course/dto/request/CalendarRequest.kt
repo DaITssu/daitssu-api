@@ -13,4 +13,5 @@ data class CalendarRequest(
     val dueAt: String,
     @Schema(description = "일정의 제목")
     val name: String,
+    val isCompleted: Boolean
 )

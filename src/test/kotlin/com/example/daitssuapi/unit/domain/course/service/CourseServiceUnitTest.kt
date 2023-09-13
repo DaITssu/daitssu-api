@@ -146,14 +146,23 @@ class CourseServiceUnitTest {
             course = "kotlin",
             type = CalendarType.ASSIGNMENT,
             name = "kotlin-첫번째 과제",
-            dueAt = LocalDateTime.of(2023,2,28,23,59,59)
+            dueAt = LocalDateTime.of(2023,2,28,23,59,59),
+            isCompleted = false
         ))
         
         every { calendarRepository.findByDueAtBetween(any(), any()) } returns calendar
         
         val result = courseService.getCalendar("2023-02-30 09:30:00")
         val expectedCalendar = mapOf("kotlin" to
-            calendar.map { CalendarResponse(name = it.name, dueAt = it.dueAt, type = it.type, id = it.id) }
+            calendar.map {
+                CalendarResponse(
+                    name = it.name,
+                    dueAt = it.dueAt,
+                    type = it.type,
+                    id = it.id,
+                    isCompleted = it.isCompleted
+                )
+            }
         )
         
         assertThat(expectedCalendar).isEqualTo(result)
@@ -179,19 +188,25 @@ class CourseServiceUnitTest {
             type = CalendarType.VIDEO,
             course = "kotlin",
             dueAt = "2023-02-28 23:59:59",
-            name = "4주차 강의"
+            name = "4주차 강의",
+            isCompleted = false
         )
         val expectedCalendar = CalendarResponse (
             type = calendarRequest.type,
             dueAt = LocalDateTime.of(2023,2,28,23,59,59),
             name = calendarRequest.name,
-            id = 0L)
+            id = 0L,
+            isCompleted = false
+        )
         
         every{ calendarRepository.save(any()) } answers {
-            Calendar(type = calendarRequest.type,
+            Calendar(
+                type = calendarRequest.type,
                 course = calendarRequest.course,
                 dueAt = LocalDateTime.of(2023,2,28,23,59,59),
-                name = calendarRequest.name )
+                name = calendarRequest.name,
+                isCompleted = calendarRequest.isCompleted
+            )
         }
         
         val result = courseService.postCalendar(calendarRequest)
@@ -206,7 +221,8 @@ class CourseServiceUnitTest {
             type = CalendarType.VIDEO,
             course = "kotlin",
             dueAt = "2023-08-15",
-            name = "8주차 강의"
+            name = "8주차 강의",
+            isCompleted = false
         )
         val expectedErrorCode = ErrorCode.INVALID_DATE_FORMAT
         
@@ -324,19 +340,22 @@ class CourseServiceUnitTest {
             type = CalendarType.VIDEO,
             course = "Kotlin",
             dueAt = LocalDateTime.of(2023,7,27,23,59,59),
-            name = "4주차 강의"
+            name = "4주차 강의",
+            isCompleted = false
         )
         val calendarRequest = CalendarRequest(
             type = CalendarType.ASSIGNMENT,
             course = "JAVA",
             dueAt = "2023-08-28 23:59:59",
-            name = "8주차 강의"
+            name = "8주차 강의",
+            isCompleted = true
         )
         val updateCalendar = Calendar(
             type = CalendarType.ASSIGNMENT,
             course = "JAVA",
             dueAt = LocalDateTime.of(2023,8,28,23,59,59),
-            name = "8주차 강의"
+            name = "8주차 강의",
+            isCompleted = true
         )
         
         every { calendarRepository.findByIdOrNull(any()) } returns calendar
@@ -347,7 +366,8 @@ class CourseServiceUnitTest {
         assertAll(
             { assertThat(findCalendar.name).isEqualTo(calendarRequest.name) },
             { assertThat(findCalendar.dueAt).isEqualTo("2023-08-28T23:59:59") },
-            { assertThat(findCalendar.type).isEqualTo(calendarRequest.type) }
+            { assertThat(findCalendar.type).isEqualTo(calendarRequest.type) },
+            { assertThat(findCalendar.isCompleted).isTrue()}
         )
     }
     
@@ -361,21 +381,24 @@ class CourseServiceUnitTest {
             type = CalendarType.VIDEO,
             course = "Kotlin",
             dueAt = LocalDateTime.of(2023,7,27,23,59,59),
-            name = "4주차 강의"
+            name = "4주차 강의",
+            isCompleted = false
         )
         
         val wrongCalendarRequest = CalendarRequest(
             type = CalendarType.ASSIGNMENT,
             course = "JAVA",
             dueAt = "2023-08-28",
-            name = "8주차 강의"
+            name = "8주차 강의",
+            isCompleted = true
         )
         
         val calendarRequest = CalendarRequest(
             type = CalendarType.ASSIGNMENT,
             course = "JAVA",
             dueAt = "2023-08-28 23:59:59",
-            name = "8주차 강의"
+            name = "8주차 강의",
+            isCompleted = true
         )
         
         every { calendarRepository.findByIdOrNull(courseId) } returns calendar

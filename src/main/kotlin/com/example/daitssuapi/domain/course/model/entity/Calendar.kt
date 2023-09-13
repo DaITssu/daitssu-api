@@ -16,12 +16,14 @@ class Calendar(
     var type: CalendarType,
     var course: String,
     var dueAt: LocalDateTime,
-    var name: String
+    var name: String,
+    var isCompleted: Boolean
 ) : BaseEntity() {
     fun updateCalendar(calendarRequest: CalendarRequest, dueAt: LocalDateTime) {
         this.type = calendarRequest.type
         this.course = calendarRequest.course
         this.name = calendarRequest.name
         this.dueAt = dueAt
+        this.isCompleted = calendarRequest.isCompleted
     }
 }

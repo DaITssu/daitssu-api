@@ -128,14 +128,16 @@ class CourseServiceTest(
             type = CalendarType.VIDEO,
             course = "do it",
             dueAt = "2023-07-27 23:59:59",
-            name = "과제 꼭 하기"
+            name = "과제 꼭 하기",
+            isCompleted = false
         )
         val findCalendar = courseService.postCalendar(calendarRequest)
      
         assertAll(
             { assertThat(findCalendar.type).isEqualTo(calendarRequest.type) },
             { assertThat(findCalendar.name).isEqualTo(calendarRequest.name) },
-            { assertThat(findCalendar.dueAt).isEqualTo("2023-07-27T23:59:59") }
+            { assertThat(findCalendar.dueAt).isEqualTo("2023-07-27T23:59:59") },
+            { assertThat(findCalendar.isCompleted).isFalse() }
         )
     }
     
@@ -146,7 +148,8 @@ class CourseServiceTest(
             type = CalendarType.VIDEO,
             course = "do it",
             dueAt = "2023-07-27",
-            name = "과제 꼭 하기"
+            name = "과제 꼭 하기",
+            isCompleted = false
         )
         
         org.junit.jupiter.api.assertThrows<DefaultException> {
@@ -161,7 +164,8 @@ class CourseServiceTest(
             type = CalendarType.ASSIGNMENT,
             course = "JAVA",
             dueAt = "2023-08-27 23:59:59",
-            name = "과제"
+            name = "과제",
+            isCompleted = true
         )
         
         val updateCalendar = courseService.updateCalendar(calendarRequestUpdate, 13L)
@@ -170,7 +174,8 @@ class CourseServiceTest(
             { assertThat(updateCalendar.name).isEqualTo(calendarRequestUpdate.name) },
             { assertThat(updateCalendar.type).isEqualTo(calendarRequestUpdate.type) },
             { assertThat(updateCalendar.dueAt).isEqualTo("2023-08-27T23:59:59") },
-            { assertThat(updateCalendar.id).isEqualTo(13L) }
+            { assertThat(updateCalendar.id).isEqualTo(13L) },
+            { assertThat(updateCalendar.isCompleted).isTrue() }
         )
     }
     
@@ -181,7 +186,8 @@ class CourseServiceTest(
             type = CalendarType.VIDEO,
             course = "do it",
             dueAt = "2023-07-27",
-            name = "과제 꼭 하기"
+            name = "과제 꼭 하기",
+            isCompleted = true
         )
         
         assertAll(
