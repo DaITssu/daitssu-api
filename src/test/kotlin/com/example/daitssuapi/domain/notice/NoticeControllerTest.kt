@@ -2,8 +2,6 @@ package com.example.daitssuapi.domain.notice
 
 import com.example.daitssuapi.domain.notice.model.repository.NoticeRepository
 import com.example.daitssuapi.domain.notice.service.NoticeService
-import org.bouncycastle.math.raw.Nat.equalTo
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test

@@ -40,7 +40,7 @@ class FunSystemControllerTest {
     fun getAllFunSystem() {
 
         // Act and Assert
-        val result = mockMvc.get("/funsystem/전체")
+        val result = mockMvc.get("/funsystem/ALL")
             .andExpect {
                 status { isOk() }
 
@@ -56,7 +56,7 @@ class FunSystemControllerTest {
     @DisplayName("Funsystem 리스트 카테고리별 검색 확인")
     fun getSomeFunSystemList() {
 
-        mockMvc.get("/funsystem/구독")
+        mockMvc.get("/funsystem/SUBSCRIPTION")
             .andExpect {
                 status { isOk() }
                 content {

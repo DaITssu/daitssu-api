@@ -18,8 +18,8 @@ enum class FunSystemCategory(val categoryCode: String){
     EMPLOYMENT_SUPPORT("취업지원");
 
     companion object {
-        fun fromCode(categoryCode: String): FunSystemCategory?{
-            return values().find{it.categoryCode == categoryCode }
+        fun fromCode(categoryName: String): FunSystemCategory?{
+            return values().find{it.name == categoryName }
         }
     }
 }

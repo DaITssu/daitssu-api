@@ -18,7 +18,7 @@ class FunSystemService (
     ):List<FunSystemResponse>{
         val funSystems : List<FunSystem>
 
-        if(category =="전체")
+        if(category =="ALL")
             funSystems = funSystemRepository.findAll()
         else{
             val funSystemCategory = FunSystemCategory.fromCode(category)
