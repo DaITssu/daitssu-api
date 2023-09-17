@@ -1,16 +1,11 @@
 package com.example.daitssuapi.domain.notice.model.entity
 
 import com.example.daitssuapi.common.audit.BaseEntity
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.Table
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
-import java.time.LocalDateTime
+import com.example.daitssuapi.common.enums.FunSystemCategory
+import jakarta.persistence.*
 
 @Entity
-@Table(schema = "notice")
+@Table(schema = "notice", name="notice_fs")
 class FunSystem (
 
     @Column(name = "title", length= 1024, nullable = false)
@@ -19,8 +14,9 @@ class FunSystem (
     @Column(name = "content", nullable = false)
     val content : String,
 
-    @Column(name = "category", nullable= false)
-    val category:String,
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category")
+    val category:FunSystemCategory?,
 
     @Column(name = "image_url")
     val imageUrl :String,
