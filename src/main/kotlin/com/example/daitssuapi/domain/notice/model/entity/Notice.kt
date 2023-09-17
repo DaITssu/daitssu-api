@@ -3,11 +3,7 @@ package com.example.daitssuapi.domain.notice.model.entity
 import com.example.daitssuapi.common.audit.BaseEntity
 import com.example.daitssuapi.common.enums.NoticeCategory
 import jakarta.persistence.*
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
-import org.springframework.beans.factory.annotation.Autowired
-import java.sql.Timestamp
-import java.time.LocalDateTime
+
 
 
 @Entity
@@ -25,7 +21,7 @@ class Notice (
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category")
-    var category: NoticeCategory?,
+    val category: NoticeCategory,
 
     @Column(name = "image_url")
     val imageUrl :String,

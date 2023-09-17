@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service
 @Service
 class NoticeService (
     private val noticeRepository: NoticeRepository,
-    private val funSystemRepository : FunSystemRepository,
 ){
     fun getNoticeList(
         category: String
@@ -24,12 +23,9 @@ class NoticeService (
         if(category == "전체")
             notices= noticeRepository.findAll()
         else{
-            val noticeCategory = NoticeCategory.fromCode(category)
-            if(noticeCategory != null){ // 카테고리 enum 값이 존재함
-                notices = noticeRepository.findByCategory(noticeCategory)
-            }else{ // 없는 카테고리
-                throw DefaultException(errorCode = ErrorCode.INVALID_CATEGORY)
-            }
+            notices = NoticeCategory.fromCode(category)?.let{
+                noticeRepository.findByCategory(it)
+            }?:throw DefaultException(errorCode=ErrorCode.INVALID_CATEGORY)
         }
 
 
