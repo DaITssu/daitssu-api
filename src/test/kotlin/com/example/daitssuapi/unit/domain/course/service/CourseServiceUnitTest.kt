@@ -78,7 +78,7 @@ class CourseServiceUnitTest {
         every { courseRepository.findAll() } returns courses
         
         val getCourses = courseService.getCourseList()
-        val expectedCourses = courses.map { CourseResponse(name = it.name, term =  it.term) }
+        val expectedCourses = courses.map { CourseResponse(name = it.name, term =  it.term, id = it.id) }
         
         assertThat(expectedCourses).isEqualTo(getCourses)
     }
@@ -86,7 +86,7 @@ class CourseServiceUnitTest {
     @Test
     @DisplayName("올바른 courseId로 조회 시 course에 대한 정보가 올바르게 전달된다")
     fun get_course_with_course_id() {
-        val courseId = 1L
+        val courseId = 0L
         val video =  mutableListOf(Video(
             name = "kotlin-1강",
             startAt = LocalDateTime.of(2023, 8, 18, 10, 0),
@@ -118,7 +118,8 @@ class CourseServiceUnitTest {
             name = "kotlin",
             term = 8,
             videos = expectedVideo,
-            assignments = expectedAssignment
+            assignments = expectedAssignment,
+            id = courseId
         )
         
         
@@ -139,20 +140,29 @@ class CourseServiceUnitTest {
     }
     
     @Test
-    @DisplayName("날짜와 시간으로 해당 월 캘린더 조회하면 캘린더 리스트가 출력된다")
+    @DisplayName("날짜로 해당 월 캘린더 조회하면 캘린더 리스트가 출력된다")
     fun get_calendar_with_local_date_time () {
         val calendar = listOf(Calendar(
             course = "kotlin",
             type = CalendarType.ASSIGNMENT,
             name = "kotlin-첫번째 과제",
-            dueAt = LocalDateTime.of(2023,2,28,23,59,59)
+            dueAt = LocalDateTime.of(2023,2,28,23,59,59),
+            isCompleted = false
         ))
         
         every { calendarRepository.findByDueAtBetween(any(), any()) } returns calendar
         
-        val result = courseService.getCalendar("2023-02-30 09:30:00")
+        val result = courseService.getCalendar("2023-02")
         val expectedCalendar = mapOf("kotlin" to
-            calendar.map { CalendarResponse(name = it.name, dueAt = it.dueAt, type = it.type) }
+            calendar.map {
+                CalendarResponse(
+                    name = it.name,
+                    dueAt = it.dueAt,
+                    type = it.type,
+                    id = it.id,
+                    isCompleted = it.isCompleted
+                )
+            }
         )
         
         assertThat(expectedCalendar).isEqualTo(result)
@@ -161,8 +171,8 @@ class CourseServiceUnitTest {
     @Test
     @DisplayName("잘못된 날짜 포맷으로 캘린더 조회하면 에러가 발생한다")
     fun get_calendar_with_invalidate_local_date_time() {
-        val date = "2023 02 30"
-        val expectedErrorCode = ErrorCode.INVALID_DATE_FORMAT
+        val date = "2023 02"
+        val expectedErrorCode = ErrorCode.INVALID_GET_DATE_FORMAT
         
         val result = assertThrows<DefaultException> {
             courseService.getCalendar(date)
@@ -178,18 +188,25 @@ class CourseServiceUnitTest {
             type = CalendarType.VIDEO,
             course = "kotlin",
             dueAt = "2023-02-28 23:59:59",
-            name = "4주차 강의"
+            name = "4주차 강의",
+            isCompleted = false
         )
         val expectedCalendar = CalendarResponse (
             type = calendarRequest.type,
             dueAt = LocalDateTime.of(2023,2,28,23,59,59),
-            name = calendarRequest.name)
+            name = calendarRequest.name,
+            id = 0L,
+            isCompleted = false
+        )
         
         every{ calendarRepository.save(any()) } answers {
-            Calendar(type = calendarRequest.type,
+            Calendar(
+                type = calendarRequest.type,
                 course = calendarRequest.course,
                 dueAt = LocalDateTime.of(2023,2,28,23,59,59),
-                name = calendarRequest.name )
+                name = calendarRequest.name,
+                isCompleted = calendarRequest.isCompleted
+            )
         }
         
         val result = courseService.postCalendar(calendarRequest)
@@ -204,7 +221,8 @@ class CourseServiceUnitTest {
             type = CalendarType.VIDEO,
             course = "kotlin",
             dueAt = "2023-08-15",
-            name = "8주차 강의"
+            name = "8주차 강의",
+            isCompleted = false
         )
         val expectedErrorCode = ErrorCode.INVALID_DATE_FORMAT
         
@@ -310,8 +328,93 @@ class CourseServiceUnitTest {
         }
         
         val result = courseService.postCourse(courseRequest)
-        val expectedCourse = CourseResponse (name = courseRequest.name, term = courseRequest.term)
+        val expectedCourse = CourseResponse (name = courseRequest.name, term = courseRequest.term, id =  0)
         
         assertThat(expectedCourse).isEqualTo(result)
+    }
+    
+    @Test
+    @DisplayName("캘린더를 수정하면 정보가 바뀐다")
+    fun put_update_calendar() {
+        val calendar = Calendar(
+            type = CalendarType.VIDEO,
+            course = "Kotlin",
+            dueAt = LocalDateTime.of(2023,7,27,23,59,59),
+            name = "4주차 강의",
+            isCompleted = false
+        )
+        val calendarRequest = CalendarRequest(
+            type = CalendarType.ASSIGNMENT,
+            course = "JAVA",
+            dueAt = "2023-08-28 23:59:59",
+            name = "8주차 강의",
+            isCompleted = true
+        )
+        val updateCalendar = Calendar(
+            type = CalendarType.ASSIGNMENT,
+            course = "JAVA",
+            dueAt = LocalDateTime.of(2023,8,28,23,59,59),
+            name = "8주차 강의",
+            isCompleted = true
+        )
+        
+        every { calendarRepository.findByIdOrNull(any()) } returns calendar
+        every { calendarRepository.save(any()) } returns updateCalendar
+        
+        val findCalendar = courseService.updateCalendar(calendarRequest, 13L)
+        
+        assertAll(
+            { assertThat(findCalendar.name).isEqualTo(calendarRequest.name) },
+            { assertThat(findCalendar.dueAt).isEqualTo("2023-08-28T23:59:59") },
+            { assertThat(findCalendar.type).isEqualTo(calendarRequest.type) },
+            { assertThat(findCalendar.isCompleted).isTrue()}
+        )
+    }
+    
+    @Test
+    @DisplayName("잘못된 calendarId, date로 요청하면 에러가 난다")
+    fun put_update_calendar_with_wrong_calendar_id_or_date() {
+        val wrongCalendarId = 999L
+        val courseId = 13L
+        
+        val calendar = Calendar(
+            type = CalendarType.VIDEO,
+            course = "Kotlin",
+            dueAt = LocalDateTime.of(2023,7,27,23,59,59),
+            name = "4주차 강의",
+            isCompleted = false
+        )
+        
+        val wrongCalendarRequest = CalendarRequest(
+            type = CalendarType.ASSIGNMENT,
+            course = "JAVA",
+            dueAt = "2023-08-28",
+            name = "8주차 강의",
+            isCompleted = true
+        )
+        
+        val calendarRequest = CalendarRequest(
+            type = CalendarType.ASSIGNMENT,
+            course = "JAVA",
+            dueAt = "2023-08-28 23:59:59",
+            name = "8주차 강의",
+            isCompleted = true
+        )
+        
+        every { calendarRepository.findByIdOrNull(courseId) } returns calendar
+        every { calendarRepository.findByIdOrNull(wrongCalendarId) } returns null
+        
+        val result = assertThrows<DefaultException> {
+            courseService.updateCalendar(wrongCalendarRequest, courseId)
+        }
+        val resultWrongId = assertThrows<DefaultException> {
+            courseService.updateCalendar(calendarRequest, wrongCalendarId)
+        }
+        
+        assertAll(
+            { assertThat(result.errorCode).isEqualTo(ErrorCode.INVALID_DATE_FORMAT) },
+            { assertThat(resultWrongId.errorCode).isEqualTo(ErrorCode.CALENDAR_NOT_FOUND)}
+        )
+        
     }
 }

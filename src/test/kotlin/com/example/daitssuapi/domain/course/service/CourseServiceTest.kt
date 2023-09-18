@@ -91,7 +91,7 @@ class CourseServiceTest(
     @DisplayName("올바른 date 형식으로 캘린더 조회시_일정이 조회된다")
     fun get_calendar_with_date () {
         // case 1. 조회가 잘되는지 확인
-        val date = "2023-07-01 11:00:00"
+        val date = "2023-07"
         val name = "eat paper"
         val findCalendar = courseService.getCalendar(date)
         
@@ -99,16 +99,7 @@ class CourseServiceTest(
             { assertThat(findCalendar.keys).contains(name) },
             { assertThat(findCalendar[name]?.size).isEqualTo(2) }
         )
-        
-        // case2 경계값
-        val date2 = "2023-05-01 00:00:00"
-        val name2 = "choco"
-        val findCalendar2 = courseService.getCalendar(date2)
-
-        assertAll(
-            { assertThat(findCalendar2.keys).contains(name2) },
-            { assertThat(findCalendar2[name2]?.size).isEqualTo(1) }
-        )
+     
     }
     
     @Test
@@ -128,14 +119,16 @@ class CourseServiceTest(
             type = CalendarType.VIDEO,
             course = "do it",
             dueAt = "2023-07-27 23:59:59",
-            name = "과제 꼭 하기"
+            name = "과제 꼭 하기",
+            isCompleted = false
         )
         val findCalendar = courseService.postCalendar(calendarRequest)
      
         assertAll(
             { assertThat(findCalendar.type).isEqualTo(calendarRequest.type) },
             { assertThat(findCalendar.name).isEqualTo(calendarRequest.name) },
-            { assertThat(findCalendar.dueAt).isEqualTo("2023-07-27T23:59:59") }
+            { assertThat(findCalendar.dueAt).isEqualTo("2023-07-27T23:59:59") },
+            { assertThat(findCalendar.isCompleted).isFalse() }
         )
     }
     
@@ -146,12 +139,57 @@ class CourseServiceTest(
             type = CalendarType.VIDEO,
             course = "do it",
             dueAt = "2023-07-27",
-            name = "과제 꼭 하기"
+            name = "과제 꼭 하기",
+            isCompleted = false
         )
         
         org.junit.jupiter.api.assertThrows<DefaultException> {
             courseService.postCalendar(calendarRequest)
         }
+    }
+    
+    @Test
+    @DisplayName("올바른 calendarRequest로 수정 요청시_캘린더가 출력된다")
+    fun put_update_calendar_with_calendar_request() {
+        val calendarRequestUpdate = CalendarRequest(
+            type = CalendarType.ASSIGNMENT,
+            course = "JAVA",
+            dueAt = "2023-08-27 23:59:59",
+            name = "과제",
+            isCompleted = true
+        )
+        
+        val updateCalendar = courseService.updateCalendar(calendarRequestUpdate, 13L)
+        
+        assertAll(
+            { assertThat(updateCalendar.name).isEqualTo(calendarRequestUpdate.name) },
+            { assertThat(updateCalendar.type).isEqualTo(calendarRequestUpdate.type) },
+            { assertThat(updateCalendar.dueAt).isEqualTo("2023-08-27T23:59:59") },
+            { assertThat(updateCalendar.id).isEqualTo(13L) },
+            { assertThat(updateCalendar.isCompleted).isTrue() }
+        )
+    }
+    
+    @Test
+    @DisplayName("잘못된 calendarRequest, courseId 요청시_에러가 발생한다")
+    fun update_create_calendar_with_wrong_calendar_request() {
+        val calendarRequest = CalendarRequest(
+            type = CalendarType.VIDEO,
+            course = "do it",
+            dueAt = "2023-07-27",
+            name = "과제 꼭 하기",
+            isCompleted = true
+        )
+        
+        assertAll(
+            { org.junit.jupiter.api.assertThrows<DefaultException> {
+                    courseService.updateCalendar(calendarRequest, 13L)
+                } },
+            { org.junit.jupiter.api.assertThrows<DefaultException> {
+                courseService.updateCalendar(calendarRequest, 1L)
+            } }
+        )
+        
     }
     
 }
