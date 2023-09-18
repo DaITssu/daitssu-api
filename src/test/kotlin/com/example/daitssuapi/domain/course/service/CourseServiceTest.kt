@@ -99,7 +99,7 @@ class CourseServiceTest(
             { assertThat(findCalendar.keys).contains(name) },
             { assertThat(findCalendar[name]?.size).isEqualTo(2) }
         )
-        
+     
     }
     
     @Test
