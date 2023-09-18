@@ -1,0 +1,28 @@
+spring:
+  profiles:
+    active: local
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;CASE_INSENSITIVE_IDENTIFIERS=true;INIT=CREATE SCHEMA IF NOT EXISTS main\;CREATE SCHEMA IF NOT EXISTS notice\;CREATE SCHEMA IF NOT EXISTS course
+    username: sa
+    password:
+
+  sql:
+    init:
+      mode: always
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+    properties:
+      show-sql: true
+
+  logging:
+    level:
+      root: DEBUG

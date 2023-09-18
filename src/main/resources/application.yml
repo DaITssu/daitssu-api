@@ -1,4 +1,3 @@
-# Common Module application.yml
 spring:
   jpa:
     properties:
@@ -11,16 +10,18 @@ spring:
         persistence:
           query:
             timeout: 5000
+
   servlet:
     multipart:
-      # location: c:\\Temp\\upload
       maxFileSize: 10MB
       maxRequestSize: 10MB
     hikari:
       leak-detection-threshold: 20000
+
   mvc:
     log-request-details: true
     log-resolved-exception: true
+
 logging:
   pattern:
     console: "\
@@ -34,10 +35,12 @@ logging:
       %m${LOG_EXCEPTION_CONVERSION_WORD}%n"
     dateformat: "yyyy-MM-dd HH:mm:ss.SSS"
     level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
   exception-conversion-word: "%replace(%wEx){'\n','\u2028'}%nopex"
+
   level:
     com:
-      example: TRACE
+      example: INFO
     org:
       springframework:
         web:

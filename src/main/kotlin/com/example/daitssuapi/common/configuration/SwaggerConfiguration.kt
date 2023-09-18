@@ -108,22 +108,13 @@ class SwaggerConfiguration {
     private val description = """
         <h3>요청 헤더</h3>
         
-        필요한 요청 헤더 2개는 다음과 같습니다. <br />
+        개발 환경은 토큰 없어도 됩니다.
+        
+        운영 환경에 필요한 요청 헤더 2개는 다음과 같습니다. <br />
         이때 "{토큰}" 대신 발급된 토큰을 넣어주세요. <br />
         
         * "Authorization: Bearer {토큰}"
         * "Content-Type: application/json"
         
-        <h3>cURL 예시</h3>
-        <code>
-        curl -X 'POST' <br />
-        &nbsp;  '$apiRootUrl/reservation-api/register' <br />
-        &nbsp;  -H 'Authorization: Bearer {토큰}' <br />
-        &nbsp;  -H 'Content-Type: application/json' <br />
-        &nbsp;  -d '{ <br />
-        &nbsp;&nbsp;  "name": "테스트", <br />
-        &nbsp;&nbsp;  "email": "string", <br />
-        &nbsp; }' <br />
-        </code>
         """.trimIndent()
 }
