@@ -3,6 +3,7 @@ package com.example.daitssuapi.domain.notice.service
 import com.example.daitssuapi.common.enums.ErrorCode
 import com.example.daitssuapi.common.enums.NoticeCategory
 import com.example.daitssuapi.common.exception.DefaultException
+import com.example.daitssuapi.domain.notice.dto.NoticePageResponse
 import com.example.daitssuapi.domain.notice.dto.NoticeResponse
 import com.example.daitssuapi.domain.notice.model.entity.Notice
 import com.example.daitssuapi.domain.notice.model.repository.NoticeRepository
@@ -36,11 +37,11 @@ class NoticeService (
     }
     fun getNoticePage(
         id: Long
-    ):NoticeResponse{
+    ): NoticePageResponse {
         val notice :Notice = noticeRepository.findByIdOrNull(id)
             ?: throw DefaultException(errorCode= ErrorCode.NOTICE_NOT_FOUND)
 
-        return NoticeResponse.fromNotice(notice)
+        return NoticePageResponse.fromNotice(notice)
     }
 
 }

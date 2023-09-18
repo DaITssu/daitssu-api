@@ -62,12 +62,8 @@ class FunSystemControllerTest {
                 content {
                     jsonPath("$.data[0].id").value(2)
                     jsonPath("$.data[0].title").value("공지사항2")
-                    jsonPath("$.data[0].content").value("2번 공지 내용입니다!!")
                     jsonPath("$.data[0].category").value("SUBSCRIPTION")
-                    jsonPath("$.data[0].imageUrl").doesNotExist()
-                    jsonPath("$.data[0].url").doesNotExist()
                     jsonPath("$.data[0].createdAt").value("0999-12-27T00:32:08")
-                    jsonPath("$.data[0].updatedAt").value("0999-12-27T00:32:08")
                 }
             }
     }

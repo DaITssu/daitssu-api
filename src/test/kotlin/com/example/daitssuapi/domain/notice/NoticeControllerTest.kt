@@ -50,7 +50,7 @@ class NoticeControllerTest {
     fun getAllNoticeList() {
 
         // Act and Assert
-        val result = mockMvc.get("/notice/전체")
+        val result = mockMvc.get("/notice/ALL")
             .andExpect {
                 status { isOk() }
 
@@ -66,19 +66,14 @@ class NoticeControllerTest {
     @DisplayName("Notice 리스트 카테고리별 검색 확인")
     fun getSomeNoticeList() {
 
-        mockMvc.get("/notice/구독")
+        mockMvc.get("/notice/SUBSCRIPTION")
             .andExpect {
                 status { isOk() }
                 content {
                     jsonPath("$.data[0].id").value(2)
                     jsonPath("$.data[0].title").value("공지사항2")
-                    jsonPath("$.data[0].departmentId").value(2)
-                    jsonPath("$.data[0].content").value("2번 공지 내용입니다!!")
                     jsonPath("$.data[0].category").value("SUBSCRIPTION")
-                    jsonPath("$.data[0].imageUrl").doesNotExist()
-                    jsonPath("$.data[0].fileUrl").doesNotExist()
                     jsonPath("$.data[0].createdAt").value("0999-12-27T00:32:08")
-                    jsonPath("$.data[0].updatedAt").value("0999-12-27T00:32:08")
                 }
             }
     }

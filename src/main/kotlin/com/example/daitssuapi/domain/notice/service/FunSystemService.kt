@@ -3,6 +3,7 @@ package com.example.daitssuapi.domain.notice.service
 import com.example.daitssuapi.common.enums.ErrorCode
 import com.example.daitssuapi.common.enums.FunSystemCategory
 import com.example.daitssuapi.common.exception.DefaultException
+import com.example.daitssuapi.domain.notice.dto.FunSystemPageResponse
 import com.example.daitssuapi.domain.notice.dto.FunSystemResponse
 import com.example.daitssuapi.domain.notice.model.entity.FunSystem
 import com.example.daitssuapi.domain.notice.model.repository.FunSystemRepository
@@ -33,11 +34,11 @@ class FunSystemService (
 
     fun getFunSystemPage(
         id : Long
-    ): FunSystemResponse {
+    ): FunSystemPageResponse {
         val funSystem : FunSystem = funSystemRepository.findByIdOrNull(id)
             ?: throw DefaultException(errorCode = ErrorCode.FUNSYSTEM_NOT_FOUND)
 
-        return FunSystemResponse.fromFunSystem(funSystem)
+        return FunSystemPageResponse.fromFunSystem(funSystem)
     }
 
 }

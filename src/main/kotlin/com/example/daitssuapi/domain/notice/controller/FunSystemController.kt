@@ -1,6 +1,7 @@
 package com.example.daitssuapi.domain.notice.controller
 
 import com.example.daitssuapi.common.dto.Response
+import com.example.daitssuapi.domain.notice.dto.FunSystemPageResponse
 import com.example.daitssuapi.domain.notice.dto.FunSystemResponse
 import com.example.daitssuapi.domain.notice.service.FunSystemService
 import org.springframework.web.bind.annotation.GetMapping
@@ -22,6 +23,6 @@ class FunSystemController(
     @GetMapping("/page/{id}")
     fun getFunSystemPage(
         @PathVariable id : Long,
-    ):Response<FunSystemResponse> =
+    ):Response<FunSystemPageResponse> =
         Response(data = funSystemService.getFunSystemPage(id))
 }
