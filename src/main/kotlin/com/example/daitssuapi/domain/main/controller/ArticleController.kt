@@ -1,13 +1,14 @@
 package com.example.daitssuapi.domain.main.controller
 
 import com.example.daitssuapi.common.dto.Response
+import com.example.daitssuapi.domain.main.dto.request.ArticleCreateRequest
 import com.example.daitssuapi.domain.main.dto.response.ArticleResponse
-import com.example.daitssuapi.domain.main.dto.request.ArticleWriteRequest
 import com.example.daitssuapi.domain.main.service.ArticleService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -29,8 +30,7 @@ class ArticleController(
     fun getArticle(
         @Parameter(name = "articleId", description = "게시글 id")
         @PathVariable articleId: Long
-    ): Response<ArticleResponse>
-        = Response(data = articleService.getArticle(articleId))
+    ): Response<ArticleResponse> = Response(data = articleService.getArticle(articleId))
 
     @Operation(
         summary = "새로운 게시글 작성",
@@ -41,9 +41,10 @@ class ArticleController(
             )
         ]
     )
-    @PostMapping
-    fun writeArticle(
-        @RequestBody articleWriteRequest: ArticleWriteRequest
-    ): Response<ArticleResponse>
-        = Response(data = articleService.writeArticle(articleWriteRequest))
+    @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun createArticle(
+        @ModelAttribute articleCreateRequest: ArticleCreateRequest
+    ) {
+        articleService.createArticle(articleCreateRequest)
+    }
 }

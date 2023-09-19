@@ -26,5 +26,6 @@ data class ArticleResponse(
     @Schema(description = "마지막 수정된 시각")
     val updatedAt: LocalDateTime,
 
-//    val images // image 데이터
+    @Schema(description = "이미지 url 리스트")
+    val imageUrls: List<String>,
 )

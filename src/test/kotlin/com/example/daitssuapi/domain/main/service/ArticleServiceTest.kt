@@ -1,6 +1,6 @@
 package com.example.daitssuapi.domain.main.service
 
-import com.example.daitssuapi.domain.main.dto.request.ArticleWriteRequest
+import com.example.daitssuapi.domain.main.dto.request.ArticleCreateRequest
 import com.example.daitssuapi.domain.main.dto.response.ArticleResponse
 import com.example.daitssuapi.domain.main.enums.Topic
 import com.example.daitssuapi.domain.main.model.entity.Article
@@ -24,18 +24,18 @@ class ArticleServiceTest(
         val user = userRepository.findAll().filter { null != it.nickname }[0]
 
         // when
-        val articleWriteRequest = ArticleWriteRequest(
+        val articleCreateRequest = ArticleCreateRequest(
             topic = Topic.CHAT,
             title = "테스트 제목",
             content = "테스트 내용",
             nickname = user.nickname!!
         )
-        val articleResponse = articleService.writeArticle(articleWriteRequest)
+        val articleResponse = articleService.createArticle(articleCreateRequest)
 
         // then
-        assertEquals(articleWriteRequest.topic.value, articleResponse.topic)
-        assertEquals(articleWriteRequest.title, articleResponse.title)
-        assertEquals(articleWriteRequest.content, articleResponse.content)
+        assertEquals(articleCreateRequest.topic.value, articleResponse.topic)
+        assertEquals(articleCreateRequest.title, articleResponse.title)
+        assertEquals(articleCreateRequest.content, articleResponse.content)
         assertEquals(user.nickname, articleResponse.writerNickName)
     }
 

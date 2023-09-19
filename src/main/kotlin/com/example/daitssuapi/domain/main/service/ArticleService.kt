@@ -1,12 +1,16 @@
 package com.example.daitssuapi.domain.main.service
 
+import com.example.daitssuapi.common.enums.DomainType
 import com.example.daitssuapi.common.enums.ErrorCode
 import com.example.daitssuapi.common.exception.DefaultException
-import com.example.daitssuapi.domain.main.dto.request.ArticleWriteRequest
+import com.example.daitssuapi.domain.infra.service.S3Service
+import com.example.daitssuapi.domain.main.dto.request.ArticleCreateRequest
 import com.example.daitssuapi.domain.main.dto.response.ArticleResponse
 import com.example.daitssuapi.domain.main.model.entity.Article
-import com.example.daitssuapi.domain.main.model.repository.ArticleRepository
+import com.example.daitssuapi.domain.main.model.entity.ArticleImage
 import com.example.daitssuapi.domain.main.model.entity.User
+import com.example.daitssuapi.domain.main.model.repository.ArticleImageRepository
+import com.example.daitssuapi.domain.main.model.repository.ArticleRepository
 import com.example.daitssuapi.domain.main.model.repository.UserRepository
 import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
@@ -15,7 +19,9 @@ import org.springframework.stereotype.Service
 @Service
 class ArticleService(
     private val articleRepository: ArticleRepository,
-    private val userRepository: UserRepository
+    private val articleImageRepository: ArticleImageRepository,
+    private val userRepository: UserRepository,
+    private val s3Service: S3Service,
 ) {
     fun getArticle(id: Long): ArticleResponse {
         val article: Article = articleRepository.findByIdOrNull(id)
@@ -27,35 +33,40 @@ class ArticleService(
             title = article.title,
             content = article.content,
             writerNickName = article.writer.nickname!!,
-            updatedAt = article.updatedAt
+            updatedAt = article.updatedAt,
+            imageUrls = article.articleImages.map { it.url }
         )
     }
 
     @Transactional
-    fun writeArticle(articleWriteRequest: ArticleWriteRequest): ArticleResponse {
-        if (articleWriteRequest.nickname == null) {
-            throw DefaultException(ErrorCode.NICKNAME_REQUIRED)
-        }
-
-        val user: User = userRepository.findByNickname(articleWriteRequest.nickname)
+    fun createArticle(articleCreateRequest: ArticleCreateRequest) {
+        val user: User = userRepository.findByIdOrNull(articleCreateRequest.userId)
             ?: throw DefaultException(ErrorCode.USER_NOT_FOUND)
 
-        val article: Article = Article(
-            topic = articleWriteRequest.topic,
-            title = articleWriteRequest.title,
-            content = articleWriteRequest.content,
+        val imageUrls = articleCreateRequest.images.map {
+            s3Service.uploadImageToS3(
+                userId = user.id,
+                domain = DomainType.COMMUNITY.name,
+                fileName = it.originalFilename!!,
+                imageByteArray = it.bytes,
+            )
+        }
+
+        val article = Article(
+            topic = articleCreateRequest.topic,
+            title = articleCreateRequest.title,
+            content = articleCreateRequest.content,
             writer = user
         )
 
-        val savedArticle = articleRepository.save(article)
+        val articleImages = imageUrls.map {
+            ArticleImage(
+                url = it,
+                article = article
+            )
+        }
 
-        return ArticleResponse(
-            id = savedArticle.id,
-            topic = savedArticle.topic.value,
-            title = savedArticle.title,
-            content = savedArticle.content,
-            writerNickName = user.nickname!!,
-            updatedAt = savedArticle.updatedAt
-        )
+        articleRepository.save(article)
+        articleImageRepository.saveAll(articleImages)
     }
 }
