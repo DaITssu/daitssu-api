@@ -40,8 +40,19 @@ class ArticleService(
         )
     }
 
-    fun pageArticleList(pageable: Pageable): Page<ArticleResponse> {
-        val articles: Page<Article> = articleRepository.findAll(pageable)
+    fun pageArticleList(
+        pageable: Pageable,
+        inquiry: String?,
+    ): Page<ArticleResponse> {
+        val articles: Page<Article> =
+            if (inquiry == null)
+                articleRepository.findAll(pageable)
+            else
+                articleRepository.findAllByTitleContainingOrContentContaining(
+                    title = inquiry,
+                    content = inquiry,
+                    pageable = pageable,
+                )
 
         return articles.map {
             ArticleResponse(

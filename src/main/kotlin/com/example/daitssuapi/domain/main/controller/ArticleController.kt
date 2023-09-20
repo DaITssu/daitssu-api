@@ -62,8 +62,13 @@ sort: [\"createdAt\"]
             sort = ["createdAt"],
         )
         pageable: Pageable,
+        @RequestParam
+        inquiry: String? = null,
     ): Response<PageArticlesResponse> {
-        val articles = articleService.pageArticleList(pageable)
+        val articles = articleService.pageArticleList(
+            inquiry = inquiry,
+            pageable = pageable
+        )
 
         return Response(
             data = PageArticlesResponse(
