@@ -13,6 +13,8 @@ import com.example.daitssuapi.domain.main.model.repository.ArticleImageRepositor
 import com.example.daitssuapi.domain.main.model.repository.ArticleRepository
 import com.example.daitssuapi.domain.main.model.repository.UserRepository
 import jakarta.transaction.Transactional
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -36,6 +38,22 @@ class ArticleService(
             updatedAt = article.updatedAt,
             imageUrls = article.articleImages.map { it.url }
         )
+    }
+
+    fun pageArticleList(pageable: Pageable): Page<ArticleResponse> {
+        val articles: Page<Article> = articleRepository.findAll(pageable)
+
+        return articles.map {
+            ArticleResponse(
+                id = it.id,
+                topic = it.topic.value,
+                title = it.title,
+                content = it.content,
+                writerNickName = it.writer.nickname!!,
+                updatedAt = it.updatedAt,
+                imageUrls = it.articleImages.map { image -> image.url }
+            )
+        }
     }
 
     @Transactional
