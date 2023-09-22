@@ -87,7 +87,9 @@ sort: [\"createdAt\"]
     @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun createArticle(
         @ModelAttribute articleCreateRequest: ArticleCreateRequest
-    ) {
+    ): Response<String> {
         articleService.createArticle(articleCreateRequest)
+
+        return Response(code = 200, message = "OK", data = "게시글 작성 성공")
     }
 }
