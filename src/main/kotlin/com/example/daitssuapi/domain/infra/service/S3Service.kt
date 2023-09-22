@@ -1,5 +1,6 @@
 package com.example.daitssuapi.domain.infra.service
 
+import com.example.daitssuapi.common.constants.FileFormat
 import org.springframework.stereotype.Service
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
@@ -24,7 +25,7 @@ class S3Service(
         val amazonS3 = S3Client.builder().build()
 
         val fileNameExceptExtension = fileName.substringBeforeLast(".")
-        val extension = if (fileName.substringAfterLast(".") in listOf("webp", "WEBP")) "webp" else "jpg"
+        val extension = if (fileName.substringAfterLast(".") in FileFormat.webp) "webp" else "jpg"
 
         val keyName = "$profile/$domain/$userId/image/" + LocalDateTime.now()
             .toString() + "-" + fileNameExceptExtension + "." + extension
