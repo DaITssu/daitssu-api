@@ -6,6 +6,7 @@ import com.example.daitssuapi.common.exception.DefaultException
 import com.example.daitssuapi.domain.infra.service.S3Service
 import com.example.daitssuapi.domain.main.dto.request.ArticleCreateRequest
 import com.example.daitssuapi.domain.main.dto.response.ArticleResponse
+import com.example.daitssuapi.domain.main.dto.response.PageArticlesResponse
 import com.example.daitssuapi.domain.main.model.entity.Article
 import com.example.daitssuapi.domain.main.model.entity.ArticleImage
 import com.example.daitssuapi.domain.main.model.entity.User
@@ -13,6 +14,8 @@ import com.example.daitssuapi.domain.main.model.repository.ArticleImageRepositor
 import com.example.daitssuapi.domain.main.model.repository.ArticleRepository
 import com.example.daitssuapi.domain.main.model.repository.UserRepository
 import jakarta.transaction.Transactional
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -35,6 +38,38 @@ class ArticleService(
             writerNickName = article.writer.nickname!!,
             updatedAt = article.updatedAt,
             imageUrls = article.articleImages.map { it.url }
+        )
+    }
+
+    fun pageArticleList(
+        pageable: Pageable,
+        inquiry: String?,
+    ): PageArticlesResponse {
+        val articles: Page<Article> =
+            if (inquiry == null)
+                articleRepository.findAll(pageable)
+            else
+                articleRepository.findAllByTitleContainingOrContentContaining(
+                    title = inquiry,
+                    content = inquiry,
+                    pageable = pageable,
+                )
+
+        val articleResponses = articles.map {
+            ArticleResponse(
+                id = it.id,
+                topic = it.topic.value,
+                title = it.title,
+                content = it.content,
+                writerNickName = it.writer.nickname!!,
+                updatedAt = it.updatedAt,
+                imageUrls = it.articleImages.map { image -> image.url }
+            )
+        }
+
+        return PageArticlesResponse(
+            articles = articleResponses.content,
+            totalPages = articleResponses.totalPages
         )
     }
 
