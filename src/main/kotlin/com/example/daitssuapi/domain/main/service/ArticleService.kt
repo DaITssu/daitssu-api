@@ -102,6 +102,13 @@ class ArticleService(
         }
 
         articleRepository.save(article)
-        articleImageRepository.saveAll(articleImages)
+
+        runCatching {
+            articleImageRepository.saveAll(articleImages)
+        }.onFailure {
+            imageUrls.map { url ->
+                s3Service.deleteFromS3ByUrl(url)
+            }
+        }.getOrThrow()
     }
 }

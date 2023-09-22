@@ -1,6 +1,7 @@
 package com.example.daitssuapi.domain.infra.service
 
 import com.example.daitssuapi.common.constants.FileFormat
+import com.example.daitssuapi.domain.infra.constants.S3Bucket
 import org.springframework.stereotype.Service
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
@@ -34,7 +35,7 @@ class S3Service(
 
         val putObjectRequest = PutObjectRequest
             .builder()
-            .bucket(bucketName)
+            .bucket(S3Bucket.bucketName)
             .key(keyName)
             .acl(objectAcl)
             .build()
@@ -46,7 +47,7 @@ class S3Service(
 
         val url = amazonS3.utilities().getUrl(
             GetUrlRequest.builder()
-                .bucket(bucketName)
+                .bucket(S3Bucket.bucketName)
                 .key(keyName)
                 .build(),
         ).toString()
@@ -56,27 +57,22 @@ class S3Service(
         return url
     }
 
-    fun deleteImageFromS3(
+    fun deleteFromS3ByUrl(
         url: String,
     ) {
         val amazonS3 = S3Client.builder().build()
         val decodedUrlString = URLDecoder.decode(url, "UTF-8").replace("%3A", ":")
 
-        val key = decodedUrlString.substringAfter(endPointUrl)
+        val key = decodedUrlString.substringAfter(S3Bucket.endPointUrl)
 
         val deleteRequest = DeleteObjectRequest.builder()
-            .bucket(bucketName)
+            .bucket(S3Bucket.bucketName)
             .key(key)
             .build()
 
         amazonS3.deleteObject(deleteRequest)
 
         amazonS3.close()
-    }
-
-    companion object {
-        const val bucketName = "daitssu-bucket"
-        const val endPointUrl = "https://daitssu-bucket.s3.ap-northeast-2.amazonaws.com/"
     }
 }
 
