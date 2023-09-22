@@ -6,6 +6,7 @@ import com.example.daitssuapi.common.exception.DefaultException
 import com.example.daitssuapi.domain.infra.service.S3Service
 import com.example.daitssuapi.domain.main.dto.request.ArticleCreateRequest
 import com.example.daitssuapi.domain.main.dto.response.ArticleResponse
+import com.example.daitssuapi.domain.main.dto.response.PageArticlesResponse
 import com.example.daitssuapi.domain.main.model.entity.Article
 import com.example.daitssuapi.domain.main.model.entity.ArticleImage
 import com.example.daitssuapi.domain.main.model.entity.User
@@ -43,7 +44,7 @@ class ArticleService(
     fun pageArticleList(
         pageable: Pageable,
         inquiry: String?,
-    ): Page<ArticleResponse> {
+    ): PageArticlesResponse {
         val articles: Page<Article> =
             if (inquiry == null)
                 articleRepository.findAll(pageable)
@@ -54,7 +55,7 @@ class ArticleService(
                     pageable = pageable,
                 )
 
-        return articles.map {
+        val articleResponses = articles.map {
             ArticleResponse(
                 id = it.id,
                 topic = it.topic.value,
@@ -65,6 +66,11 @@ class ArticleService(
                 imageUrls = it.articleImages.map { image -> image.url }
             )
         }
+
+        return PageArticlesResponse(
+            articles = articleResponses.content,
+            totalPages = articleResponses.totalPages
+        )
     }
 
     @Transactional

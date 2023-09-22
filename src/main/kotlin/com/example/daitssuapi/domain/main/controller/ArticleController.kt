@@ -71,10 +71,7 @@ sort: [\"createdAt\"]
         )
 
         return Response(
-            data = PageArticlesResponse(
-                articles = articles.content,
-                totalPages = articles.totalPages,
-            )
+            data = articles
         )
     }
 
