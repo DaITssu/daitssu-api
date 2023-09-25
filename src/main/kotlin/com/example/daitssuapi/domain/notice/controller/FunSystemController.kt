@@ -4,10 +4,7 @@ import com.example.daitssuapi.common.dto.Response
 import com.example.daitssuapi.domain.notice.dto.FunSystemPageResponse
 import com.example.daitssuapi.domain.notice.dto.FunSystemResponse
 import com.example.daitssuapi.domain.notice.service.FunSystemService
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/funsystem")
@@ -16,9 +13,15 @@ class FunSystemController(
 ){
     @GetMapping("/{category}")
     fun getFunSystemList(
-        @PathVariable category:String
-    ): Response<List<FunSystemResponse>> =
-        Response(data = funSystemService.getFunSystemList(category))
+        @PathVariable category:String,
+        @RequestParam(required = false) searchKeyword : String?
+    ): Response<List<FunSystemResponse>>{
+        if(searchKeyword == null)
+            return Response(data = funSystemService.getFunSystemList(category))
+        else
+            return Response(data = funSystemService.getFunSystemSearchList(category,searchKeyword))
+    }
+
 
     @GetMapping("/page/{id}")
     fun getFunSystemPage(

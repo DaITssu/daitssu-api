@@ -13,7 +13,10 @@ import org.springframework.transaction.annotation.Transactional
 interface NoticeRepository :JpaRepository<Notice, Long>{
     fun findByCategory(category:NoticeCategory):
             List<Notice>
-
+    fun findByCategoryAndTitleContaining(category:NoticeCategory,title :String):
+            List<Notice>
+    fun findByTitleContaining(searchKeyword: String):
+            List<Notice>
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(value="UPDATE Notice SET views=views+1 WHERE id= :id")

@@ -58,12 +58,27 @@ class NoticeControllerTest {
             .andReturn()
         println(result.response.contentAsString)
     }
-
     @Sql("classpath:schema.sql")
     @Sql("classpath:data.sql")
     @Test
     @WithMockUser
-    @DisplayName("Notice 리스트 카테고리별 검색 확인")
+    @DisplayName("Notice 리스트 전체 검색 확인")
+    fun getAllNoticeListWithMark() {
+
+        // Act and Assert
+        val result = mockMvc.get("/notice/ALL?searchKeyword=!")
+            .andExpect {
+                status { isOk() }
+
+            }
+            .andReturn()
+        println(result.response.contentAsString)
+    }
+    @Sql("classpath:schema.sql")
+    @Sql("classpath:data.sql")
+    @Test
+    @WithMockUser
+    @DisplayName("Notice 리스트 카테고리 검색 확인")
     fun getSomeNoticeList() {
 
         mockMvc.get("/notice/SUBSCRIPTION")
@@ -100,7 +115,30 @@ class NoticeControllerTest {
                 }
             }
     }
+    @Sql("classpath:schema.sql")
+    @Sql("classpath:data.sql")
+    @Test
+    @WithMockUser
+    @DisplayName("Notice 리스트 카테고리별 검색 확인") // 같은 카테고리로 4번과 5번이 있는데 둘중 5 하나만 검색해서 나오게 함
+    fun getSearchedNoticeList() {
 
+        mockMvc.get("/notice/INTERNATIONAL_EXCHANGE?searchKeyword=5")
+            .andExpect {
+                status { isOk() }
+                content {
+                    jsonPath("$.data[0].id").value(5)
+                    jsonPath("$.data[0].title").value("공지사항5!")
+                    jsonPath("$.data[0].departmentId").value(5)
+                    jsonPath("$.data[0].content").value("5번 공지 내용입니다!!")
+                    jsonPath("$.data[0].category").value("INTERNATIONAL_EXCHANGE")
+                    jsonPath("$.data[0].imageUrl").doesNotExist()
+                    jsonPath("$.data[0].fileUrl").doesNotExist()
+                    jsonPath("$.data[0].createdAt").value("0999-12-27T00:32:08")
+                    jsonPath("$.data[0].updatedAt").value("0999-12-27T00:32:08")
+                }
+            }
+
+    }
     @Sql("classpath:schema.sql")
     @Sql("classpath:data.sql")
     @Test

@@ -14,7 +14,10 @@ interface FunSystemRepository :JpaRepository<FunSystem, Long> {
 
     fun findByCategory(category: FunSystemCategory):
             List<FunSystem>
-
+    fun findByCategoryAndTitleContaining(category: FunSystemCategory, title :String):
+            List<FunSystem>
+    fun findByTitleContaining(searchKeyword: String):
+            List<FunSystem>
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(value="UPDATE FunSystem SET views=views+1 WHERE id= :id")

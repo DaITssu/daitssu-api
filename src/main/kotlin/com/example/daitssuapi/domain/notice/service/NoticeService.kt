@@ -35,6 +35,25 @@ class NoticeService (
         return notices.map { NoticeResponse.fromNotice(it) }
 
     }
+    fun getNoticeSearchList(
+        category: String,
+        searchKeyword : String
+    ):List<NoticeResponse> {
+
+        val notices:List<Notice>
+
+        if(category == "ALL")
+            notices= noticeRepository.findByTitleContaining(searchKeyword)
+        else{
+            notices = NoticeCategory.fromCode(category)?.let {
+                noticeRepository.findByCategoryAndTitleContaining(it,searchKeyword)
+            } ?: throw DefaultException(errorCode = ErrorCode.INVALID_CATEGORY)
+        }
+
+
+        return notices.map { NoticeResponse.fromNotice(it) }
+
+    }
     fun getNoticePage(
         id: Long
     ): NoticePageResponse {

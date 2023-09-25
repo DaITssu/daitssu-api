@@ -53,7 +53,7 @@ class FunSystemControllerTest {
     @Sql("classpath:data.sql")
     @Test
     @WithMockUser
-    @DisplayName("Funsystem 리스트 카테고리별 검색 확인")
+    @DisplayName("Funsystem 리스트 카테고리 확인")
     fun getSomeFunSystemList() {
 
         mockMvc.get("/funsystem/SUBSCRIPTION")
@@ -67,7 +67,20 @@ class FunSystemControllerTest {
                 }
             }
     }
+    @Sql("classpath:schema.sql")
+    @Sql("classpath:data.sql")
+    @Test
+    @WithMockUser
+    @DisplayName("FunSystem 리스트 카테고리별 검색 확인") // 같은 카테고리로 4번과 5번이 있는데 둘중 5 하나만 검색해서 나오게 함
+    fun getSearchedFunSystemList() {
 
+        val result = mockMvc.get("/funsystem/EXPERIENTIAL_ACTIVITIES?searchKeyword=5")
+            .andExpect {
+                status { isOk() }
+
+            }.andReturn()
+        println(result.response.contentAsString)
+    }
     @Sql("classpath:schema.sql")
     @Sql("classpath:data.sql")
     @Test

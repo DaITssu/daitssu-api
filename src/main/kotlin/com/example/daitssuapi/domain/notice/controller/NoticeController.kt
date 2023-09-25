@@ -15,9 +15,14 @@ class NoticeController (
 
     @GetMapping("/{category}")
     fun getNoticeList(
-        @PathVariable category: String
-    ): Response<List<NoticeResponse>> =
-        Response(data = noticeService.getNoticeList(category))
+        @PathVariable category: String,
+        @RequestParam(required = false) searchKeyword : String?
+    ): Response<List<NoticeResponse>>{
+        if(searchKeyword == null)
+            return Response(data = noticeService.getNoticeList(category))
+        else
+            return Response(data = noticeService.getNoticeSearchList(category,searchKeyword))
+    }
 
     @GetMapping("/page/{id}")
     fun getNoticePage(

@@ -31,7 +31,25 @@ class FunSystemService (
         }
         return funSystems.map{FunSystemResponse.fromFunSystem(it)}
     }
+    fun getFunSystemSearchList(
+        category: String,
+        searchKeyword : String
+    ):List<FunSystemResponse> {
 
+        val funSystems:List<FunSystem>
+
+        if(category == "ALL")
+            funSystems= funSystemRepository.findByTitleContaining(searchKeyword)
+        else{
+            funSystems = FunSystemCategory.fromCode(category)?.let {
+                funSystemRepository.findByCategoryAndTitleContaining(it,searchKeyword)
+            } ?: throw DefaultException(errorCode = ErrorCode.INVALID_CATEGORY)
+        }
+
+
+        return funSystems.map { FunSystemResponse.fromFunSystem(it) }
+
+    }
     fun getFunSystemPage(
         id : Long
     ): FunSystemPageResponse {
