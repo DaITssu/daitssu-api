@@ -9,6 +9,7 @@ data class NoticeResponse(
     val title: String,
     val category: NoticeCategory?,
     val createdAt: LocalDateTime,
+    val views : Int,
 ) {
     companion object {
         fun fromNotice(notice: Notice): NoticeResponse {
@@ -17,6 +18,7 @@ data class NoticeResponse(
                 title = notice.title,
                 category = notice.category,
                 createdAt = notice.createdAt,
+                views = notice.views,
             )
         }
     }

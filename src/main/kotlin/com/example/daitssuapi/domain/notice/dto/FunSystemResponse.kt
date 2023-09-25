@@ -9,6 +9,7 @@ data class FunSystemResponse (
     val title: String,
     val category: FunSystemCategory?,
     val createdAt: LocalDateTime,
+    val views : Int,
 ){
     companion object {
         fun fromFunSystem(funSystem: FunSystem): FunSystemResponse {
@@ -17,6 +18,7 @@ data class FunSystemResponse (
                 title = funSystem.title,
                 category = funSystem.category,
                 createdAt = funSystem.createdAt,
+                views = funSystem.views,
             )
         }
     }

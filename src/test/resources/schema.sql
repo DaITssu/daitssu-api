@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS notice.notice(
     image_url VARCHAR(2048) NULL,
     file_url VARCHAR(2048) NULL,
     created_at TIMESTAMP NULL,
-    updated_at TIMESTAMP NULL
+    updated_at TIMESTAMP NULL,
+    views integer NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS notice.notice_fs(
@@ -20,6 +21,7 @@ CREATE TABLE IF NOT EXISTS notice.notice_fs(
     image_url VARCHAR(2048) NULL,
     url VARCHAR(2048) NOT NULL,
     created_at TIMESTAMP NULL,
-    updated_at TIMESTAMP NULL
+    updated_at TIMESTAMP NULL,
+    views integer NOT NULL
 );
 

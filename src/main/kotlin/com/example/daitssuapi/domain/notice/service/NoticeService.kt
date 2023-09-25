@@ -44,6 +44,8 @@ class NoticeService (
         return NoticePageResponse.fromNotice(notice)
     }
 
+    fun updateViews( id:Long ) { noticeRepository.updateViewsById(id)}
+
 }
 
 

@@ -4,10 +4,9 @@ import com.example.daitssuapi.common.dto.Response
 import com.example.daitssuapi.domain.notice.dto.NoticePageResponse
 import com.example.daitssuapi.domain.notice.dto.NoticeResponse
 import com.example.daitssuapi.domain.notice.service.NoticeService
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+
+
 @RestController
 @RequestMapping("/notice")
 class NoticeController (
@@ -23,8 +22,11 @@ class NoticeController (
     @GetMapping("/page/{id}")
     fun getNoticePage(
         @PathVariable id: Long,
-    ): Response<NoticePageResponse> =
-        Response(data = noticeService.getNoticePage(id))
+    ): Response<NoticePageResponse> {
+        noticeService.updateViews(id)
+        return Response(data = noticeService.getNoticePage(id))
+    }
+
 }
 
 

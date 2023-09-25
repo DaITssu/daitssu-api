@@ -13,6 +13,7 @@ data class FunSystemPageResponse (
     val url: String?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
+    val views : Int,
 ){
     companion object {
         fun fromFunSystem(funSystem: FunSystem): FunSystemPageResponse {
@@ -24,7 +25,8 @@ data class FunSystemPageResponse (
                 imageUrl = funSystem.imageUrl,
                 url = funSystem.url,
                 createdAt = funSystem.createdAt,
-                updatedAt = funSystem.updatedAt
+                updatedAt = funSystem.updatedAt,
+                views = funSystem.views,
             )
         }
     }

@@ -14,6 +14,7 @@ data class NoticePageResponse(
     val fileUrl: String?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
+    val views : Int,
 ) {
     companion object {
         fun fromNotice(notice: Notice): NoticePageResponse {
@@ -26,7 +27,8 @@ data class NoticePageResponse(
                 imageUrl = notice.imageUrl,
                 fileUrl = notice.fileUrl,
                 createdAt = notice.createdAt,
-                updatedAt = notice.updatedAt
+                updatedAt = notice.updatedAt,
+                views = notice.views,
             )
         }
     }

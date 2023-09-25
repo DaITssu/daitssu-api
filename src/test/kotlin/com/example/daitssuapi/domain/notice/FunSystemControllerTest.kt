@@ -89,4 +89,20 @@ class FunSystemControllerTest {
                 }
             }
     }
+
+    @Sql("classpath:schema.sql")
+    @Sql("classpath:data.sql")
+    @Test
+    @WithMockUser
+    @DisplayName("FunSyetem view 테스팅")
+    fun getFunSystemPageViewsTest() {
+        val result = mockMvc.get("/funsystem/page/1")
+            .andExpect {
+                status { isOk() }
+
+            }.andReturn()
+
+        println(result.response.contentAsString)
+    }
+
 }

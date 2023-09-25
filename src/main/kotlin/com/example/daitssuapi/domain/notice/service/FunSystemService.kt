@@ -40,5 +40,5 @@ class FunSystemService (
 
         return FunSystemPageResponse.fromFunSystem(funSystem)
     }
-
+    fun updateViews( id:Long ) { funSystemRepository.updateViewsById(id)}
 }

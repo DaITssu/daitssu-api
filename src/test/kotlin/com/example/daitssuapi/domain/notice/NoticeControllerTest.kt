@@ -13,6 +13,7 @@ import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
@@ -49,7 +50,6 @@ class NoticeControllerTest {
     @DisplayName("Notice 리스트 컨트롤러 로직 확인")
     fun getAllNoticeList() {
 
-        // Act and Assert
         val result = mockMvc.get("/notice/ALL")
             .andExpect {
                 status { isOk() }
@@ -99,5 +99,20 @@ class NoticeControllerTest {
                     jsonPath("$.data[0].updatedAt").value("0999-12-27T00:32:08")
                 }
             }
+    }
+
+    @Sql("classpath:schema.sql")
+    @Sql("classpath:data.sql")
+    @Test
+    @WithMockUser
+    @DisplayName("Notice view 테스팅")
+    fun getNoticePageViewsTest() {
+        val result = mockMvc.get("/notice/page/1")
+            .andExpect {
+                status { isOk() }
+
+            }.andReturn()
+
+        println(result.response.contentAsString)
     }
 }

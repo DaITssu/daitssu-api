@@ -23,6 +23,9 @@ class FunSystemController(
     @GetMapping("/page/{id}")
     fun getFunSystemPage(
         @PathVariable id : Long,
-    ):Response<FunSystemPageResponse> =
-        Response(data = funSystemService.getFunSystemPage(id))
+    ):Response<FunSystemPageResponse>{
+        funSystemService.updateViews(id)
+        return Response(data = funSystemService.getFunSystemPage(id))
+    }
+
 }
