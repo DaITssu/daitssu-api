@@ -20,7 +20,7 @@ class Article(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     var writer: User,
-
-    @Column(length = 2048)
-    var imageUrl: String? = null,
-): BaseEntity()
+) : BaseEntity() {
+    @OneToMany(mappedBy = "article")
+    var articleImages: MutableSet<ArticleImage> = mutableSetOf()
+}
