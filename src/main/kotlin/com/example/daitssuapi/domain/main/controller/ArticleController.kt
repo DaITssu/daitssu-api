@@ -90,6 +90,6 @@ sort: [\"createdAt\"]
     ): Response<String> {
         articleService.createArticle(articleCreateRequest)
 
-        return Response(code = 200, message = "OK", data = "게시글 작성 성공")
+        return Response(code = 0, message = "OK", data = null)
     }
 }

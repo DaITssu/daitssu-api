@@ -1,7 +1,9 @@
 package com.example.daitssuapi.domain.infra.service
 
 import com.example.daitssuapi.common.constants.FileFormat
-import com.example.daitssuapi.domain.infra.constants.S3Bucket
+import com.example.daitssuapi.common.enums.ErrorCode
+import com.example.daitssuapi.common.exception.DefaultException
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
@@ -16,6 +18,8 @@ import java.time.LocalDateTime
 @Service
 class S3Service(
     private val profile: String,
+    @Value("\${aws.s3.bucket}") private val s3BucketName: String,
+    @Value("\${aws.s3.url}") private val s3Endpoint: String,
 ) {
     fun uploadImageToS3(
         userId: Long,
@@ -28,26 +32,31 @@ class S3Service(
         val fileNameExceptExtension = fileName.substringBeforeLast(".")
         val extension = if (fileName.substringAfterLast(".") in FileFormat.webp) "webp" else "jpg"
 
-        val keyName = "$profile/$domain/$userId/image/" + LocalDateTime.now()
-            .toString() + "-" + fileNameExceptExtension + "." + extension
+        val pathKey = "$profile/$domain/$userId/image/"
+        val fileKey = LocalDateTime.now().toString() + "-" + fileNameExceptExtension + "." + extension
+        val keyName = pathKey + fileKey
 
         val objectAcl = ObjectCannedACL.PUBLIC_READ
 
         val putObjectRequest = PutObjectRequest
             .builder()
-            .bucket(S3Bucket.bucketName)
+            .bucket(s3BucketName)
             .key(keyName)
             .acl(objectAcl)
             .build()
 
-        amazonS3.putObject(
-            putObjectRequest,
-            RequestBody.fromInputStream(ByteArrayInputStream(imageByteArray), imageByteArray.size.toLong()),
-        )
+        runCatching {
+            amazonS3.putObject(
+                putObjectRequest,
+                RequestBody.fromInputStream(ByteArrayInputStream(imageByteArray), imageByteArray.size.toLong()),
+            )
+        }.onFailure {
+            throw DefaultException(errorCode = ErrorCode.S3_UPLOAD_FAILED)
+        }
 
         val url = amazonS3.utilities().getUrl(
             GetUrlRequest.builder()
-                .bucket(S3Bucket.bucketName)
+                .bucket(s3BucketName)
                 .key(keyName)
                 .build(),
         ).toString()
@@ -63,10 +72,10 @@ class S3Service(
         val amazonS3 = S3Client.builder().build()
         val decodedUrlString = URLDecoder.decode(url, "UTF-8").replace("%3A", ":")
 
-        val key = decodedUrlString.substringAfter(S3Bucket.endPointUrl)
+        val key = decodedUrlString.substringAfter(s3Endpoint)
 
         val deleteRequest = DeleteObjectRequest.builder()
-            .bucket(S3Bucket.bucketName)
+            .bucket(s3BucketName)
             .key(key)
             .build()
 
