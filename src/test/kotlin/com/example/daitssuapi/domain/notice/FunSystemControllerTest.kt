@@ -1,41 +1,19 @@
 package com.example.daitssuapi.domain.notice
 
-import org.junit.jupiter.api.BeforeEach
+import com.example.daitssuapi.utils.ControllerTest
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.security.test.context.support.WithMockUser
-import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import org.springframework.web.context.WebApplicationContext
-import org.springframework.web.filter.CharacterEncodingFilter
 
-@AutoConfigureMockMvc
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@ControllerTest
 class FunSystemControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
-    @Autowired
-    private lateinit var ctx : WebApplicationContext
-
-    @BeforeEach
-    fun setup() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
-            .addFilters<DefaultMockMvcBuilder>(CharacterEncodingFilter("UTF-8", true))
-            .build()
-    }
-
-    @Sql("classpath:schema.sql")
-    @Sql("classpath:data.sql")
     @Test
-    @WithMockUser
     @DisplayName("FunSystem 리스트 컨트롤러 로직 확인")
     fun getAllFunSystem() {
 
@@ -49,10 +27,7 @@ class FunSystemControllerTest {
         println(result.response.contentAsString)
     }
 
-    @Sql("classpath:schema.sql")
-    @Sql("classpath:data.sql")
     @Test
-    @WithMockUser
     @DisplayName("Funsystem 리스트 카테고리별 검색 확인")
     fun getSomeFunSystemList() {
 
@@ -72,10 +47,7 @@ class FunSystemControllerTest {
             }
     }
 
-    @Sql("classpath:schema.sql")
-    @Sql("classpath:data.sql")
     @Test
-    @WithMockUser
     @DisplayName("Funsystem 페이징 확인")
     fun getFunSystemPage() {
         mockMvc.get("/funsystem/page/1")
