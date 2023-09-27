@@ -1,5 +1,6 @@
 package com.example.daitssuapi.domain.course.service
 
+import com.example.daitssuapi.common.enums.CalendarType
 import com.example.daitssuapi.common.enums.ErrorCode
 import com.example.daitssuapi.common.enums.RegisterStatus
 import com.example.daitssuapi.common.exception.DefaultException
@@ -17,6 +18,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
@@ -202,5 +204,43 @@ class CourseService(
         }
         
         return dateTime
+    }
+    
+    /**
+     * todo : userid , 보여주는 과제 갯수는 2개인지, 카운팅, 관계 설정
+     */
+    fun getTodayDueAtCalendars() : TodayCalendarResponse {
+        val day = LocalDate.now()
+        val startTime = LocalTime.of(0,0,0)
+        val endTime = LocalTime.of(23,59,59)
+        val todayStart = checkDateReturnDate("$day $startTime:00")
+        val todayEnd = checkDateReturnDate("$day $endTime")
+        
+        
+        val todayVideos = calendarRepository.findCourses(
+            startDateTime = todayStart,
+            endDateTime = todayEnd,
+            type = CalendarType.VIDEO
+        ).map { TodayCalendarData(
+            course = it.getCourse(),
+            dueAt = it.getDueAt(),
+            count = it.getCount()
+        ) }.sortedBy { it.dueAt }
+        
+        
+        val todayAssignments = calendarRepository.findCourses(
+            startDateTime = todayStart,
+            endDateTime = todayEnd,
+            type = CalendarType.ASSIGNMENT
+        ).map { TodayCalendarData(
+            course = it.getCourse(),
+            dueAt = it.getDueAt(),
+            count = it.getCount()
+        ) }.sortedBy { it.dueAt }
+        
+        return TodayCalendarResponse(
+            videos = todayVideos,
+            assignments = todayAssignments
+        )
     }
 }
