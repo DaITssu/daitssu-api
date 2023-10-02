@@ -12,6 +12,9 @@ enum class ErrorCode(val code: Int, val message: String) {
     ARTICLE_NOT_FOUND(MAIN_NUMBERING + 3, "게시글을 찾을 수 없습니다."),
     NICKNAME_REQUIRED(MAIN_NUMBERING + 4, "닉네임이 필요한 작업입니다."),
     USER_NICKNAME_MISSING(MAIN_NUMBERING + 5, "유저의 닉네임이 없습니다"),
+    COMMENT_NOT_FOUND(MAIN_NUMBERING + 6, "원 댓글이 없습니다"),
+    COMMENT_TOO_LONG(MAIN_NUMBERING + 7, "댓글이 너무 깁니다"),
+    DIFFERENT_ARTICLE(MAIN_NUMBERING + 8, "다른 게시글에 달린 댓글의 대댓글입니다"),
 
     NOTICE_NOT_FOUND(NOTICE_NUMBERING + 1, "공지사항 내용을 찾을 수 없습니다"),
     FUNSYSTEM_NOT_FOUND(NOTICE_NUMBERING + 2, "펀시스템 내용을 찾을 수 없습니다"),

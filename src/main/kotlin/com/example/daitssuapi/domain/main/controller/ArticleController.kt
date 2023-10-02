@@ -2,7 +2,9 @@ package com.example.daitssuapi.domain.main.controller
 
 import com.example.daitssuapi.common.dto.Response
 import com.example.daitssuapi.domain.main.dto.request.ArticleCreateRequest
+import com.example.daitssuapi.domain.main.dto.request.CommentWriteRequest
 import com.example.daitssuapi.domain.main.dto.response.ArticleResponse
+import com.example.daitssuapi.domain.main.dto.response.CommentResponse
 import com.example.daitssuapi.domain.main.dto.response.PageArticlesResponse
 import com.example.daitssuapi.domain.main.service.ArticleService
 import io.swagger.v3.oas.annotations.Operation
@@ -74,6 +76,35 @@ sort: [\"createdAt\"]
             data = articles
         )
     }
+
+    @Operation(
+        summary = "댓글 작성",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "OK"
+            )
+        ]
+    )
+    @PostMapping("/{articleId}/comments")
+    fun writeComment(
+        @PathVariable articleId: Long,
+        @RequestBody commentWriteRequest: CommentWriteRequest
+    ): Response<CommentResponse> = Response(data = articleService.writeComment(articleId = articleId, request = commentWriteRequest))
+
+    @Operation(
+        summary = "댓글 조회",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "OK"
+            )
+        ]
+    )
+    @GetMapping("/{articleId}/comments")
+    fun getComments(
+        @PathVariable articleId: Long
+    ): Response<List<CommentResponse>> = Response(data = articleService.getComments(articleId = articleId))
 
     @Operation(
         summary = "새로운 게시글 작성",
