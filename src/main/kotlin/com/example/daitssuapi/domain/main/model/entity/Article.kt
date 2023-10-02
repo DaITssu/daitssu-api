@@ -20,7 +20,7 @@ class Article(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     var writer: User,
-) : BaseEntity() {
+
     @OneToMany(mappedBy = "article")
     var articleImages: MutableSet<ArticleImage> = mutableSetOf()
-}
+) : BaseEntity()
