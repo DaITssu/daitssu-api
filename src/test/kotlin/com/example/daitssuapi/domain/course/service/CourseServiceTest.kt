@@ -6,7 +6,6 @@ import com.example.daitssuapi.common.exception.DefaultException
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
 import com.example.daitssuapi.domain.course.model.repository.CourseRepository
 import com.example.daitssuapi.domain.course.model.repository.UserCourseRelationRepository
-import com.example.daitssuapi.domain.main.model.repository.UserRepository
 import com.example.daitssuapi.utils.IntegrationTest
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Assertions.*
@@ -192,4 +191,19 @@ class CourseServiceTest(
         
     }
     
+    @Test
+    @DisplayName("오늘 마감인 캘린더 요청시, 과제와 강의가 출력된다.")
+    fun get_calendar_with_today_date() {
+        val calendars = courseService.getTodayDueAtCalendars()
+
+        assertAll(
+            { assertThat(calendars.videos.size).isEqualTo(2) },
+            { assertThat(calendars.videos.get(0).course).isEqualTo("eat paper") },
+            { assertThat(calendars.videos.get(0).count).isEqualTo(2) },
+            { assertThat(calendars.assignments.size).isEqualTo(2) },
+            { assertThat(calendars.assignments.get(0).course).isEqualTo("eat paper") },
+            { assertThat(calendars.assignments.get(0).count).isEqualTo(2) }
+        )
+    }
+
 }
