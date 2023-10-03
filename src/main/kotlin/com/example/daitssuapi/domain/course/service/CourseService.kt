@@ -1,5 +1,6 @@
 package com.example.daitssuapi.domain.course.service
 
+import com.example.daitssuapi.common.enums.CalendarType
 import com.example.daitssuapi.common.enums.ErrorCode
 import com.example.daitssuapi.common.enums.RegisterStatus
 import com.example.daitssuapi.common.exception.DefaultException
@@ -17,6 +18,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
@@ -203,4 +205,66 @@ class CourseService(
         
         return dateTime
     }
+    
+    fun getTodayDueAtCalendars() : TodayCalendarResponse {
+        val day = LocalDate.now()
+        val startTime = LocalTime.of(0, 0, 0)
+        val endTime = LocalTime.of(23, 59, 59)
+        val todayStart = checkDateReturnDate("$day $startTime:00")
+        val todayEnd = checkDateReturnDate("$day $endTime")
+        val videos: MutableList<TodayCalendarDataDto> = mutableListOf()
+        val assignments: MutableList<TodayCalendarDataDto> = mutableListOf()
+        
+        val videoCourses = calendarRepository.findDistinctTop2ByTypeAndDueAtBetweenOrderByDueAtAsc(
+            startDateTime = todayStart,
+            endDateTime = todayEnd,
+            type = CalendarType.VIDEO
+        )
+        
+        val assignmentCourses = calendarRepository.findDistinctTop2ByTypeAndDueAtBetweenOrderByDueAtAsc(
+            startDateTime = todayStart,
+            endDateTime = todayEnd,
+            type = CalendarType.ASSIGNMENT
+        )
+        
+        for (calendar: Calendar in videoCourses) {
+            val calendars = calendarRepository.findByTypeAndCourseAndDueAtBetween(
+                type = CalendarType.VIDEO,
+                course = calendar.course,
+                startDateTime = todayStart,
+                endDateTime = todayEnd
+            )
+            
+            val todayCalendarDataDto = TodayCalendarDataDto(
+                course = calendar.course,
+                dueAt = calendars.minOf { it.dueAt },
+                count = calendars.size
+            )
+            
+            videos.add(todayCalendarDataDto)
+        }
+        
+        for (calendar: Calendar in assignmentCourses) {
+            val calendars = calendarRepository.findByTypeAndCourseAndDueAtBetween(
+                type = CalendarType.ASSIGNMENT,
+                course = calendar.course,
+                startDateTime = todayStart,
+                endDateTime = todayEnd
+            )
+            
+            val todayCalendarDataDto = TodayCalendarDataDto(
+                course = calendar.course,
+                dueAt = calendars.minOf { it.dueAt },
+                count = calendars.size
+            )
+            
+            assignments.add(todayCalendarDataDto)
+        }
+        
+        return TodayCalendarResponse(
+            videos = videos,
+            assignments = assignments
+        )
+    }
 }
+
