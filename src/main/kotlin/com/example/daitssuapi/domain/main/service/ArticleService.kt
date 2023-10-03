@@ -28,6 +28,7 @@ class ArticleService(
     private val userRepository: UserRepository,
     private val s3Service: S3Service,
 ) {
+    // TODO : 게시글 조회 시, 해당 유저의 스크랩 여부도 노출해야함
     fun getArticle(id: Long): ArticleResponse {
         val article: Article = articleRepository.findByIdOrNull(id)
             ?: throw DefaultException(ErrorCode.ARTICLE_NOT_FOUND)
@@ -39,7 +40,8 @@ class ArticleService(
             content = article.content,
             writerNickName = article.writer.nickname!!,
             updatedAt = article.updatedAt,
-            imageUrls = article.articleImages.map { it.url }
+            imageUrls = article.articleImages.map { it.url },
+            scrapCount = scrapRepository.findByArticleIdAndIsActiveTrue(article.id).size
         )
     }
 
