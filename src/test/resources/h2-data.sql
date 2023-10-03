@@ -27,6 +27,10 @@ INSERT INTO main.comment(id, user_id, article_id, content, original_id, created_
     (2, 3, 1, '대충 대댓글 쓴거1', 1, '2023-09-16 10:00:00.000', '2023-09-16 10:00:00.000'),
     (3, 1, 3, '대충 댓글 쓴거2', null, '2023-09-16 10:00:00.000', '2023-09-16 10:00:00.000');
 
+INSERT INTO main.scrap(id, user_id, article_id, is_active, created_at, updated_at) VALUES
+    (1, 1, 1, true, '2023-09-16 10:00:00.000', '2023-09-16 10:00:00.000'),
+    (2, 3, 1, false, '2023-09-16 10:00:00.000', '2023-09-16 10:00:00.000');
+
 INSERT INTO course.course (id, name, term, created_at, updated_at) VALUES
     (1, 'eat paper', 15, '2023-07-27 10:00:00.000', '2023-07-27 10:00:00.000'),
     (2, 'do it', 15, '2023-07-28 10:00:00.000', '2023-07-28 10:00:00.000'),
