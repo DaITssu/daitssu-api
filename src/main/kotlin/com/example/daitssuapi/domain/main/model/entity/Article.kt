@@ -22,5 +22,11 @@ class Article(
     var writer: User,
 
     @OneToMany(mappedBy = "article")
-    var articleImages: MutableSet<ArticleImage> = mutableSetOf()
+    var images: MutableSet<ArticleImage> = mutableSetOf(),
+
+    @OneToMany(mappedBy = "article")
+    var likes: MutableSet<ArticleLike> = mutableSetOf(),
+
+    @OneToMany(mappedBy = "article")
+    var comments: MutableSet<Comment> = mutableSetOf(),
 ) : BaseEntity()

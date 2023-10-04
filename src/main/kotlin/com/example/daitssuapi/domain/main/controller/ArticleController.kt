@@ -78,6 +78,22 @@ sort: [\"createdAt\"]
     }
 
     @Operation(
+        summary = "인기 게시글 조회(2개)",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "OK"
+            )
+        ]
+    )
+    @GetMapping
+    fun getPopularArticles(): Response<List<ArticleResponse>> {
+        val articles = articleService.getPopularArticles()
+
+        return Response(data = articles)
+    }
+
+    @Operation(
         summary = "댓글 작성",
         responses = [
             ApiResponse(
@@ -90,7 +106,8 @@ sort: [\"createdAt\"]
     fun writeComment(
         @PathVariable articleId: Long,
         @RequestBody commentWriteRequest: CommentWriteRequest
-    ): Response<CommentResponse> = Response(data = articleService.writeComment(articleId = articleId, request = commentWriteRequest))
+    ): Response<CommentResponse> =
+        Response(data = articleService.writeComment(articleId = articleId, request = commentWriteRequest))
 
     @Operation(
         summary = "댓글 조회",
@@ -120,6 +137,27 @@ sort: [\"createdAt\"]
         @ModelAttribute articleCreateRequest: ArticleCreateRequest
     ): Response<String> {
         articleService.createArticle(articleCreateRequest)
+
+        return Response(code = 0, message = "OK", data = null)
+    }
+
+    @Operation(
+        summary = "게시글 좋아요",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "OK"
+            )
+        ]
+    )
+    @PostMapping("/{articleId}/user/{userId}/like")
+    fun like(
+        @PathVariable
+        articleId: Long,
+        @PathVariable
+        userId: Long
+    ): Response<String> {
+        articleService.like(articleId = articleId, userId = userId)
 
         return Response(code = 0, message = "OK", data = null)
     }
