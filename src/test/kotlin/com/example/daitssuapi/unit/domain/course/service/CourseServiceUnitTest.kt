@@ -417,4 +417,114 @@ class CourseServiceUnitTest {
         )
         
     }
+    
+    @Test
+    @DisplayName("오늘 마감인 과제, 강의가 있으면 올바르게 출력된다")
+    fun get_today_calendar_not_empty() {
+        val videoCourses = listOf(
+            Calendar(
+                course = "just",
+                dueAt = LocalDateTime.of(2023,10,2,9,0,0),
+                type = CalendarType.VIDEO,
+                name = "강의 1",
+                isCompleted = false
+            ),
+            Calendar(
+                course = "do it",
+                dueAt = LocalDateTime.of(2023,10,2,16,0,0),
+                type = CalendarType.VIDEO,
+                name = "강의 1",
+                isCompleted = false
+            )
+        )
+        
+        val assignmentCourses = listOf(
+            Calendar(
+                course = "i study",
+                dueAt = LocalDateTime.of(2023,10,2,14,0,0),
+                type = CalendarType.ASSIGNMENT,
+                name = "강의 1",
+                isCompleted = false
+            )
+        )
+        
+        val justVideos = listOf(
+            Calendar(
+                course = "just",
+                dueAt = LocalDateTime.of(2023,10,2,14,0,0),
+                type = CalendarType.VIDEO,
+                name = "강의 1",
+                isCompleted = false
+            ),
+            Calendar(
+                course = "just",
+                dueAt = LocalDateTime.of(2023,10,2,23,59,59),
+                type = CalendarType.VIDEO,
+                name = "강의 2",
+                isCompleted = true
+            )
+        )
+        
+        val doitCalendars = listOf(
+            Calendar(
+                course = "do it",
+                dueAt = LocalDateTime.of(2023,10,2,16,0,0),
+                type = CalendarType.VIDEO,
+                name = "강의 1",
+                isCompleted = false
+            )
+        )
+        
+        val iStudyVideos = listOf(
+            Calendar(
+                course = "i study",
+                dueAt = LocalDateTime.of(2023,10,2,14,0,0),
+                type = CalendarType.ASSIGNMENT,
+                name = "강의 1",
+                isCompleted = false
+            ),
+            Calendar(
+                course = "i study",
+                dueAt = LocalDateTime.of(2023,10,2,23,59,59),
+                type = CalendarType.ASSIGNMENT,
+                name = "강의 2",
+                isCompleted = true
+            )
+        )
+        
+        
+        every { calendarRepository.findDistinctTop2ByTypeAndDueAtBetweenOrderByDueAtAsc(
+            type = CalendarType.VIDEO, any(), any()) } returns videoCourses
+        every { calendarRepository.findDistinctTop2ByTypeAndDueAtBetweenOrderByDueAtAsc(
+            type = CalendarType.ASSIGNMENT, any(), any()) } returns assignmentCourses
+        every { calendarRepository.findByTypeAndCourseAndDueAtBetween(
+            type = CalendarType.VIDEO, course = "just", any(), any()) } returns justVideos
+        every { calendarRepository.findByTypeAndCourseAndDueAtBetween(
+            type = CalendarType.VIDEO, course = "do it", any(), any()) } returns doitCalendars
+        every { calendarRepository.findByTypeAndCourseAndDueAtBetween(
+            type = CalendarType.ASSIGNMENT, course = "i study", any(), any()) } returns iStudyVideos
+        
+        val todayCalendar = courseService.getTodayDueAtCalendars()
+        
+        assertAll(
+            { assertThat(todayCalendar.videos.size).isEqualTo(2) },
+            { assertThat(todayCalendar.assignments.size).isEqualTo(1) },
+            { assertThat(todayCalendar.videos.get(0).course).isEqualTo("just") },
+            { assertThat(todayCalendar.videos.get(0).count).isEqualTo(2) },
+            { assertThat(todayCalendar.videos.get(0).dueAt).isEqualTo(
+                LocalDateTime.of(2023,10,2,14,0,0)
+            ) },
+            { assertThat(todayCalendar.videos.get(1).course).isEqualTo("do it") },
+            { assertThat(todayCalendar.videos.get(1).count).isEqualTo(1) },
+            { assertThat(todayCalendar.videos.get(1).dueAt).isEqualTo(
+                LocalDateTime.of(2023,10,2,16,0,0)
+            ) },
+            { assertThat(todayCalendar.assignments.get(0).course).isEqualTo("i study") },
+            { assertThat(todayCalendar.assignments.get(0).count).isEqualTo(2) },
+            { assertThat(todayCalendar.assignments.get(0).dueAt).isEqualTo(
+                LocalDateTime.of(2023,10,2,14,0,0)
+            ) }
+        )
+        
+    }
 }
