@@ -32,4 +32,5 @@ enum class ErrorCode(val code: Int, val message: String) {
     INVALID_GET_DATE_FORMAT(SERVER_NUMBERING + 4, "잘못된 날짜 형식입니다. yyyy-MM 형식으로 요청바랍니다."),
 
     S3_UPLOAD_FAILED(INFRA_NUMBERING + 1, "S3 객체 생성에 실패했습니다."),
+    S3_DELETE_FAILED(INFRA_NUMBERING + 2, "S3 객체 삭제에 실패했습니다."),
 }

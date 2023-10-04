@@ -86,7 +86,7 @@ sort: [\"createdAt\"]
             )
         ]
     )
-    @GetMapping
+    @GetMapping("/popular")
     fun getPopularArticles(): Response<List<ArticleResponse>> {
         val articles = articleService.getPopularArticles()
 
@@ -137,6 +137,24 @@ sort: [\"createdAt\"]
         @ModelAttribute articleCreateRequest: ArticleCreateRequest
     ): Response<String> {
         articleService.createArticle(articleCreateRequest)
+
+        return Response(code = 0, message = "OK", data = null)
+    }
+
+    @Operation(
+        summary = "게시글 삭제",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "OK"
+            )
+        ]
+    )
+    @DeleteMapping("/{articleId}")
+    fun deleteArticle(
+        @PathVariable articleId: Long
+    ): Response<String> {
+        articleService.deleteArticle(articleId)
 
         return Response(code = 0, message = "OK", data = null)
     }

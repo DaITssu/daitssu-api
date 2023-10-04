@@ -143,6 +143,18 @@ class ArticleService(
     }
 
     @Transactional
+    fun deleteArticle(articleId: Long) {
+        val article: Article = articleRepository.findByIdOrNull(articleId)
+            ?: throw DefaultException(ErrorCode.ARTICLE_NOT_FOUND)
+
+        article.images.map {
+            s3Service.deleteFromS3ByUrl(it.url)
+        }
+
+        articleRepository.delete(article)
+    }
+
+    @Transactional
     fun writeComment(articleId: Long, request: CommentWriteRequest): CommentResponse {
         val user = userRepository.findByIdOrNull(request.userId)
             ?: throw DefaultException(errorCode = ErrorCode.USER_NOT_FOUND)
