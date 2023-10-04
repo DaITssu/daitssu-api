@@ -78,7 +78,7 @@ sort: [\"createdAt\"]
     }
 
     @Operation(
-        summary = "인기 게시글 조회(2개)",
+        summary = "인기 게시글 조회(24시간)",
         responses = [
             ApiResponse(
                 responseCode = "200",

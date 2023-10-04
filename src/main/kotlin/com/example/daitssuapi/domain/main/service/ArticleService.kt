@@ -18,7 +18,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.nio.charset.Charset
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Service
 class ArticleService(
@@ -82,7 +82,7 @@ class ArticleService(
 
     fun getPopularArticles(): List<ArticleResponse> {
         val articles: List<Article> = articleRepository.findAllByCreatedAtIsLessThanEqual(
-            createdAt = LocalDate.now().atStartOfDay()
+            createdAt = LocalDateTime.now().minusDays(1)
         )
 
         articles.sortedBy { it.likes.size }
