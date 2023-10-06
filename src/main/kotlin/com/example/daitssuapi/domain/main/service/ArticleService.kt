@@ -6,6 +6,7 @@ import com.example.daitssuapi.common.enums.ErrorCode
 import com.example.daitssuapi.common.exception.DefaultException
 import com.example.daitssuapi.domain.infra.service.S3Service
 import com.example.daitssuapi.domain.main.dto.request.ArticleCreateRequest
+import com.example.daitssuapi.domain.main.dto.request.ArticleUpdateRequest
 import com.example.daitssuapi.domain.main.dto.request.CommentWriteRequest
 import com.example.daitssuapi.domain.main.dto.response.ArticleResponse
 import com.example.daitssuapi.domain.main.dto.response.CommentResponse
@@ -48,6 +49,8 @@ class ArticleService(
         )
     }
 
+
+
     fun pageArticleList(
         pageable: Pageable,
         inquiry: String?,
@@ -80,6 +83,33 @@ class ArticleService(
         )
     }
 
+    @Transactional
+    fun updateArticle(
+            articleId: Long,
+            articleUpdateRequest: ArticleUpdateRequest
+            ){
+        val user: User = userRepository.findByIdOrNull(articleUpdateRequest.userId)
+                ?: throw DefaultException(ErrorCode.USER_NOT_FOUND)
+        val article: Article = articleRepository.findByIdOrNull(articleId)
+                ?: throw DefaultException(ErrorCode.ARTICLE_NOT_FOUND)
+
+
+        article.title = articleUpdateRequest.title.toString()
+        article.topic = articleUpdateRequest.topic
+        article.content = articleUpdateRequest.content.toString()
+
+        val newImageUrls = articleUpdateRequest.images?.mapNotNull { image ->
+            // MultipartFile이 null이 아니고, 이미지 업로드가 성공한 경우에만 URL을 반환
+            runCatching {
+                s3Service.uploadImageToS3(
+                        userId = user.id,
+                        domain = DomainType.COMMUNITY.name,
+                        fileName = image.originalFilename!!,
+                        imageByteArray = image.bytes
+                )
+            }.getOrNull()
+        }
+    }
     @Transactional
     fun createArticle(articleCreateRequest: ArticleCreateRequest) {
         val user: User = userRepository.findByIdOrNull(articleCreateRequest.userId)

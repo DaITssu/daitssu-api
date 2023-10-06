@@ -2,6 +2,7 @@ package com.example.daitssuapi.domain.main.controller
 
 import com.example.daitssuapi.common.dto.Response
 import com.example.daitssuapi.domain.main.dto.request.ArticleCreateRequest
+import com.example.daitssuapi.domain.main.dto.request.ArticleUpdateRequest
 import com.example.daitssuapi.domain.main.dto.request.CommentWriteRequest
 import com.example.daitssuapi.domain.main.dto.response.ArticleResponse
 import com.example.daitssuapi.domain.main.dto.response.CommentResponse
@@ -123,4 +124,27 @@ sort: [\"createdAt\"]
 
         return Response(code = 0, message = "OK", data = null)
     }
+
+    @Operation(
+            summary = "게시글 수정",
+            responses = [
+                ApiResponse(
+                        responseCode = "200",
+                        description = "OK"
+                )
+            ]
+    )
+    @PutMapping("/{articleId}")
+    fun updateArticle(
+            @Parameter(name = "articleId", description = "게시글 id")
+            @PathVariable articleId: Long,
+            @Parameter(name = "request", description = "게시글 수정 요청")
+            @RequestBody articleUpdateRequest: ArticleUpdateRequest
+    ): Response<String> {
+        articleService.updateArticle(articleId, articleUpdateRequest)
+        return Response(code = 0, message = "OK", data = null)
+    }
+
+
+
 }
