@@ -21,6 +21,9 @@ class Article(
     @JoinColumn(name = "user_id")
     var writer: User,
 
-    @OneToMany(mappedBy = "article")
-    var articleImages: MutableSet<ArticleImage> = mutableSetOf()
+    @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
+    var articleImages: MutableSet<ArticleImage> = mutableSetOf(),
+
+    @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
+    val scraps: List<Scrap> = emptyList()
 ) : BaseEntity()

@@ -41,7 +41,7 @@ class ArticleService(
             writerNickName = article.writer.nickname!!,
             updatedAt = article.updatedAt,
             imageUrls = article.articleImages.map { it.url },
-            scrapCount = scrapRepository.findByArticleIdAndIsActiveTrue(article.id).size
+            scrapCount = article.scraps.size
         )
     }
 
