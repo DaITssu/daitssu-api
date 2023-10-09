@@ -1,11 +1,14 @@
 package com.example.daitssuapi.domain.main.controller
 
 import com.example.daitssuapi.common.dto.Response
+import com.example.daitssuapi.common.enums.ErrorCode
+import com.example.daitssuapi.common.exception.DefaultException
 import com.example.daitssuapi.domain.main.dto.request.ArticleCreateRequest
 import com.example.daitssuapi.domain.main.dto.request.CommentWriteRequest
 import com.example.daitssuapi.domain.main.dto.response.ArticleResponse
 import com.example.daitssuapi.domain.main.dto.response.CommentResponse
 import com.example.daitssuapi.domain.main.dto.response.PageArticlesResponse
+import com.example.daitssuapi.domain.main.enums.Topic
 import com.example.daitssuapi.domain.main.service.ArticleService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -70,6 +73,33 @@ sort: [\"createdAt\"]
         val articles = articleService.pageArticleList(
             inquiry = inquiry,
             pageable = pageable
+        )
+
+        return Response(
+            data = articles
+        )
+    }
+
+    @GetMapping("/topic/{topic}")
+    fun pageArticleListWithTopic(
+
+        @PageableDefault(
+            page = 0,
+            size = 10,
+            sort = ["createdAt"],
+        )
+        pageable: Pageable,
+        @PathVariable topic: Topic,
+        @RequestParam
+        inquiry: String? = null,
+    ): Response<PageArticlesResponse> {
+        if(topic !in Topic.values()){
+            throw DefaultException(errorCode = ErrorCode.INVALID_TOPIC)
+        }
+        val articles = articleService.pageArticleListWithTopic(
+            inquiry = inquiry,
+            pageable = pageable,
+            topic = topic,
         )
 
         return Response(

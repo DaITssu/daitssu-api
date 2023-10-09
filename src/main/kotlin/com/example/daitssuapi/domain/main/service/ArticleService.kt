@@ -10,6 +10,7 @@ import com.example.daitssuapi.domain.main.dto.request.CommentWriteRequest
 import com.example.daitssuapi.domain.main.dto.response.ArticleResponse
 import com.example.daitssuapi.domain.main.dto.response.CommentResponse
 import com.example.daitssuapi.domain.main.dto.response.PageArticlesResponse
+import com.example.daitssuapi.domain.main.enums.Topic
 import com.example.daitssuapi.domain.main.model.entity.Article
 import com.example.daitssuapi.domain.main.model.entity.ArticleImage
 import com.example.daitssuapi.domain.main.model.entity.Comment
@@ -23,6 +24,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.web.bind.annotation.PathVariable
 import java.nio.charset.Charset
 
 @Service
@@ -60,6 +62,42 @@ class ArticleService(
                     title = inquiry,
                     content = inquiry,
                     pageable = pageable,
+                )
+
+        val articleResponses = articles.map {
+            ArticleResponse(
+                id = it.id,
+                topic = it.topic.value,
+                title = it.title,
+                content = it.content,
+                writerNickName = it.writer.nickname!!,
+                updatedAt = it.updatedAt,
+                imageUrls = it.articleImages.map { image -> image.url }
+            )
+        }
+
+        return PageArticlesResponse(
+            articles = articleResponses.content,
+            totalPages = articleResponses.totalPages
+        )
+    }
+    fun pageArticleListWithTopic(
+        pageable: Pageable,
+        inquiry: String?,
+        topic :Topic,
+    ): PageArticlesResponse {
+        val articles: Page<Article> =
+            if (inquiry == null)
+                articleRepository.findByTopic(
+                    pageable = pageable,
+                    topic = topic
+                )
+            else
+                articleRepository.findByTopicAndTitleContainingOrContentContaining(
+                    title = inquiry,
+                    content = inquiry,
+                    pageable = pageable,
+                    topic = topic,
                 )
 
         val articleResponses = articles.map {
