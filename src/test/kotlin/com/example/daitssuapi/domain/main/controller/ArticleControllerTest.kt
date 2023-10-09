@@ -46,7 +46,43 @@ class ArticleControllerTest(
             .andExpect(jsonPath("$.data.writerNickName").value(article.writer.nickname))
             .andExpect(jsonPath("$.data.topic").value(article.topic.value))
     }
+    @Test
+    @DisplayName("article get controller with topic test")
+    fun article_get_controller_with_topic_test() {
+        // given
+        val baseUri = "/community/article/topic/QUESTION"
+        val article = articleRepository.findAll()[1] //QUESTION 가진 article 나와야함
 
+        // when & then
+        mockMvc.perform(
+            get("$baseUri")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer test")
+        ).andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.data.title").value(article.title))
+            .andExpect(jsonPath("$.data.content").value(article.content))
+            .andExpect(jsonPath("$.data.writerNickName").value(article.writer.nickname))
+            .andExpect(jsonPath("$.data.topic").value(article.topic.value))
+    }
+
+    @Test
+    @DisplayName("article get controller with topic and_search_test")
+    fun article_get_controller_with_topic_and_search_test() {
+        // given
+        val baseUri = "/community/article/topic/QUESTION?inquery=4"
+        val article = articleRepository.findAll()[3] //내용 4 포함하는 QUESTION 주제 article 나와야함
+
+        // when & then
+        mockMvc.perform(
+            get("$baseUri")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer test")
+        ).andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.data.title").value(article.title))
+            .andExpect(jsonPath("$.data.content").value(article.content))
+            .andExpect(jsonPath("$.data.writerNickName").value(article.writer.nickname))
+            .andExpect(jsonPath("$.data.topic").value(article.topic.value))
+    }
     @Test
     @DisplayName("성공_올바른 정보를 넘겨줄 때_댓글이 작성된다")
     fun writeComment() {

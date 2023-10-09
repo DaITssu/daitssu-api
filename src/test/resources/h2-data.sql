@@ -20,7 +20,8 @@ INSERT INTO main.users(id, student_id, name, nickname, department_id, term) VALU
 INSERT INTO main.article(id, topic, title, content, user_id, created_at, updated_at) VALUES
     (1, 'CHAT', '대충 제목1', '대충 내용1', 2, '2023-09-16 10:00:00.000', '2023-09-16 10:00:00.000'),
     (2, 'QUESTION', '대충 제목2', '대충 내용1', 4, '2023-09-16 10:00:00.000', '2023-09-16 10:00:00.000'),
-    (3, 'INFORMATION', '대충 제목3', '대충 내용1', 4, '2023-09-16 10:00:00.000', '2023-09-16 10:00:00.000');
+    (3, 'INFORMATION', '대충 제목3', '대충 내용1', 4, '2023-09-16 10:00:00.000', '2023-09-16 10:00:00.000'),
+    (4, 'QUESTION', '대충 제목4', '대충 내용1', 4, '2023-09-16 10:00:00.000', '2023-09-16 10:00:00.000');
 
 INSERT INTO main.comment(id, user_id, article_id, content, original_id, created_at, updated_at) VALUES
     (1, 1, 1, '대충 댓글 쓴거1', null, '2023-09-16 10:00:00.000', '2023-09-16 10:00:00.000'),
