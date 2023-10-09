@@ -1,6 +1,7 @@
 package com.example.daitssuapi.domain.main.model.entity
 
 import com.example.daitssuapi.common.audit.BaseEntity
+import com.example.daitssuapi.domain.notice.model.entity.FunSystem
 import com.example.daitssuapi.domain.notice.model.entity.Notice
 import jakarta.persistence.*
 
@@ -18,6 +19,10 @@ class Comment(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "notice_id")
     var notice: Notice? = null,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "notice_fs_id")
+    var funSystem: FunSystem? = null,
 
     val content: String,
 
