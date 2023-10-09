@@ -15,6 +15,7 @@ enum class ErrorCode(val code: Int, val message: String) {
     COMMENT_NOT_FOUND(MAIN_NUMBERING + 6, "원 댓글이 없습니다"),
     COMMENT_TOO_LONG(MAIN_NUMBERING + 7, "댓글이 너무 깁니다"),
     DIFFERENT_ARTICLE(MAIN_NUMBERING + 8, "다른 게시글에 달린 댓글의 대댓글입니다"),
+    INVALID_TOPIC(MAIN_NUMBERING+9,"존재하지 않는 주제입니다"),
 
     NOTICE_NOT_FOUND(NOTICE_NUMBERING + 1, "공지사항 내용을 찾을 수 없습니다"),
     FUNSYSTEM_NOT_FOUND(NOTICE_NUMBERING + 2, "펀시스템 내용을 찾을 수 없습니다"),
