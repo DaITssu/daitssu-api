@@ -18,25 +18,32 @@ class ExceptionHandler(
     private val traceIdResolver: TraceIdResolver,
 ) {
     private val log: KLogger = KotlinLogging.logger {}
-    private val traceId = traceIdResolver.getTraceIdOrNull()
 
     @ExceptionHandler(Exception::class)
     fun handleException(exception: Exception, request: HttpServletRequest): ResponseEntity<Response<Any>> {
         val requestInfo = RequestLoggingFilter.makeRequestInfo(ContentCachingRequestWrapper(request))
+        val traceId = traceIdResolver.getTraceIdOrNull()
+        val timestamp = LocalDateTime.now()
 
         lateinit var response: Response<Any>
         var httpStatus: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR
 
         when (exception) {
             is BaseException -> {
-                response = Response(code = exception.errorCode.code, message = exception.errorCode.message, data = null)
+                response = Response(
+                    traceId = traceId,
+                    timestamp = timestamp,
+                    code = exception.errorCode.code,
+                    message = exception.errorCode.message,
+                    data = null
+                )
                 httpStatus = exception.httpStatus
 
                 log.warn {
                     """
                         {
                             "traceId": $traceId,
-                            "timestamp": ${LocalDateTime.now()},
+                            "timestamp": $timestamp,
                             "request" : $requestInfo,
                             "code" : "${exception.errorCode.code}",
                             "message" : "${exception.errorCode.message}",
@@ -47,13 +54,19 @@ class ExceptionHandler(
             }
 
             else -> {
-                response = Response(code = 1, message = "", data = null)
+                response = Response(
+                    traceId = traceId,
+                    timestamp = timestamp,
+                    code = 1,
+                    message = exception.message ?: "",
+                    data = null
+                )
 
                 log.warn {
                     """
                         {
                             "traceId": $traceId,"traceId": $traceId,
-                            "timestamp": ${LocalDateTime.now()},
+                            "timestamp": $timestamp,
                             "request" : $requestInfo,
                             "message" : "${exception.message?.replace("\"", "'")}",
                             "status" : "$httpStatus"
