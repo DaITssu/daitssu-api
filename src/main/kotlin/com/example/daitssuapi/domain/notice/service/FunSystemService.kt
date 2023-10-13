@@ -9,6 +9,7 @@ import com.example.daitssuapi.domain.notice.model.entity.FunSystem
 import com.example.daitssuapi.domain.notice.model.repository.FunSystemRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class FunSystemService (
@@ -44,5 +45,12 @@ class FunSystemService (
 
         return FunSystemPageResponse.fromFunSystem(funSystem)
     }
-    fun updateViews( id:Long ) { funSystemRepository.updateViewsById(id)}
+    @Transactional
+    fun updateViews( id:Long ) {
+        val funSystem =funSystemRepository.findByIdOrNull(id)
+            ?:throw DefaultException(ErrorCode.FUNSYSTEM_NOT_FOUND)
+        funSystem.views = funSystem.views +1
+        funSystemRepository.save(funSystem)
+    }
+
 }

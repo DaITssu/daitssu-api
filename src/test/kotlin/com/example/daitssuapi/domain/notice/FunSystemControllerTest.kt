@@ -122,15 +122,15 @@ class FunSystemControllerTest {
     @Sql("classpath:data.sql")
     @Test
     @WithMockUser
-    @DisplayName("FunSyetem view 테스팅")
+    @DisplayName("FunSyetem view 증가 테스팅")
     fun getFunSystemPageViewsTest() {
         val result = mockMvc.get("/funsystem/page/1")
             .andExpect {
                 status { isOk() }
-
-            }.andReturn()
-
-        println(result.response.contentAsString)
+                content{
+                    jsonPath("$.data[0].views").value(1)
+                }
+            }
     }
 
 }

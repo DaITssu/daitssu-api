@@ -145,14 +145,15 @@ class NoticeControllerTest {
     @Sql("classpath:data.sql")
     @Test
     @WithMockUser
-    @DisplayName("Notice view 테스팅")
+    @DisplayName("Notice view 증가 테스팅")
     fun getNoticePageViewsTest() {
         val result = mockMvc.get("/notice/page/1")
             .andExpect {
                 status { isOk() }
+                content{
+                    jsonPath("$.data[0].views").value(1)
+                }
+            }
 
-            }.andReturn()
-
-        println(result.response.contentAsString)
     }
 }

@@ -9,6 +9,7 @@ import com.example.daitssuapi.domain.notice.model.entity.Notice
 import com.example.daitssuapi.domain.notice.model.repository.NoticeRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class NoticeService (
@@ -45,8 +46,13 @@ class NoticeService (
 
         return NoticePageResponse.fromNotice(notice)
     }
-
-    fun updateViews( id:Long ) { noticeRepository.updateViewsById(id)}
+    @Transactional
+    fun updateViews( id:Long ) {
+        val notice =noticeRepository.findByIdOrNull(id)
+            ?:throw DefaultException(ErrorCode.NOTICE_NOT_FOUND)
+        notice.views = notice.views +1
+        noticeRepository.save(notice)
+    }
 
 }
 

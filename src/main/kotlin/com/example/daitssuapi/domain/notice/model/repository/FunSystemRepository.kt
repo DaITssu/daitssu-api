@@ -18,8 +18,5 @@ interface FunSystemRepository :JpaRepository<FunSystem, Long> {
             List<FunSystem>
     fun findByTitleContaining(searchKeyword: String):
             List<FunSystem>
-    @Modifying(clearAutomatically = true)
-    @Transactional
-    @Query(value="UPDATE FunSystem SET views=views+1 WHERE id= :id")
-    fun updateViewsById(@Param("id") id: Long)
+
 }
