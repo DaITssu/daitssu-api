@@ -36,11 +36,11 @@ class FunSystemControllerTest {
     @Sql("classpath:data.sql")
     @Test
     @WithMockUser
-    @DisplayName("FunSystem 리스트 컨트롤러 로직 확인")
+    @DisplayName("FunSystem 리스트 전부 가져오기")
     fun getAllFunSystem() {
 
         // Act and Assert
-        val result = mockMvc.get("/funsystem/ALL")
+        val result = mockMvc.get("/funsystem")
             .andExpect {
                 status { isOk() }
 
@@ -77,10 +77,25 @@ class FunSystemControllerTest {
         val result = mockMvc.get("/funsystem/EXPERIENTIAL_ACTIVITIES?searchKeyword=5")
             .andExpect {
                 status { isOk() }
+                content{
+                    jsonPath("$.data[0].id").value(5)
+                }
+            }
+    }
+    @Sql("classpath:schema.sql")
+    @Sql("classpath:data.sql")
+    @Test
+    @WithMockUser
+    @DisplayName("실패 : FunSystem 잘못된 카테고리 테스트")
+    fun getSearchedAllFunSystemList() {
 
+        val result = mockMvc.get("/funsystem/INVALID")
+            .andExpect {
+                status{is5xxServerError()}
             }.andReturn()
         println(result.response.contentAsString)
     }
+
     @Sql("classpath:schema.sql")
     @Sql("classpath:data.sql")
     @Test

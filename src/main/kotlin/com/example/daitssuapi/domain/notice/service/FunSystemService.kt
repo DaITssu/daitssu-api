@@ -14,47 +14,33 @@ import org.springframework.stereotype.Service
 class FunSystemService (
     private val funSystemRepository: FunSystemRepository
 ){
+    fun getAllFunSystemList(searchKeyword:String?):List<FunSystemResponse>{
+        val funSystems: List<FunSystem>
+        if(searchKeyword==null){
+            funSystems = funSystemRepository.findAll()
+        }else{
+            funSystems= funSystemRepository.findByTitleContaining(searchKeyword)
+        }
+        return funSystems.map { FunSystemResponse.fromFunSystem(it) }
+    }
     fun getFunSystemList(
-        category:String
+        category: FunSystemCategory,
+        searchKeyword: String?,
     ):List<FunSystemResponse>{
         val funSystems : List<FunSystem>
-
-        if(category =="ALL")
-            funSystems = funSystemRepository.findAll()
-        else{
-            val funSystemCategory = FunSystemCategory.fromCode(category)
-            if(funSystemCategory !=null){
-                funSystems = funSystemRepository.findByCategory(funSystemCategory)
-            }else{
-                throw DefaultException(errorCode = ErrorCode.INVALID_CATEGORY)
-            }
+        if(searchKeyword==null){
+            funSystems = funSystemRepository.findByCategory(category)
+        }else{
+            funSystems = funSystemRepository.findByCategoryAndTitleContaining(category,searchKeyword)
         }
         return funSystems.map{FunSystemResponse.fromFunSystem(it)}
     }
-    fun getFunSystemSearchList(
-        category: String,
-        searchKeyword : String
-    ):List<FunSystemResponse> {
 
-        val funSystems:List<FunSystem>
-
-        if(category == "ALL")
-            funSystems= funSystemRepository.findByTitleContaining(searchKeyword)
-        else{
-            funSystems = FunSystemCategory.fromCode(category)?.let {
-                funSystemRepository.findByCategoryAndTitleContaining(it,searchKeyword)
-            } ?: throw DefaultException(errorCode = ErrorCode.INVALID_CATEGORY)
-        }
-
-
-        return funSystems.map { FunSystemResponse.fromFunSystem(it) }
-
-    }
     fun getFunSystemPage(
         id : Long
     ): FunSystemPageResponse {
         val funSystem : FunSystem = funSystemRepository.findByIdOrNull(id)
-            ?: throw DefaultException(errorCode = ErrorCode.FUNSYSTEM_NOT_FOUND)
+            ?: throw DefaultException(ErrorCode.FUNSYSTEM_NOT_FOUND)
 
         return FunSystemPageResponse.fromFunSystem(funSystem)
     }

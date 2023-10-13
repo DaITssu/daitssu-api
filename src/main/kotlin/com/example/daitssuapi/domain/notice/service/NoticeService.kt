@@ -14,46 +14,29 @@ import org.springframework.stereotype.Service
 class NoticeService (
     private val noticeRepository: NoticeRepository,
 ){
-    fun getNoticeList(
-        category: String
-    ):List<NoticeResponse> {
-
-        val notices:List<Notice>
-
-        if(category == "ALL")
-            notices= noticeRepository.findAll()
-        else{
-            val noticeCategory = NoticeCategory.fromCode(category)
-            if(noticeCategory !=null){
-                notices = noticeRepository.findByCategory(noticeCategory)
-            }else{
-                throw DefaultException(errorCode = ErrorCode.INVALID_CATEGORY)
-            }
-        }
-
-
-        return notices.map { NoticeResponse.fromNotice(it) }
-
-    }
-    fun getNoticeSearchList(
-        category: String,
-        searchKeyword : String
-    ):List<NoticeResponse> {
-
-        val notices:List<Notice>
-
-        if(category == "ALL")
+    fun getAllNoticeList(searchKeyword:String?):List<NoticeResponse>{
+        val notices: List<Notice>
+        if(searchKeyword==null){
+            notices = noticeRepository.findAll()
+        }else{
             notices= noticeRepository.findByTitleContaining(searchKeyword)
-        else{
-            notices = NoticeCategory.fromCode(category)?.let {
-                noticeRepository.findByCategoryAndTitleContaining(it,searchKeyword)
-            } ?: throw DefaultException(errorCode = ErrorCode.INVALID_CATEGORY)
         }
-
-
         return notices.map { NoticeResponse.fromNotice(it) }
-
     }
+
+    fun getNoticeList(
+        category: NoticeCategory,
+        searchKeyword: String?,
+    ):List<NoticeResponse>{
+        val notices : List<Notice>
+        if(searchKeyword==null){
+            notices = noticeRepository.findByCategory(category)
+        }else{
+            notices = noticeRepository.findByCategoryAndTitleContaining(category,searchKeyword)
+        }
+        return notices.map{ NoticeResponse.fromNotice(it)}
+    }
+
     fun getNoticePage(
         id: Long
     ): NoticePageResponse {

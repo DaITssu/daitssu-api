@@ -50,7 +50,7 @@ class NoticeControllerTest {
     @DisplayName("Notice 리스트 컨트롤러 로직 확인")
     fun getAllNoticeList() {
 
-        val result = mockMvc.get("/notice/ALL")
+        val result = mockMvc.get("/notice")
             .andExpect {
                 status { isOk() }
 
@@ -65,14 +65,16 @@ class NoticeControllerTest {
     @DisplayName("Notice 리스트 전체 검색 확인")
     fun getAllNoticeListWithMark() {
 
-        // Act and Assert
-        val result = mockMvc.get("/notice/ALL?searchKeyword=!")
+        val expected = noticeService.getNoticePage(4)
+        val result = mockMvc.get("/notice?searchKeyword=4")
             .andExpect {
                 status { isOk() }
-
+                content{
+                    jsonPath("$.data[0].id").value(expected.id)
+                }
             }
-            .andReturn()
-        println(result.response.contentAsString)
+
+
     }
     @Sql("classpath:schema.sql")
     @Sql("classpath:data.sql")
