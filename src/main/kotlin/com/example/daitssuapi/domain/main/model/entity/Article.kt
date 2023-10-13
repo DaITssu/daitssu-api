@@ -21,6 +21,6 @@ class Article(
     @JoinColumn(name = "user_id")
     var writer: User,
 
-    @Column(length = 2048)
-    var imageUrl: String? = null,
-): BaseEntity()
+    @OneToMany(mappedBy = "article")
+    var articleImages: MutableSet<ArticleImage> = mutableSetOf()
+) : BaseEntity()

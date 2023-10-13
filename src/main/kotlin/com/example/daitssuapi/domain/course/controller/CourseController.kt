@@ -116,4 +116,9 @@ class CourseController(
         @PathVariable calendarId: Long
     ) : Response<CalendarResponse> =
         Response(data = courseService.updateCalendar(calendarRequest = calendarRequest, calendarId = calendarId))
+    
+    @GetMapping("/calendar/today")
+    fun getTodayCalendar() : Response<TodayCalendarResponse> =
+        Response(data = courseService.getTodayDueAtCalendars())
+
 }

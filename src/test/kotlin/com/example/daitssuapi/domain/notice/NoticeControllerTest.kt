@@ -1,56 +1,31 @@
 package com.example.daitssuapi.domain.notice
 
-import com.example.daitssuapi.domain.notice.model.repository.NoticeRepository
-import com.example.daitssuapi.domain.notice.service.NoticeService
-import org.junit.jupiter.api.BeforeEach
+import com.example.daitssuapi.utils.ControllerTest
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.security.test.context.support.WithMockUser
-import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import org.springframework.web.context.WebApplicationContext
-import org.springframework.web.filter.CharacterEncodingFilter
 
 
-@AutoConfigureMockMvc
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@ControllerTest
 class NoticeControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
-    @Autowired
-    private lateinit var noticeService: NoticeService
-
-    @Autowired
-    private lateinit var noticeRepository: NoticeRepository
-
-    @Autowired
-    private lateinit var ctx : WebApplicationContext
-
-    @BeforeEach
-    fun setup() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
-            .addFilters<DefaultMockMvcBuilder>(CharacterEncodingFilter("UTF-8", true))
-            .build()
-    }
-
-    @Sql("classpath:schema.sql")
-    @Sql("classpath:data.sql")
     @Test
-    @WithMockUser
     @DisplayName("Notice 리스트 컨트롤러 로직 확인")
     fun getAllNoticeList() {
 
+<<<<<<< HEAD
         val result = mockMvc.get("/notice")
+=======
+        // Act and Assert
+        val result = mockMvc.get("/notice/ALL")
+>>>>>>> develop
             .andExpect {
                 status { isOk() }
 
@@ -58,6 +33,7 @@ class NoticeControllerTest {
             .andReturn()
         println(result.response.contentAsString)
     }
+<<<<<<< HEAD
     @Sql("classpath:schema.sql")
     @Sql("classpath:data.sql")
     @Test
@@ -84,6 +60,14 @@ class NoticeControllerTest {
     fun getSomeNoticeList() {
 
         mockMvc.get("/notice/SUBSCRIPTION")
+=======
+
+    @Test
+    @DisplayName("Notice 리스트 카테고리별 검색 확인")
+    fun getSomeNoticeList() {
+
+        mockMvc.get("/notice/ACADEMICS")
+>>>>>>> develop
             .andExpect {
                 status { isOk() }
                 content {
@@ -95,10 +79,7 @@ class NoticeControllerTest {
             }
     }
 
-    @Sql("classpath:schema.sql")
-    @Sql("classpath:data.sql")
     @Test
-    @WithMockUser
     @DisplayName("Notice 페이징 확인")
     fun getNoticePage() {
         mockMvc.get("/notice/page/1")
@@ -117,6 +98,7 @@ class NoticeControllerTest {
                 }
             }
     }
+<<<<<<< HEAD
     @Sql("classpath:schema.sql")
     @Sql("classpath:data.sql")
     @Test
@@ -157,3 +139,6 @@ class NoticeControllerTest {
 
     }
 }
+=======
+}
+>>>>>>> develop
