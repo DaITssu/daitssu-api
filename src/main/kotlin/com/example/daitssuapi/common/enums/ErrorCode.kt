@@ -20,6 +20,8 @@ enum class ErrorCode(val code: Int, val message: String) {
     NOTICE_NOT_FOUND(NOTICE_NUMBERING + 1, "공지사항 내용을 찾을 수 없습니다"),
     FUNSYSTEM_NOT_FOUND(NOTICE_NUMBERING + 2, "펀시스템 내용을 찾을 수 없습니다"),
     INVALID_CATEGORY(NOTICE_NUMBERING + 3, "존재하지 않는 카테고리입니다"),
+    DIFFERENT_NOTICE(NOTICE_NUMBERING + 4, "다른 공지사항에 달린 댓글의 대댓글입니다"),
+    DIFFERENT_FUNSYSTEM(NOTICE_NUMBERING + 5, "다른 펀시스템에 달린 댓글의 대댓글입니다"),
 
     COURSE_NOT_FOUND(COURSE_NUMBERING + 1, "과목을 찾을 수 없습니다."),
     USER_COURSE_RELATION_NOT_FOUND(COURSE_NUMBERING + 2, "유저가 수강중인 강의를 찾을 수 없습니다."),

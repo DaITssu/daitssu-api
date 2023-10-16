@@ -154,7 +154,7 @@ class ArticleServiceTest(
     fun writeCommentFailDifferentArticle() {
         val article = articleRepository.findAll()[0]
         val originalComment = commentRepository.findAll().filter {
-            it.article.id != article.id
+            it.article?.id != article.id
         }[0]
         val user = userRepository.findAll()[0]
         val request = CommentWriteRequest(
@@ -169,9 +169,9 @@ class ArticleServiceTest(
     @Test
     @DisplayName("성공_올바른 정보를 넘겨줄 때_댓글들이 조회된다")
     fun getComment() {
-        val comment = commentRepository.findAll()[0]
+        val comment = commentRepository.findAll().filter { null != it.article }[0]
 
-        val response = articleService.getComments(articleId = comment.article.id)
+        val response = articleService.getComments(articleId = comment.article!!.id)
 
         assertAll(
             { assertThat(response.size).isNotEqualTo(0) }
