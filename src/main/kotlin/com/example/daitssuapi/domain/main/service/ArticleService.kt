@@ -10,14 +10,8 @@ import com.example.daitssuapi.domain.main.dto.request.CommentWriteRequest
 import com.example.daitssuapi.domain.main.dto.response.ArticleResponse
 import com.example.daitssuapi.domain.main.dto.response.CommentResponse
 import com.example.daitssuapi.domain.main.dto.response.PageArticlesResponse
-import com.example.daitssuapi.domain.main.model.entity.Article
-import com.example.daitssuapi.domain.main.model.entity.ArticleImage
-import com.example.daitssuapi.domain.main.model.entity.Comment
-import com.example.daitssuapi.domain.main.model.entity.User
-import com.example.daitssuapi.domain.main.model.repository.ArticleImageRepository
-import com.example.daitssuapi.domain.main.model.repository.ArticleRepository
-import com.example.daitssuapi.domain.main.model.repository.CommentRepository
-import com.example.daitssuapi.domain.main.model.repository.UserRepository
+import com.example.daitssuapi.domain.main.model.entity.*
+import com.example.daitssuapi.domain.main.model.repository.*
 import jakarta.transaction.Transactional
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -30,9 +24,11 @@ class ArticleService(
     private val articleImageRepository: ArticleImageRepository,
     private val articleRepository: ArticleRepository,
     private val commentRepository: CommentRepository,
+    private val scrapRepository: ScrapRepository,
     private val userRepository: UserRepository,
     private val s3Service: S3Service,
 ) {
+    // TODO : 게시글 조회 시, 해당 유저의 스크랩 여부도 노출해야함
     fun getArticle(id: Long): ArticleResponse {
         val article: Article = articleRepository.findByIdOrNull(id)
             ?: throw DefaultException(ErrorCode.ARTICLE_NOT_FOUND)
@@ -44,7 +40,8 @@ class ArticleService(
             content = article.content,
             writerNickName = article.writer.nickname!!,
             updatedAt = article.updatedAt,
-            imageUrls = article.articleImages.map { it.url }
+            imageUrls = article.articleImages.map { it.url },
+            scrapCount = article.scraps.size
         )
     }
 
@@ -174,5 +171,20 @@ class ArticleService(
                 updatedAt = it.updatedAt
             )
         }
+    }
+
+    @Transactional
+    fun scrapArticle(articleId: Long, userId: Long, isActive: Boolean) {
+        val scrap = scrapRepository.findByArticleIdAndUserId(articleId = articleId, userId = userId)
+            ?: Scrap(
+                user = userRepository.findByIdOrNull(id = userId)
+                    ?: throw DefaultException(errorCode = ErrorCode.USER_NOT_FOUND),
+                article = articleRepository.findByIdOrNull(id = articleId)
+                    ?: throw DefaultException(errorCode = ErrorCode.ARTICLE_NOT_FOUND),
+                isActive = if (isActive) true else throw DefaultException(errorCode = ErrorCode.NEW_SCRAP_ISACTIVE_NOT_FALSE)
+            )
+
+        scrap.isActive = isActive
+        scrapRepository.save(scrap)
     }
 }

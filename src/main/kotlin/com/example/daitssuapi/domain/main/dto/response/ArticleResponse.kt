@@ -28,4 +28,7 @@ data class ArticleResponse(
 
     @Schema(description = "이미지 url 리스트")
     val imageUrls: List<String>,
+
+    @Schema(description = "게시글 스크랩 횟수")
+    val scrapCount: Int? = null
 )
