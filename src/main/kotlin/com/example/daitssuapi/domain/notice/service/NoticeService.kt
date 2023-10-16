@@ -9,9 +9,15 @@ import com.example.daitssuapi.domain.main.dto.response.CommentResponse
 import com.example.daitssuapi.domain.main.model.entity.Comment
 import com.example.daitssuapi.domain.main.model.repository.CommentRepository
 import com.example.daitssuapi.domain.main.model.repository.UserRepository
+import com.example.daitssuapi.domain.main.dto.response.ArticleResponse
+import com.example.daitssuapi.domain.main.dto.response.PageArticlesResponse
+import com.example.daitssuapi.domain.main.model.entity.Article
 import com.example.daitssuapi.domain.notice.dto.NoticeResponse
+import com.example.daitssuapi.domain.notice.dto.PageNoticeResponse
 import com.example.daitssuapi.domain.notice.model.entity.Notice
 import com.example.daitssuapi.domain.notice.model.repository.NoticeRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -24,18 +30,19 @@ class NoticeService(
     private val userRepository: UserRepository
 ) {
     fun getNoticeList(
-        category: String
-    ): List<NoticeResponse> {
+        category: String,
+        pageable: Pageable
+    ):Page<NoticeResponse> {
 
-        val notices: List<Notice>
+        val notices:Page<Notice>
 
-        if (category == "ALL")
-            notices = noticeRepository.findAll()
-        else {
+        if(category == "ALL")
+            notices= noticeRepository.findAll(pageable)
+        else{
             val noticeCategory = NoticeCategory.fromCode(category)
-            if (noticeCategory != null) {
-                notices = noticeRepository.findByCategory(noticeCategory)
-            } else {
+            if(noticeCategory !=null){
+                notices = noticeRepository.findByCategory(noticeCategory, pageable)
+            }else{
                 throw DefaultException(errorCode = ErrorCode.INVALID_CATEGORY)
             }
         }
@@ -54,6 +61,38 @@ class NoticeService(
         return NoticeResponse.fromNotice(notice)
     }
 
+    fun pageNoticeList(
+        pageable: Pageable,
+        inquiry: String?,
+    ): PageNoticeResponse {
+        val notice: Page<Notice> =
+            if (inquiry == null)
+                noticeRepository.findAll(pageable)
+            else
+                noticeRepository.findByCategory(
+                    category = NoticeCategory,
+                    pageable = pageable
+                )
+
+        val noticeResponses = notice.map {
+            NoticeResponse(
+                id = it.id,
+                title = it.title,
+                departmentId = it.departmentId,
+                content = it.content,
+                category = it.category,
+                imageUrl = it.imageUrl,
+                fileUrl = it.fileUrl,
+                createdAt = it.createdAt,
+                updatedAt = it.updatedAt
+            )
+        }
+
+        return PageNoticeResponse(
+            notice = noticeResponses.content,
+            totalPage = noticeResponses.totalPages
+        )
+    }
     @Transactional
     fun writeComment(noticeId: Long, request: CommentWriteRequest): CommentResponse {
         val user = userRepository.findByIdOrNull(request.userId)
