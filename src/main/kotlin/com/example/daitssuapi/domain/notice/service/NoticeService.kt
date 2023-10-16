@@ -9,9 +9,6 @@ import com.example.daitssuapi.domain.main.dto.response.CommentResponse
 import com.example.daitssuapi.domain.main.model.entity.Comment
 import com.example.daitssuapi.domain.main.model.repository.CommentRepository
 import com.example.daitssuapi.domain.main.model.repository.UserRepository
-import com.example.daitssuapi.domain.main.dto.response.ArticleResponse
-import com.example.daitssuapi.domain.main.dto.response.PageArticlesResponse
-import com.example.daitssuapi.domain.main.model.entity.Article
 import com.example.daitssuapi.domain.notice.dto.NoticeResponse
 import com.example.daitssuapi.domain.notice.dto.PageNoticeResponse
 import com.example.daitssuapi.domain.notice.model.entity.Notice
@@ -32,17 +29,17 @@ class NoticeService(
     fun getNoticeList(
         category: String,
         pageable: Pageable
-    ):Page<NoticeResponse> {
+    ): Page<NoticeResponse> {
 
-        val notices:Page<Notice>
+        val notices: Page<Notice>
 
-        if(category == "ALL")
-            notices= noticeRepository.findAll(pageable)
-        else{
+        if (category == "ALL")
+            notices = noticeRepository.findAll(pageable)
+        else {
             val noticeCategory = NoticeCategory.fromCode(category)
-            if(noticeCategory !=null){
+            if (noticeCategory != null) {
                 notices = noticeRepository.findByCategory(noticeCategory, pageable)
-            }else{
+            } else {
                 throw DefaultException(errorCode = ErrorCode.INVALID_CATEGORY)
             }
         }
@@ -63,14 +60,14 @@ class NoticeService(
 
     fun pageNoticeList(
         pageable: Pageable,
-        inquiry: String?,
+        category: NoticeCategory?,
     ): PageNoticeResponse {
         val notice: Page<Notice> =
-            if (inquiry == null)
+            if (category == null)
                 noticeRepository.findAll(pageable)
             else
                 noticeRepository.findByCategory(
-                    category = NoticeCategory,
+                    category = category,
                     pageable = pageable
                 )
 
@@ -93,6 +90,7 @@ class NoticeService(
             totalPage = noticeResponses.totalPages
         )
     }
+
     @Transactional
     fun writeComment(noticeId: Long, request: CommentWriteRequest): CommentResponse {
         val user = userRepository.findByIdOrNull(request.userId)
@@ -102,12 +100,14 @@ class NoticeService(
 
         validateComment(notice = notice, content = request.content, originalCommentId = request.originalCommentId)
 
-        val comment = commentRepository.save(Comment(
-            writer = user,
-            notice = notice,
-            content = request.content,
-            originalId = request.originalCommentId
-        ))
+        val comment = commentRepository.save(
+            Comment(
+                writer = user,
+                notice = notice,
+                content = request.content,
+                originalId = request.originalCommentId
+            )
+        )
 
         return CommentResponse(
             commentId = comment.id,

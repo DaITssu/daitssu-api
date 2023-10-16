@@ -1,17 +1,15 @@
 package com.example.daitssuapi.domain.notice.controller
 
 import com.example.daitssuapi.common.dto.Response
+import com.example.daitssuapi.common.enums.NoticeCategory
 import com.example.daitssuapi.domain.main.dto.request.CommentWriteRequest
 import com.example.daitssuapi.domain.main.dto.response.CommentResponse
-import com.example.daitssuapi.domain.main.dto.response.PageArticlesResponse
 import com.example.daitssuapi.domain.notice.dto.NoticeResponse
 import com.example.daitssuapi.domain.notice.dto.PageNoticeResponse
 import com.example.daitssuapi.domain.notice.service.NoticeService
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.responses.ApiResponse
-import org.springframework.web.bind.annotation.*
-
 import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
@@ -55,12 +53,13 @@ sort: [\"createdAt\"]
         )
         pageable: Pageable,
         @RequestParam
-        inquiry: String? = null,
+        category: NoticeCategory?
     ): Response<PageNoticeResponse> {
         val notice = noticeService.pageNoticeList(
-            inquiry = inquiry,
+            category = category,
             pageable = pageable
         )
+
 
         return Response(
             data = notice
@@ -80,7 +79,8 @@ sort: [\"createdAt\"]
     fun writeComment(
         @PathVariable noticeId: Long,
         @RequestBody commentWriteRequest: CommentWriteRequest
-    ): Response<CommentResponse> = Response(data = noticeService.writeComment(noticeId = noticeId, request = commentWriteRequest))
+    ): Response<CommentResponse> =
+        Response(data = noticeService.writeComment(noticeId = noticeId, request = commentWriteRequest))
 
     @Operation(
         summary = "댓글 조회",
