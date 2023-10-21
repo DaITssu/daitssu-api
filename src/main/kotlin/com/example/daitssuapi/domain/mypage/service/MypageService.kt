@@ -3,7 +3,6 @@ package com.example.daitssuapi.domain.mypage.service
 import com.example.daitssuapi.common.enums.ErrorCode
 import com.example.daitssuapi.common.exception.DefaultException
 import com.example.daitssuapi.domain.main.model.repository.ArticleRepository
-import com.example.daitssuapi.domain.main.model.repository.CommentRepository
 import com.example.daitssuapi.domain.main.model.repository.ScrapRepository
 import com.example.daitssuapi.domain.main.model.repository.UserRepository
 import com.example.daitssuapi.domain.mypage.dto.response.MyArticleResponse
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service
 class MypageService (
     private val userRepository: UserRepository,
     private val articleRepository: ArticleRepository,
-    private val commentRepository: CommentRepository,
     private val scrapRepository: ScrapRepository
 ){
     
@@ -37,16 +35,17 @@ class MypageService (
     fun getMyScrap(userId: Long) : List<MyScrapResponse> {
         val user = userRepository.findByIdOrNull(userId)
             ?: throw DefaultException(errorCode = ErrorCode.USER_NOT_FOUND)
-        return scrapRepository.findByUserAndIsActiveTrue(user).map {
+        return scrapRepository.findByUserAndIsActiveTrueOrderByCreatedAtDesc(user).map {
             MyScrapResponse(
                 id = it.article.id,
                 topic = it.article.topic.value,
                 title = it.article.title,
                 content = it.article.content,
                 createdAt = it.article.createdAt,
-                commentSize = commentRepository.findByArticleId(it.article.id).size
+                commentSize = it.article.comments.count { comment -> !comment.isDeleted }
             )
-        }.sortedByDescending { it.createdAt }
+        }
+        
     }
 
 }
