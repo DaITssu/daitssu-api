@@ -18,5 +18,5 @@ interface ArticleRepository : JpaRepository<Article, Long> {
         createdAt: LocalDateTime
     ): List<Article>
     
-    fun findAllByWriter(writer: User) : List<Article>
+    fun findAllByWriterOrderByCreatedAtDesc(writer: User) : List<Article>
 }

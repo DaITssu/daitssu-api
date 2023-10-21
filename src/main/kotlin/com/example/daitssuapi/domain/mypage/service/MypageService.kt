@@ -19,16 +19,16 @@ class MypageService (
     fun getMyArticle(userId: Long) : List<MyArticleResponse> {
         val user = userRepository.findByIdOrNull(userId)
             ?: throw DefaultException(errorCode = ErrorCode.USER_NOT_FOUND)
-        return articleRepository.findAllByWriter(user).map {
+        return articleRepository.findAllByWriterOrderByCreatedAtDesc(user).map {
             MyArticleResponse(
                 id = it.id,
                 topic = it.topic.value,
                 title = it.title,
                 content = it.content,
                 createdAt = it.createdAt,
-                commentSize = commentRepository.findByArticleId(it.id).size
+                commentSize = it.comments.count { comment -> !comment.isDeleted }
             )
-        }.sortedByDescending { it.createdAt }
+        }
     }
     
 
