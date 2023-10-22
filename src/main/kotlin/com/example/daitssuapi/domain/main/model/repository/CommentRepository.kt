@@ -10,5 +10,5 @@ interface CommentRepository : JpaRepository<Comment, Long> {
 
     fun findByFunSystemId(funSystemId: Long): List<Comment>
 
-    fun findByWriterId(userId: Long): List<Comment>
+    fun findByWriterIdAndIsDeletedFalseOrderByIdDesc(userId: Long): List<Comment>
 }
