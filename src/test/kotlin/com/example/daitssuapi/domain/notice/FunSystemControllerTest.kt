@@ -4,6 +4,8 @@ import com.example.daitssuapi.utils.ControllerTest
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.test.context.support.WithMockUser
+import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -14,12 +16,9 @@ class FunSystemControllerTest {
     private lateinit var mockMvc: MockMvc
 
     @Test
-<<<<<<< HEAD
     @WithMockUser
     @DisplayName("FunSystem 리스트 전부 가져오기")
-=======
-    @DisplayName("FunSystem 리스트 컨트롤러 로직 확인")
->>>>>>> develop
+
     fun getAllFunSystem() {
 
         // Act and Assert
@@ -33,12 +32,9 @@ class FunSystemControllerTest {
     }
 
     @Test
-<<<<<<< HEAD
+
     @WithMockUser
     @DisplayName("Funsystem 리스트 카테고리 확인")
-=======
-    @DisplayName("Funsystem 리스트 카테고리별 검색 확인")
->>>>>>> develop
     fun getSomeFunSystemList() {
 
         mockMvc.get("/funsystem/SUBSCRIPTION")
@@ -53,7 +49,7 @@ class FunSystemControllerTest {
             }
     }
     @Sql("classpath:schema.sql")
-    @Sql("classpath:data.sql")
+    @Sql("classpath:h2-data.sql")
     @Test
     @WithMockUser
     @DisplayName("FunSystem 리스트 카테고리별 검색 확인") // 같은 카테고리로 4번과 5번이 있는데 둘중 5 하나만 검색해서 나오게 함
@@ -68,7 +64,7 @@ class FunSystemControllerTest {
             }
     }
     @Sql("classpath:schema.sql")
-    @Sql("classpath:data.sql")
+    @Sql("classpath:h2-data.sql")
     @Test
     @WithMockUser
     @DisplayName("실패 : FunSystem 잘못된 카테고리 테스트")
@@ -99,10 +95,9 @@ class FunSystemControllerTest {
                 }
             }
     }
-<<<<<<< HEAD
 
     @Sql("classpath:schema.sql")
-    @Sql("classpath:data.sql")
+    @Sql("classpath:h2-data.sql")
     @Test
     @WithMockUser
     @DisplayName("FunSyetem view 증가 테스팅")
@@ -117,6 +112,4 @@ class FunSystemControllerTest {
     }
 
 }
-=======
-}
->>>>>>> develop
+
