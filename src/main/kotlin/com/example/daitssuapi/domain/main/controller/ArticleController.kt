@@ -176,6 +176,8 @@ sort: [\"createdAt\"]
         userId: Long
     ): Response<Nothing> {
         articleService.like(articleId = articleId, userId = userId)
+
+        return Response(code = 0, message = "OK", data = null)
     }
 
     @Operation(
