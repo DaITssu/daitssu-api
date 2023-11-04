@@ -26,9 +26,11 @@ class ArticleService(
     private val articleLikeRepository: ArticleLikeRepository,
     private val articleRepository: ArticleRepository,
     private val commentRepository: CommentRepository,
+    private val scrapRepository: ScrapRepository,
     private val userRepository: UserRepository,
     private val s3Service: S3Service,
 ) {
+    // TODO : 게시글 조회 시, 해당 유저의 스크랩 여부도 노출해야함
     fun getArticle(id: Long): ArticleResponse {
         val article: Article = articleRepository.findByIdOrNull(id)
             ?: throw DefaultException(ErrorCode.ARTICLE_NOT_FOUND)
@@ -42,7 +44,8 @@ class ArticleService(
             updatedAt = article.updatedAt,
             imageUrls = article.images.map { it.url },
             likes = article.likes.size,
-            comments = article.comments.size
+            comments = article.comments.size,
+            scrapCount = article.scraps.size
         )
     }
 
@@ -252,5 +255,20 @@ class ArticleService(
                 updatedAt = it.updatedAt
             )
         }
+    }
+
+    @Transactional
+    fun scrapArticle(articleId: Long, userId: Long, isActive: Boolean) {
+        val scrap = scrapRepository.findByArticleIdAndUserId(articleId = articleId, userId = userId)
+            ?: Scrap(
+                user = userRepository.findByIdOrNull(id = userId)
+                    ?: throw DefaultException(errorCode = ErrorCode.USER_NOT_FOUND),
+                article = articleRepository.findByIdOrNull(id = articleId)
+                    ?: throw DefaultException(errorCode = ErrorCode.ARTICLE_NOT_FOUND),
+                isActive = if (isActive) true else throw DefaultException(errorCode = ErrorCode.NEW_SCRAP_ISACTIVE_NOT_FALSE)
+            )
+
+        scrap.isActive = isActive
+        scrapRepository.save(scrap)
     }
 }

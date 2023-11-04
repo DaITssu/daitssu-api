@@ -34,4 +34,7 @@ data class ArticleResponse(
 
     @Schema(description = "댓글 수")
     val comments: Int,
+
+    @Schema(description = "게시글 스크랩 횟수")
+    val scrapCount: Int? = null
 )

@@ -174,8 +174,26 @@ sort: [\"createdAt\"]
         articleId: Long,
         @PathVariable
         userId: Long
-    ): Response<String> {
+    ): Response<Nothing> {
         articleService.like(articleId = articleId, userId = userId)
+    }
+
+    @Operation(
+            summary = "게시글 스크랩",
+            responses = [
+                ApiResponse(
+                        responseCode = "200",
+                        description = "OK"
+                )
+            ]
+    )
+    @PostMapping("/{articleId}/scrap")
+    fun scrapArticle(
+        @PathVariable articleId: Long,
+        @RequestParam userId: Long,
+        @RequestParam isActive: Boolean
+    ): Response<Nothing> {
+        articleService.scrapArticle(articleId = articleId, userId = userId, isActive = isActive)
 
         return Response(code = 0, message = "OK", data = null)
     }
