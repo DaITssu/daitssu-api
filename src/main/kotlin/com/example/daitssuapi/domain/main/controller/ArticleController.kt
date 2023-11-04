@@ -86,7 +86,7 @@ sort: [\"createdAt\"]
             )
         ]
     )
-    @GetMapping
+    @GetMapping("/popular")
     fun getPopularArticles(): Response<List<ArticleResponse>> {
         val articles = articleService.getPopularArticles()
 
@@ -142,6 +142,24 @@ sort: [\"createdAt\"]
     }
 
     @Operation(
+        summary = "게시글 삭제",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "OK"
+            )
+        ]
+    )
+    @DeleteMapping("/{articleId}")
+    fun deleteArticle(
+        @PathVariable articleId: Long
+    ): Response<String> {
+        articleService.deleteArticle(articleId)
+
+        return Response(code = 0, message = "OK", data = null)
+    }
+
+    @Operation(
         summary = "게시글 좋아요",
         responses = [
             ApiResponse(
@@ -156,8 +174,28 @@ sort: [\"createdAt\"]
         articleId: Long,
         @PathVariable
         userId: Long
-    ): Response<String> {
+    ): Response<Nothing> {
         articleService.like(articleId = articleId, userId = userId)
+
+        return Response(code = 0, message = "OK", data = null)
+    }
+
+    @Operation(
+            summary = "게시글 스크랩",
+            responses = [
+                ApiResponse(
+                        responseCode = "200",
+                        description = "OK"
+                )
+            ]
+    )
+    @PostMapping("/{articleId}/scrap")
+    fun scrapArticle(
+        @PathVariable articleId: Long,
+        @RequestParam userId: Long,
+        @RequestParam isActive: Boolean
+    ): Response<Nothing> {
+        articleService.scrapArticle(articleId = articleId, userId = userId, isActive = isActive)
 
         return Response(code = 0, message = "OK", data = null)
     }

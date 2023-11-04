@@ -192,4 +192,19 @@ class CourseServiceTest(
         
     }
     
+    
+    @Test
+    @DisplayName("오늘 마감인 캘린더 요청시, 과제와 강의가 출력된다.")
+    fun get_calendar_with_today_date() {
+        val calendars = courseService.getTodayDueAtCalendars()
+        
+        assertAll(
+            { assertThat(calendars.videos.size).isEqualTo(2) },
+            { assertThat(calendars.videos.get(0).course).isEqualTo("eat paper") },
+            { assertThat(calendars.videos.get(0).count).isEqualTo(2) },
+            { assertThat(calendars.assignments.size).isEqualTo(2) },
+            { assertThat(calendars.assignments.get(0).course).isEqualTo("eat paper") },
+            { assertThat(calendars.assignments.get(0).count).isEqualTo(2) }
+        )
+    }
 }

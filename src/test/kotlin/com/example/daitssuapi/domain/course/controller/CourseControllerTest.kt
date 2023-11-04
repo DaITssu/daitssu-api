@@ -225,4 +225,16 @@ class CourseControllerTest(
         )
         
     }
+    
+    @Test
+    @DisplayName("오늘 마감하는 과제, 강의 요청시_캘린더가 출력된다")
+    fun get_today_calendar() {
+        val response = mockMvc.perform(
+            get("$courseUrl/calendar/today")
+        )
+            .andExpect(status().isOk)
+            .andReturn().response
+        
+        assertThat(jacksonObjectMapper().readTree(response.contentAsString)["data"].isEmpty).isFalse()
+    }
 }

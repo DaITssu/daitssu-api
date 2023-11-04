@@ -29,4 +29,10 @@ class Article(
 
     @OneToMany(mappedBy = "article")
     var comments: MutableSet<Comment> = mutableSetOf(),
+
+    @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
+    var articleImages: MutableSet<ArticleImage> = mutableSetOf(),
+
+    @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
+    val scraps: List<Scrap> = emptyList()
 ) : BaseEntity()
