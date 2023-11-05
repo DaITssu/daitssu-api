@@ -22,7 +22,7 @@ class MyPageController(
         @PathVariable userId: Long,
         @RequestBody request: CommentDeleteRequest
     ): Response<String> {
-        myPageService.deleteComments(comments = request.comments)
+        myPageService.deleteComments(commentIds = request.commentIds)
 
         return Response(data = "Delete Ok")
     }

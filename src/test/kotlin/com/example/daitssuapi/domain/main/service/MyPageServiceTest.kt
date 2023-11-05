@@ -53,10 +53,10 @@ class MyPageServiceTest(
         val comments = commentRepository.findAll()
         val userId = comments[0].writer.id
         val request = CommentDeleteRequest(
-            comments = comments.filter { it.writer.id == userId }.map { it.id }
+            commentIds = comments.filter { it.writer.id == userId }.map { it.id }
         )
 
-        myPageService.deleteComments(comments = request.comments)
+        myPageService.deleteComments(commentIds = request.commentIds)
 
         comments.filter { it.writer.id == userId }.forEach { comment ->
             assertThat(comment.isDeleted).isTrue()

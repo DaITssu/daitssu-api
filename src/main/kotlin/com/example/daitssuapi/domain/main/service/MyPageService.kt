@@ -23,8 +23,8 @@ class MyPageService(
     }
 
     @Transactional
-    fun deleteComments(comments: List<Long>) {
-        commentRepository.findAllById(comments).forEach {
+    fun deleteComments(commentIds: List<Long>) {
+        commentRepository.findAllById(commentIds).forEach {
             it.isDeleted = true
         }
     }

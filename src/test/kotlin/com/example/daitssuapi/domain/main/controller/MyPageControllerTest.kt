@@ -67,7 +67,7 @@ class MyPageControllerTest(
         val comments = commentRepository.findAll()
         val userId = comments[0].writer.id
         val commentDeleteRequest = CommentDeleteRequest(
-            comments = comments.filter { it.writer.id == userId }.filter { !it.isDeleted }.map { it.id }
+            commentIds = comments.filter { it.writer.id == userId }.filter { !it.isDeleted }.map { it.id }
         )
         val url = "$baseUrl/$userId/comments"
         val request = jacksonObjectMapper().writeValueAsString(commentDeleteRequest)
