@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 class MypageService (
     private val userRepository: UserRepository,
     private val articleRepository: ArticleRepository,
-    private val commentRepository: CommentRepository
+    private val commentRepository: CommentRepository,
 ){
     
     fun getMyArticle(userId: Long) : List<MyArticleResponse> {
@@ -28,9 +28,8 @@ class MypageService (
                 createdAt = it.createdAt,
                 commentSize = commentRepository.findByArticleId(it.id).size
             )
-        }
-        
-        
+        }.sortedByDescending { it.createdAt }
     }
+    
 
 }
