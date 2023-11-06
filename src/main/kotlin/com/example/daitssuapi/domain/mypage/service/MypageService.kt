@@ -46,7 +46,7 @@ class MypageService (
                 createdAt = it.article.createdAt,
                 commentSize = commentRepository.findByArticleId(it.article.id).size
             )
-        }
+        }.sortedByDescending { it.createdAt }
     }
 
 }
