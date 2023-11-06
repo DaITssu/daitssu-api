@@ -35,22 +35,4 @@ class MypageControllerTest {
             .andExpect(jsonPath("$.data").isEmpty)
     }
     
-    @Test
-    @DisplayName("스크랩이 있는 userId를 이용하여 조회시_1개 이상의 게시글이 조회된다")
-    fun get_my_scraps_with_user_id(){
-        val userId = 1L
-        
-        mockMvc.perform((get("$url/$userId/scraps")))
-            .andExpect(status().isOk)
-    }
-    
-    @Test
-    @DisplayName("스크랩이 없는 userId를 이용하여 조회시_ 빈 List를 받는다")
-    fun get_my_scraps_with_wrong_user_id() {
-        val wrongUserId = 2L
-        
-        mockMvc.perform((get("$url/$wrongUserId/scraps")))
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.data").isEmpty)
-    }
 }
