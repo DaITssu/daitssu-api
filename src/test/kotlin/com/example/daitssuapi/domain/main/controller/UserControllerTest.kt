@@ -37,4 +37,17 @@ class UserControllerTest(
             .andExpect(status().isNotFound)
             .andExpect(jsonPath("$.data").isEmpty)
     }
+    @Test
+    @DisplayName("userId를 이욯하여 닉네임 변경")
+    fun update_user_nickname_with_userId(){
+        val user = userRepository.findAll()[0]
+        val nickname = "changed!"
+        mockMvc.perform(put("$url/nickname")
+            .param("userId",user.id.toString())
+            .param("nickname", nickname)
+        ).andExpect(status().isOk)
+            .andExpect(jsonPath("$.data.nickname").value(userRepository.findAll()[0].nickname))
+
+    }
 }
+

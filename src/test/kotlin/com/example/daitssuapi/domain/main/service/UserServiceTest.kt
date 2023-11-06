@@ -37,4 +37,15 @@ class UserServiceTest(
 
         assertThrows<DefaultException> { userService.getUser(userId = wrongUserId) }
     }
+    @Test
+    @DisplayName("user")
+    fun update_nickname_test(){
+        val before = userRepository.findAll()[0]
+        val beforeNickname = before.nickname
+        val nickname = "test"
+        val after = userService.updateNickname(userId = before.id, nickname= nickname)
+        assertAll(
+            {assertThat(after.nickname).isNotEqualTo(beforeNickname)}
+        )
+    }
 }
