@@ -1,5 +1,9 @@
 DELETE FROM course.user_course_relation;
+DELETE FROM course.video;
+DELETE FROM course.calendar;
+DELETE FROM course.assignment;
 DELETE FROM course.course;
+DELETE FROM main.comment;
 DELETE FROM main.article;
 DELETE FROM main.users;
 DELETE FROM main.department;
