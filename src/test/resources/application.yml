@@ -26,3 +26,8 @@ spring:
   logging:
     level:
       root: DEBUG
+
+aws:
+  s3:
+    bucket: QWER
+    url: ASDF
