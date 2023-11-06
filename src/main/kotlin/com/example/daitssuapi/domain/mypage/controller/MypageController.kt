@@ -2,7 +2,6 @@ package com.example.daitssuapi.domain.mypage.controller
 
 import com.example.daitssuapi.common.dto.Response
 import com.example.daitssuapi.domain.mypage.dto.response.MyArticleResponse
-import com.example.daitssuapi.domain.mypage.dto.response.MyScrapResponse
 import com.example.daitssuapi.domain.mypage.service.MypageService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -21,11 +20,5 @@ class MypageController(
         @PathVariable("userId") userId: Long
     ) : Response<List<MyArticleResponse>> =
         Response(data = mypageService.getMyArticle(userId = userId))
-
-    @GetMapping("/{userId}/scraps")
-    fun getMyScraps(
-        @PathVariable("userId") userId: Long
-    ) : Response<List<MyScrapResponse>> =
-        Response(data = mypageService.getMyScrap(userId = userId))
 
 }
