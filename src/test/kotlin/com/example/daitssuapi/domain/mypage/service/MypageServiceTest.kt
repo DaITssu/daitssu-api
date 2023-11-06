@@ -21,7 +21,7 @@ class MypageServiceTest (
     @Test
     @DisplayName("올바른 userId를 받으면 작성한 게시글이 조회된다")
     fun get_my_articles_with_user_id() {
-        val userId =2L
+        val userId =4L
         val user = userRepository.findById(userId).get()
         val articles = articleRepository.findAllByWriter(user)
         val findArticles = mypageService.getMyArticle(userId = userId)
@@ -29,7 +29,8 @@ class MypageServiceTest (
         assertAll(
             { assertThat(findArticles).isNotEmpty },
             { assertThat(findArticles.size).isEqualTo(articles.size) },
-            { assertThat(findArticles.get(0).commentSize).isEqualTo(2)}
+            { assertThat(findArticles.get(0).id).isEqualTo(4)},
+            { assertThat(findArticles.get(2).commentSize).isEqualTo(1)}
         )
     }
     
@@ -42,5 +43,4 @@ class MypageServiceTest (
             mypageService.getMyArticle(userId = wrongUserId)
         }
     }
-
 }

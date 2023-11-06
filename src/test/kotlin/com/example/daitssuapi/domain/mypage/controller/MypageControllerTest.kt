@@ -34,4 +34,5 @@ class MypageControllerTest {
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.data").isEmpty)
     }
+    
 }
