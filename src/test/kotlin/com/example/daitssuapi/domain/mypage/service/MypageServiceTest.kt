@@ -55,8 +55,10 @@ class MypageServiceTest (
         assertAll(
             { assertThat(findScraps).isNotEmpty },
             { assertThat(findScraps.size).isEqualTo(scraps.size) },
-            { assertThat(findScraps.get(0).commentSize).isEqualTo(2) },
-            { assertThat(findScraps.get(0).topic).isEqualTo("잡담")}
+            { assertThat(findScraps.get(0).id).isEqualTo(4) },
+            { assertThat(findScraps.get(0).topic).isEqualTo("정보")},
+            { assertThat(findScraps.get(1).commentSize).isEqualTo(2) },
+            { assertThat(findScraps.get(1).topic).isEqualTo("잡담")}
         )
     }
     
