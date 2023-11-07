@@ -38,7 +38,7 @@ class UserControllerTest(
             .andExpect(jsonPath("$.data").isEmpty)
     }
     @Test
-    @DisplayName("userId를 이욯하여 닉네임 변경")
+    @DisplayName("userId를 이용하여 닉네임 변경")
     fun update_user_nickname_with_userId(){
         val user = userRepository.findAll()[0]
         val nickname = "changed!"

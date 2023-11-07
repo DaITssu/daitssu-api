@@ -38,7 +38,7 @@ class UserServiceTest(
         assertThrows<DefaultException> { userService.getUser(userId = wrongUserId) }
     }
     @Test
-    @DisplayName("user")
+    @DisplayName("user 닉네임 변환 테스트")
     fun update_nickname_test(){
         val before = userRepository.findAll()[0]
         val beforeNickname = before.nickname
