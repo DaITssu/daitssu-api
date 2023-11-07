@@ -33,10 +33,10 @@ class UserController(
     ): Response<UserResponse> = Response(data = userService.getUser(userId = userId))
 
 
-    @PutMapping("/nickname")
+    @PatchMapping("/nickname")
     fun updateNickname(
         @RequestParam userId: Long,
         @RequestParam nickname: String,
-    ): Response<UserResponse> =
+    ): Response<String> =
         Response(data = userService.updateNickname(userId = userId, nickname = nickname))
 }
