@@ -49,11 +49,12 @@ class CourseController(
             ApiResponse(responseCode = "200", description = "OK")
         ]
     )
-    @GetMapping("/calendar/{date}")
+    @GetMapping("/calendar/{date}/{userId}")
     fun getCalendar(
-        @PathVariable("date") date: String
+        @PathVariable("date") date: String,
+        @PathVariable("userId") userId: Long
     ): Response<Map<String, List<CalendarResponse>>> =
-        Response(data = courseService.getCalendar(dateRequest = date))
+        Response(data = courseService.getCalendar(dateRequest = date, userId = userId))
 
     @Operation(
         summary = "일정 추가하기",
@@ -117,8 +118,10 @@ class CourseController(
     ) : Response<CalendarResponse> =
         Response(data = courseService.updateCalendar(calendarRequest = calendarRequest, calendarId = calendarId))
     
-    @GetMapping("/calendar/today")
-    fun getTodayCalendar() : Response<TodayCalendarResponse> =
-        Response(data = courseService.getTodayDueAtCalendars())
+    @GetMapping("/calendar/today/{userId}")
+    fun getTodayCalendar(
+        @PathVariable("userId") userId: Long
+    ) : Response<TodayCalendarResponse> =
+        Response(data = courseService.getTodayDueAtCalendars(userId = userId))
 
 }
