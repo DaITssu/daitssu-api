@@ -93,11 +93,12 @@ class CourseServiceTest(
         // case 1. 조회가 잘되는지 확인
         val date = "2023-07"
         val name = "eat paper"
-        val findCalendar = courseService.getCalendar(date)
+        val userId = 1L
+        val findCalendar = courseService.getCalendar(date, userId)
         
         assertAll(
             { assertThat(findCalendar.keys).contains(name) },
-            { assertThat(findCalendar[name]?.size).isEqualTo(2) }
+            { assertThat(findCalendar[name]?.size).isEqualTo(1) }
         )
      
     }
@@ -106,9 +107,10 @@ class CourseServiceTest(
     @DisplayName("잘못된 date 형식으로 캘린더 조회시_에러가 발생한다")
     fun get_calendar_with_wrong_date() {
         val date = "2023-07-27"
+        val userId = 1L
         
         org.junit.jupiter.api.assertThrows<DefaultException> {
-            courseService.getCalendar(date)
+            courseService.getCalendar(dateRequest = date, userId = userId)
         }
     }
     
@@ -120,7 +122,8 @@ class CourseServiceTest(
             course = "do it",
             dueAt = "2023-07-27 23:59:59",
             name = "과제 꼭 하기",
-            isCompleted = false
+            isCompleted = false,
+            userId = 1L
         )
         val findCalendar = courseService.postCalendar(calendarRequest)
      
@@ -140,7 +143,8 @@ class CourseServiceTest(
             course = "do it",
             dueAt = "2023-07-27",
             name = "과제 꼭 하기",
-            isCompleted = false
+            isCompleted = false,
+            userId = 1L
         )
         
         org.junit.jupiter.api.assertThrows<DefaultException> {
@@ -156,7 +160,8 @@ class CourseServiceTest(
             course = "JAVA",
             dueAt = "2023-08-27 23:59:59",
             name = "과제",
-            isCompleted = true
+            isCompleted = true,
+            userId = 1L
         )
         
         val updateCalendar = courseService.updateCalendar(calendarRequestUpdate, 13L)
@@ -178,7 +183,8 @@ class CourseServiceTest(
             course = "do it",
             dueAt = "2023-07-27",
             name = "과제 꼭 하기",
-            isCompleted = true
+            isCompleted = true,
+            userId = 1L
         )
         
         assertAll(
@@ -196,7 +202,8 @@ class CourseServiceTest(
     @Test
     @DisplayName("오늘 마감인 캘린더 요청시, 과제와 강의가 출력된다.")
     fun get_calendar_with_today_date() {
-        val calendars = courseService.getTodayDueAtCalendars()
+        val userId = 1L
+        val calendars = courseService.getTodayDueAtCalendars(userId = userId)
         
         assertAll(
             { assertThat(calendars.videos.size).isEqualTo(2) },
@@ -204,7 +211,7 @@ class CourseServiceTest(
             { assertThat(calendars.videos.get(0).count).isEqualTo(2) },
             { assertThat(calendars.assignments.size).isEqualTo(2) },
             { assertThat(calendars.assignments.get(0).course).isEqualTo("eat paper") },
-            { assertThat(calendars.assignments.get(0).count).isEqualTo(2) }
+            { assertThat(calendars.assignments.get(0).count).isEqualTo(1) }
         )
     }
 }
