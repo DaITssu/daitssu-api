@@ -26,5 +26,15 @@ data class ArticleResponse(
     @Schema(description = "마지막 수정된 시각")
     val updatedAt: LocalDateTime,
 
-//    val images // image 데이터
+    @Schema(description = "이미지 url 리스트")
+    val imageUrls: List<String>,
+
+    @Schema(description = "좋아요 수")
+    val likes: Int,
+
+    @Schema(description = "댓글 수")
+    val comments: Int,
+
+    @Schema(description = "게시글 스크랩 횟수")
+    val scrapCount: Int? = null
 )

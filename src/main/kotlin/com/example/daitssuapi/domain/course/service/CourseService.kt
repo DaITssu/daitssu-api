@@ -1,5 +1,6 @@
 package com.example.daitssuapi.domain.course.service
 
+import com.example.daitssuapi.common.enums.CalendarType
 import com.example.daitssuapi.common.enums.ErrorCode
 import com.example.daitssuapi.common.enums.RegisterStatus
 import com.example.daitssuapi.common.exception.DefaultException
@@ -15,7 +16,9 @@ import com.example.daitssuapi.domain.course.model.entity.Video
 import com.example.daitssuapi.domain.course.model.repository.*
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
@@ -31,7 +34,7 @@ class CourseService(
     fun getCourseList(): List<CourseResponse> {
         val courses: List<Course> = courseRepository.findAll()
         return courses.map { course ->
-            CourseResponse(name = course.name, term = course.term)
+            CourseResponse(name = course.name, term = course.term, id = course.id)
         }
     }
 
@@ -60,6 +63,7 @@ class CourseService(
         }
 
         return CourseResponse(
+            id = course.id,
             name = course.name,
             videos = videoResponses,
             assignments = assignmentResponses,
@@ -68,42 +72,41 @@ class CourseService(
     }
 
     fun getCalendar(dateRequest: String): Map<String, List<CalendarResponse>> {
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        val date: LocalDateTime
+        val date = "$dateRequest-01"
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val dateTime: LocalDate
         try {
-            date = LocalDateTime.parse(dateRequest, formatter)
+            dateTime = LocalDate.parse(date, formatter)
         } catch (e: DateTimeParseException) {
-            throw DefaultException(errorCode = ErrorCode.INVALID_DATE_FORMAT)
+            throw DefaultException(errorCode = ErrorCode.INVALID_GET_DATE_FORMAT)
         }
 
-        val yearMonth = YearMonth.of(date.year, date.monthValue)
+        val yearMonth = YearMonth.of(dateTime.year, dateTime.monthValue)
         val startDateTime = yearMonth.atDay(1).atStartOfDay()
         val endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59)
 
         return calendarRepository.findByDueAtBetween(startDateTime, endDateTime).groupBy(
-            { it.course }, { CalendarResponse(it.type, it.dueAt, it.name) }
+            { it.course }, { CalendarResponse(it.id, it.type, it.dueAt, it.name, it.isCompleted) }
         )
     }
 
     fun postCalendar(calendarRequest: CalendarRequest): CalendarResponse {
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        val dateTime: LocalDateTime
-        try {
-            dateTime = LocalDateTime.parse(calendarRequest.dueAt, formatter)
-        } catch (e: DateTimeParseException) {
-            throw DefaultException(errorCode = ErrorCode.INVALID_DATE_FORMAT)
-        }
+        val dateTime = checkDateReturnDate(calendarRequest.dueAt)
+        
         val calendar = Calendar(
             type = calendarRequest.type,
             course = calendarRequest.course,
             dueAt = dateTime,
-            name = calendarRequest.name
+            name = calendarRequest.name,
+            isCompleted = calendarRequest.isCompleted
         ).also { calendarRepository.save(it) }
 
         return CalendarResponse(
+            id = calendar.id,
             type = calendar.type,
             dueAt = calendar.dueAt,
-            name = calendar.name
+            name = calendar.name,
+            isCompleted = calendar.isCompleted
         )
     }
 
@@ -158,7 +161,7 @@ class CourseService(
         val course = Course(courseRequest.name, courseRequest.term)
             .also { courseRepository.save(it) }
 
-        return CourseResponse(name = course.name, term = course.term)
+        return CourseResponse(name = course.name, term = course.term, id = course.id)
     }
 
     fun getUserCourses(userId: Long): List<UserCourseResponse> =
@@ -172,4 +175,96 @@ class CourseService(
                 updatedAt = it.course.updatedAt
             )
         }
+    
+    fun updateCalendar(calendarRequest: CalendarRequest, calendarId : Long) : CalendarResponse {
+        val calendar = calendarRepository.findByIdOrNull(calendarId)
+            ?: throw DefaultException(ErrorCode.CALENDAR_NOT_FOUND)
+        
+        val dateTime = checkDateReturnDate(calendarRequest.dueAt)
+        
+        calendar.updateCalendar(calendarRequest = calendarRequest, dueAt = dateTime)
+            .also { calendarRepository.save(calendar) }
+        
+        return CalendarResponse(
+            id = calendar.id,
+            type = calendar.type,
+            dueAt = calendar.dueAt,
+            name = calendar.name,
+            isCompleted = calendar.isCompleted
+        )
+    }
+    
+    fun checkDateReturnDate(dueAt: String) : LocalDateTime {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val dateTime: LocalDateTime
+        try {
+            dateTime = LocalDateTime.parse(dueAt, formatter)
+        } catch (e: DateTimeParseException) {
+            throw DefaultException(errorCode = ErrorCode.INVALID_DATE_FORMAT)
+        }
+        
+        return dateTime
+    }
+    
+    fun getTodayDueAtCalendars() : TodayCalendarResponse {
+        val day = LocalDate.now()
+        val startTime = LocalTime.of(0, 0, 0)
+        val endTime = LocalTime.of(23, 59, 59)
+        val todayStart = checkDateReturnDate("$day $startTime:00")
+        val todayEnd = checkDateReturnDate("$day $endTime")
+        val videos: MutableList<TodayCalendarDataDto> = mutableListOf()
+        val assignments: MutableList<TodayCalendarDataDto> = mutableListOf()
+        
+        val videoCourses = calendarRepository.findDistinctTop2ByTypeAndDueAtBetweenOrderByDueAtAsc(
+            startDateTime = todayStart,
+            endDateTime = todayEnd,
+            type = CalendarType.VIDEO
+        )
+        
+        val assignmentCourses = calendarRepository.findDistinctTop2ByTypeAndDueAtBetweenOrderByDueAtAsc(
+            startDateTime = todayStart,
+            endDateTime = todayEnd,
+            type = CalendarType.ASSIGNMENT
+        )
+        
+        for (calendar: Calendar in videoCourses) {
+            val calendars = calendarRepository.findByTypeAndCourseAndDueAtBetween(
+                type = CalendarType.VIDEO,
+                course = calendar.course,
+                startDateTime = todayStart,
+                endDateTime = todayEnd
+            )
+            
+            val todayCalendarDataDto = TodayCalendarDataDto(
+                course = calendar.course,
+                dueAt = calendars.minOf { it.dueAt },
+                count = calendars.size
+            )
+            
+            videos.add(todayCalendarDataDto)
+        }
+        
+        for (calendar: Calendar in assignmentCourses) {
+            val calendars = calendarRepository.findByTypeAndCourseAndDueAtBetween(
+                type = CalendarType.ASSIGNMENT,
+                course = calendar.course,
+                startDateTime = todayStart,
+                endDateTime = todayEnd
+            )
+            
+            val todayCalendarDataDto = TodayCalendarDataDto(
+                course = calendar.course,
+                dueAt = calendars.minOf { it.dueAt },
+                count = calendars.size
+            )
+            
+            assignments.add(todayCalendarDataDto)
+        }
+        
+        return TodayCalendarResponse(
+            videos = videos,
+            assignments = assignments
+        )
+    }
 }
+
