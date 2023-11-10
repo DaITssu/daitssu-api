@@ -20,7 +20,7 @@ class User(
 
     var term: Int,
     
-    var ssuToken: String,
+    var ssuToken: String?,
 
     var refreshToken: String,
 ) : BaseEntity()

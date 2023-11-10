@@ -3,38 +3,53 @@ package com.example.daitssuapi.domain.auth.service
 import com.example.daitssuapi.common.enums.ErrorCode
 import com.example.daitssuapi.common.exception.DefaultException
 import com.example.daitssuapi.common.security.component.TokenProvider
-import com.example.daitssuapi.domain.auth.controller.request.SignUpRequest
+import com.example.daitssuapi.domain.auth.client.SmartCampusCrawlerClient
+import com.example.daitssuapi.domain.auth.client.request.CrawlBaseInformationRequest
+import com.example.daitssuapi.domain.auth.client.request.SmartCampusSignInRequest
 import com.example.daitssuapi.domain.auth.controller.response.AuthResponse
 import com.example.daitssuapi.domain.main.model.entity.User
 import com.example.daitssuapi.domain.main.model.repository.DepartmentRepository
 import com.example.daitssuapi.domain.main.model.repository.UserRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class AuthService(
-    private val tokenProvider: TokenProvider,
-    private val userRepository: UserRepository,
-    private val departmentRepository: DepartmentRepository,
-    private val passwordEncoder: PasswordEncoder,
+        private val smartCampusCrawlerClient: SmartCampusCrawlerClient,
+        private val tokenProvider: TokenProvider,
+        private val userRepository: UserRepository,
+        private val departmentRepository: DepartmentRepository,
 ) {
     @Transactional
     fun signIn(
         studentId: String,
+        password: String,
     ): AuthResponse {
         val user = userRepository.findByNicknameOrStudentId(
             nickname = studentId,
             studentId = studentId,
         ) ?: throw DefaultException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND)
 
-        // TODO: 람다 스캠 로그인 검증 or exception(비밀번호 오류)
+        val token =
+            try {
+                smartCampusCrawlerClient.smartCampusSignIn(
+                    smartCampusSignInRequest = SmartCampusSignInRequest(
+                        student_id = studentId,
+                        password = password,
+                    )
+                )
+            } catch (e: Exception) {
+                throw DefaultException(ErrorCode.PASSWORD_INCORRECT, HttpStatus.BAD_REQUEST)
+            }
+        print("------")
+        print(user.id)
 
         val accessToken = tokenProvider.createAccessToken(user.id)
         val refreshToken = tokenProvider.createRefreshToken(user.id)
 
+        user.ssuToken = token
         user.refreshToken = refreshToken.token
 
         return AuthResponse(
@@ -45,30 +60,31 @@ class AuthService(
 
     @Transactional
     fun signUp(
-        signUpRequest: SignUpRequest,
+        nickname: String,
+        name: String,
+        departmentId: Long,
+        studentId: String,
+        term: Int,
     ): AuthResponse {
-        val department = departmentRepository.findByIdOrNull(signUpRequest.departmentId)
+        val department = departmentRepository.findByIdOrNull(departmentId)
             ?: throw DefaultException(ErrorCode.DEPARTMENT_NOT_FOUND)
 
         var user = userRepository.findByStudentId(
-            studentId = signUpRequest.studentId,
+            studentId = studentId,
         )
 
         if (user != null)
             throw DefaultException(ErrorCode.USER_ALREADY_EXISTS, HttpStatus.BAD_REQUEST)
 
-        // TODO: 스캠 로그인 람다 호출 및 토큰 발급 or exception(비밀번호 오류)
-        val ssuToken = ""
-
         user = userRepository.save(
             User(
-                nickname = signUpRequest.nickname,
-                name = signUpRequest.name,
+                nickname = nickname,
+                name = name,
                 department = department,
-                studentId = signUpRequest.studentId,
+                studentId = studentId,
                 imageUrl = null,
-                term = signUpRequest.term,
-                ssuToken = ssuToken,
+                term = term,
+                ssuToken = null,
                 refreshToken = "",
             )
         )
@@ -100,5 +116,23 @@ class AuthService(
             accessToken = accessToken,
             refreshToken = newRefreshToken,
         )
+    }
+
+    fun refreshInfo(
+        userId: Long,
+    ) {
+        val user = userRepository.findByIdOrNull(userId)
+            ?: throw DefaultException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND)
+
+        try {
+            if (user.ssuToken == null)
+                throw DefaultException(ErrorCode.TOKEN_NOT_FOUND, HttpStatus.NOT_FOUND)
+            else
+                smartCampusCrawlerClient.crawlBaseInformation(
+                    crawlBaseInformationRequest = CrawlBaseInformationRequest(user.ssuToken!!)
+               )
+        } catch (e: Exception) {
+            throw DefaultException(ErrorCode.TOKEN_EXPIRED, HttpStatus.BAD_REQUEST)
+        }
     }
 }

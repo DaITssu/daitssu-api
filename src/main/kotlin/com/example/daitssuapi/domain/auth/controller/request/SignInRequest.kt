@@ -6,4 +6,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class SignInRequest(
     @Schema(description = "학번")
     val studentId: String,
+    @Schema(description = "비밀번호")
+    val password: String,
 )

@@ -5,7 +5,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.Table
 
 @Entity
-@Table(schema = "main")
+@Table(schema = "main", name = "department")
 class Department(
     var name: String
 ) : BaseEntity()
