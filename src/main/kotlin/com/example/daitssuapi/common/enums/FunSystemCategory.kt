@@ -2,7 +2,7 @@ package com.example.daitssuapi.common.enums
 
 enum class FunSystemCategory(val categoryCode: String){
 
-    ALL("전체"),
+//    ALL("전체"),
     SUBSCRIPTION("구독"),
     LEARNING_SKILLS("학습역량"),
     COMPETITION("공모전/경진대회"),

@@ -1,7 +1,7 @@
 package com.example.daitssuapi.common.enums
 
 enum class NoticeCategory(val categoryCode: String) {
-    ALL("전체"),
+//    ALL("전체"),
     SUBSCRIPTION("구독"),
     ACADEMICS("학사"),
     SCHOLARSHIP("장학"),
