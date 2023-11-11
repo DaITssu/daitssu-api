@@ -141,6 +141,7 @@ sort: [\"createdAt\"]
         return Response(code = 0, message = "OK", data = null)
     }
 
+    @Deprecated("삭제를 하는 것이 맞는지 확인") // TODO
     @Operation(
         summary = "게시글 삭제",
         responses = [

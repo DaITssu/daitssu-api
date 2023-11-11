@@ -17,7 +17,12 @@ class FunSystemController(
     private val funSystemService: FunSystemService
 
 ){
-
+    @Operation(
+        summary = "펀시스템 공지 전체 조회",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
     @GetMapping
     fun getAllFunSystemList(
         @RequestParam searchKeyword:String? = null
@@ -25,7 +30,13 @@ class FunSystemController(
         return Response(data = funSystemService.getAllFunSystemList(searchKeyword))
     }
 
-    @GetMapping("/{category}")
+    @Operation(
+        summary = "카테고리를 이용한 공지 조회",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
+    @GetMapping("/{category}") // TODO : 저게 Path로 들어가는게 맞을까요?
     fun getFunSystemListWithCategory(
         @PathVariable category:FunSystemCategory,
         @RequestParam searchKeyword:String? = null,
@@ -34,8 +45,13 @@ class FunSystemController(
         return Response(data = funSystemService.getFunSystemList(category, searchKeyword))
     }
 
-
-    @GetMapping("/page/{id}") //
+    @Operation(
+        summary = "N페이지의 공지 조회",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
+    @GetMapping("/page/{id}") // TODO : 페이지 기준이 없는데 이게 무슨 의미가 있나 싶습니다.
     fun getFunSystemPage(
         @PathVariable id : Long,
     ):Response<FunSystemPageResponse>{
@@ -71,7 +87,4 @@ class FunSystemController(
     fun getComments(
         @PathVariable funSystemId: Long
     ): Response<List<CommentResponse>> = Response(data = funSystemService.getComments(funSystemId = funSystemId))
-
-
 }
-

@@ -17,13 +17,26 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 class NoticeController (
     private val noticeService : NoticeService,
 ){
+    @Operation(
+        summary = "전체 공지 조회",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
     @GetMapping
     fun getAllNoticeList(
         @RequestParam searchKeyword:String? = null
     ): Response<List<NoticeResponse>>{
         return Response(data = noticeService.getAllNoticeList(searchKeyword))
     }
-    @GetMapping("/{category}")
+
+    @Operation(
+        summary = "카테고리를 이용한 공지 조회",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
+    @GetMapping("/{category}") // TODO : 저게 Path로 들어가는게 맞을까요?
     fun getNoticeListWithCategory(
         @PathVariable category: NoticeCategory,
         @RequestParam searchKeyword:String? = null,
@@ -31,7 +44,13 @@ class NoticeController (
         return Response(data = noticeService.getNoticeList(category, searchKeyword))
     }
 
-    @GetMapping("/page/{id}")
+    @Operation(
+        summary = "N페이지의 공지 조회",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
+    @GetMapping("/page/{id}") // TODO : 페이지 기준이 없는데 이게 무슨 의미가 있나 싶습니다.
     fun getNoticePage(
         @PathVariable id: Long,
     ): Response<NoticePageResponse> {
