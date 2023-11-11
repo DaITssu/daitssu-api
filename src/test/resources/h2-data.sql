@@ -4,6 +4,7 @@ DELETE FROM course.calendar;
 DELETE FROM course.assignment;
 DELETE FROM course.course;
 DELETE FROM main.comment;
+DELETE FROM main.scrap;
 DELETE FROM main.article;
 DELETE FROM main.users;
 DELETE FROM main.department;
