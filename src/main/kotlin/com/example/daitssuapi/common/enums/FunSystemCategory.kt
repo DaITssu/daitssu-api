@@ -17,9 +17,6 @@ enum class FunSystemCategory(val categoryCode: String){
     STARTUP_SUPPORT("창업지원"),
     EMPLOYMENT_SUPPORT("취업지원");
 
-    companion object {
-        fun fromCode(categoryName: String): FunSystemCategory?{
-            return values().find{it.name == categoryName }
-        }
-    }
+
+
 }

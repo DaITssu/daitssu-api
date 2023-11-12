@@ -18,10 +18,12 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.nio.charset.Charset
+import java.time.LocalDateTime
 
 @Service
 class ArticleService(
     private val articleImageRepository: ArticleImageRepository,
+    private val articleLikeRepository: ArticleLikeRepository,
     private val articleRepository: ArticleRepository,
     private val commentRepository: CommentRepository,
     private val scrapRepository: ScrapRepository,
@@ -40,7 +42,9 @@ class ArticleService(
             content = article.content,
             writerNickName = article.writer.nickname!!,
             updatedAt = article.updatedAt,
-            imageUrls = article.articleImages.map { it.url },
+            imageUrls = article.images.map { it.url },
+            likes = article.likes.size,
+            comments = article.comments.size,
             scrapCount = article.scraps.size
         )
     }
@@ -67,7 +71,9 @@ class ArticleService(
                 content = it.content,
                 writerNickName = it.writer.nickname!!,
                 updatedAt = it.updatedAt,
-                imageUrls = it.articleImages.map { image -> image.url }
+                imageUrls = it.images.map { image -> image.url },
+                likes = it.likes.size,
+                comments = it.comments.size
             )
         }
 
@@ -76,6 +82,29 @@ class ArticleService(
             totalPages = articleResponses.totalPages
         )
     }
+
+    fun getPopularArticles(): List<ArticleResponse> {
+        val articles: List<Article> = articleRepository.findAllByCreatedAtIsLessThanEqual(
+            createdAt = LocalDateTime.now().minusDays(1)
+        )
+
+        articles.sortedBy { it.likes.size }
+
+        return articles.map {
+            ArticleResponse(
+                id = it.id,
+                topic = it.topic.value,
+                title = it.title,
+                content = it.content,
+                writerNickName = it.writer.nickname!!,
+                updatedAt = it.updatedAt,
+                imageUrls = it.images.map { image -> image.url },
+                likes = it.likes.size,
+                comments = it.comments.size
+            )
+        }
+    }
+
 
     @Transactional
     fun createArticle(articleCreateRequest: ArticleCreateRequest) {
@@ -95,7 +124,7 @@ class ArticleService(
             topic = articleCreateRequest.topic,
             title = articleCreateRequest.title,
             content = articleCreateRequest.content,
-            writer = user
+            writer = user,
         )
 
         val articleImages = imageUrls.map {
@@ -117,6 +146,18 @@ class ArticleService(
     }
 
     @Transactional
+    fun deleteArticle(articleId: Long) {
+        val article: Article = articleRepository.findByIdOrNull(articleId)
+            ?: throw DefaultException(ErrorCode.ARTICLE_NOT_FOUND)
+
+        article.images.map {
+            s3Service.deleteFromS3ByUrl(it.url)
+        }
+
+        articleRepository.delete(article)
+    }
+
+    @Transactional
     fun writeComment(articleId: Long, request: CommentWriteRequest): CommentResponse {
         val user = userRepository.findByIdOrNull(request.userId)
             ?: throw DefaultException(errorCode = ErrorCode.USER_NOT_FOUND)
@@ -125,12 +166,14 @@ class ArticleService(
 
         validateComment(article = article, content = request.content, originalCommentId = request.originalCommentId)
 
-        val comment = commentRepository.save(Comment(
-            writer = user,
-            article = article,
-            content = request.content,
-            originalId = request.originalCommentId
-        ))
+        val comment = commentRepository.save(
+            Comment(
+                writer = user,
+                article = article,
+                content = request.content,
+                originalId = request.originalCommentId
+            )
+        )
 
         return CommentResponse(
             commentId = comment.id,
@@ -140,6 +183,47 @@ class ArticleService(
             createdAt = comment.createdAt,
             updatedAt = comment.updatedAt
         )
+    }
+
+    @Transactional
+    fun like(
+        articleId: Long,
+        userId: Long,
+    ) {
+        val article = articleRepository.findByIdOrNull(articleId)
+            ?: throw DefaultException(errorCode = ErrorCode.ARTICLE_NOT_FOUND)
+
+        val user = userRepository.findByIdOrNull(userId)
+            ?: throw DefaultException(errorCode = ErrorCode.USER_NOT_FOUND)
+
+        val articleLike =
+            if (articleLikeRepository.findByUserAndArticle(article = article, user = user) != null) {
+                throw DefaultException(errorCode = ErrorCode.ALREADY_LIKED)
+            } else {
+                ArticleLike(
+                    article = article,
+                    user = user
+                )
+            }
+
+        articleLikeRepository.save(articleLike)
+    }
+
+    @Transactional
+    fun dislike(
+        articleId: Long,
+        userId: Long,
+    ) {
+        val article = articleRepository.findByIdOrNull(articleId)
+            ?: throw DefaultException(errorCode = ErrorCode.ARTICLE_NOT_FOUND)
+
+        val user = userRepository.findByIdOrNull(userId)
+            ?: throw DefaultException(errorCode = ErrorCode.USER_NOT_FOUND)
+
+        val articleLike = articleLikeRepository.findByUserAndArticle(article = article, user = user)
+            ?: throw DefaultException(errorCode = ErrorCode.ALREADY_DISLIKED)
+
+        articleLikeRepository.delete(articleLike)
     }
 
     private fun validateComment(article: Article, content: String, originalCommentId: Long?) {

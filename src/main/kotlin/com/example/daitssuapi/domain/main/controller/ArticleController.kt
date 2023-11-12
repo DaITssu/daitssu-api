@@ -78,6 +78,22 @@ sort: [\"createdAt\"]
     }
 
     @Operation(
+        summary = "인기 게시글 조회(24시간)",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "OK"
+            )
+        ]
+    )
+    @GetMapping("/popular")
+    fun getPopularArticles(): Response<List<ArticleResponse>> {
+        val articles = articleService.getPopularArticles()
+
+        return Response(data = articles)
+    }
+
+    @Operation(
         summary = "댓글 작성",
         responses = [
             ApiResponse(
@@ -90,7 +106,8 @@ sort: [\"createdAt\"]
     fun writeComment(
         @PathVariable articleId: Long,
         @RequestBody commentWriteRequest: CommentWriteRequest
-    ): Response<CommentResponse> = Response(data = articleService.writeComment(articleId = articleId, request = commentWriteRequest))
+    ): Response<CommentResponse> =
+        Response(data = articleService.writeComment(articleId = articleId, request = commentWriteRequest))
 
     @Operation(
         summary = "댓글 조회",
@@ -124,8 +141,9 @@ sort: [\"createdAt\"]
         return Response(code = 0, message = "OK", data = null)
     }
 
+    @Deprecated("삭제를 하는 것이 맞는지 확인") // TODO
     @Operation(
-        summary = "스크랩",
+        summary = "게시글 삭제",
         responses = [
             ApiResponse(
                 responseCode = "200",
@@ -133,12 +151,51 @@ sort: [\"createdAt\"]
             )
         ]
     )
+    @DeleteMapping("/{articleId}")
+    fun deleteArticle(
+        @PathVariable articleId: Long
+    ): Response<String> {
+        articleService.deleteArticle(articleId)
+
+        return Response(code = 0, message = "OK", data = null)
+    }
+
+    @Operation(
+        summary = "게시글 좋아요",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "OK"
+            )
+        ]
+    )
+    @PostMapping("/{articleId}/user/{userId}/like")
+    fun like(
+        @PathVariable
+        articleId: Long,
+        @PathVariable
+        userId: Long
+    ): Response<Nothing> {
+        articleService.like(articleId = articleId, userId = userId)
+
+        return Response(code = 0, message = "OK", data = null)
+    }
+
+    @Operation(
+            summary = "게시글 스크랩",
+            responses = [
+                ApiResponse(
+                        responseCode = "200",
+                        description = "OK"
+                )
+            ]
+    )
     @PostMapping("/{articleId}/scrap")
     fun scrapArticle(
         @PathVariable articleId: Long,
         @RequestParam userId: Long,
         @RequestParam isActive: Boolean
-    ): Response<Nothing>{
+    ): Response<Nothing> {
         articleService.scrapArticle(articleId = articleId, userId = userId, isActive = isActive)
 
         return Response(code = 0, message = "OK", data = null)
