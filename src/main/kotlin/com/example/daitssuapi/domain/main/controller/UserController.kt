@@ -32,7 +32,15 @@ class UserController(
         @PathVariable userId: Long
     ): Response<UserResponse> = Response(data = userService.getUser(userId = userId))
 
-
+    @Operation(
+        summary = "유저 닉네임 수정",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "OK"
+            )
+        ]
+    )
     @PatchMapping("/nickname")
     fun updateNickname(
         @RequestParam userId: Long,
