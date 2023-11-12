@@ -62,7 +62,7 @@ INSERT INTO course.assignment (id, course_id, name, start_at, due_at) VALUES
     (3, 2, '1-1', '2023-07-20 12:00:00', '2023-07-27 23:59:59'),
     (4, 3, '2-1', '2023-08-20 12:00:00', '2023-08-27 23:59:59');
 
-INSERT INTO course.calendar (id, name, course, type, due_at, is_completed) VALUES
+INSERT INTO course.calendar (id, name, course, type, due_at, is_complete) VALUES
     (11, '이 날까지 과제 제출', 'eat paper', 'ASSIGNMENT', '2023-07-27 23:59:59', false),
     (12, '이 날까지 강의 시청', 'eat paper', 'VIDEO', '2023-07-27 23:59:59', false),
     (13, '강의', 'do it', 'VIDEO', '2023-02-27 23:59:59', false),

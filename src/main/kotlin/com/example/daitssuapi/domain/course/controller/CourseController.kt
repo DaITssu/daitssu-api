@@ -44,7 +44,7 @@ class CourseController(
         Response(data = courseService.getCourse(courseId = courseId))
 
     @Operation(
-        summary = "월 단위로 일정 가져오기",
+        summary = "월 단위 일정 조회",
         responses = [
             ApiResponse(responseCode = "200", description = "OK")
         ]
@@ -56,7 +56,7 @@ class CourseController(
         Response(data = courseService.getCalendar(dateRequest = date))
 
     @Operation(
-        summary = "일정 추가하기",
+        summary = "일정 추가",
         responses = [
             ApiResponse(responseCode = "200", description = "OK")
         ]
@@ -68,7 +68,7 @@ class CourseController(
         Response(data = courseService.postCalendar(calendarRequest = calendarRequest))
 
     @Operation(
-        summary = "강의 추가하기",
+        summary = "영상 추가",
         responses = [
             ApiResponse(responseCode = "200", description = "OK")
         ]
@@ -80,7 +80,7 @@ class CourseController(
         Response(data = courseService.postVideo(videoRequest))
 
     @Operation(
-        summary = "과제 추가하기",
+        summary = "과제 추가",
         responses = [
             ApiResponse(responseCode = "200", description = "OK")
         ]
@@ -92,7 +92,7 @@ class CourseController(
         Response(data = courseService.postAssignment(assignmentRequest = assignmentRequest))
 
     @Operation(
-        summary = "과목 추가하기",
+        summary = "과목 추가",
         responses = [
             ApiResponse(responseCode = "200", description = "OK")
         ]
@@ -104,19 +104,37 @@ class CourseController(
         Response(data = courseService.postCourse(courseRequest = courseRequest))
 
     //TODO : 유저 토큰 기능 구현 후 토큰에서 userId 가져오도록 변경
+    @Operation(
+        summary = "유저의 강의 조회",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
     @GetMapping("/user/{userId}")
     fun getUserCourse(
         @PathVariable userId: Long
     ): Response<List<UserCourseResponse>> =
         Response(data = courseService.getUserCourses(userId = userId))
-    
+
+    @Operation(
+        summary = "강의 일정 수정",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
     @PutMapping("/calendar/{calendarId}")
     fun updateCalendar(
         @RequestBody calendarRequest: CalendarRequest,
         @PathVariable calendarId: Long
     ) : Response<CalendarResponse> =
         Response(data = courseService.updateCalendar(calendarRequest = calendarRequest, calendarId = calendarId))
-    
+
+    @Operation(
+        summary = "금일 강의 조회",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
     @GetMapping("/calendar/today")
     fun getTodayCalendar() : Response<TodayCalendarResponse> =
         Response(data = courseService.getTodayDueAtCalendars())
