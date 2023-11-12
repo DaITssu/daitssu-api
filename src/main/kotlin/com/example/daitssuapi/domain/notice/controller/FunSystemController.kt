@@ -1,7 +1,7 @@
 package com.example.daitssuapi.domain.notice.controller
 
 import com.example.daitssuapi.common.dto.Response
-import com.example.daitssuapi.common.enums.FunSystemCategory
+import com.example.daitssuapi.domain.notice.enums.FunSystemCategory
 import com.example.daitssuapi.domain.notice.dto.FunSystemPageResponse
 import com.example.daitssuapi.domain.notice.dto.FunSystemResponse
 import com.example.daitssuapi.domain.notice.service.FunSystemService
@@ -72,7 +72,7 @@ class FunSystemController(
                 ExampleObject(value = "EMPLOYMENT_SUPPORT", name = "취업지원")
             ]
         )
-        @PathVariable category:FunSystemCategory,
+        @PathVariable category: FunSystemCategory,
 
         @Parameter(
             name = "searchKeyword",

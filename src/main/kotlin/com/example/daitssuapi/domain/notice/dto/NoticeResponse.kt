@@ -1,6 +1,6 @@
 package com.example.daitssuapi.domain.notice.dto
 
-import com.example.daitssuapi.common.enums.NoticeCategory
+import com.example.daitssuapi.domain.notice.enums.NoticeCategory
 import com.example.daitssuapi.domain.notice.model.entity.Notice
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDateTime

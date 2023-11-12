@@ -1,7 +1,7 @@
 package com.example.daitssuapi.domain.notice.model.entity
 
 import com.example.daitssuapi.common.audit.BaseEntity
-import com.example.daitssuapi.common.enums.FunSystemCategory
+import com.example.daitssuapi.domain.notice.enums.FunSystemCategory
 import jakarta.persistence.*
 
 @Entity
@@ -16,7 +16,7 @@ class FunSystem (
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category")
-    val category:FunSystemCategory?,
+    val category: FunSystemCategory?,
 
     @Column(name = "image_url")
     val imageUrl :String,

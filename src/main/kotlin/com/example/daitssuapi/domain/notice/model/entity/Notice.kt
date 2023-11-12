@@ -1,7 +1,7 @@
 package com.example.daitssuapi.domain.notice.model.entity
 
 import com.example.daitssuapi.common.audit.BaseEntity
-import com.example.daitssuapi.common.enums.NoticeCategory
+import com.example.daitssuapi.domain.notice.enums.NoticeCategory
 import jakarta.persistence.*
 
 
@@ -32,6 +32,6 @@ class Notice (
     @Column(name = "views", nullable = false)
     var views : Int,
 
-): BaseEntity(){
+    ): BaseEntity(){
 
 }

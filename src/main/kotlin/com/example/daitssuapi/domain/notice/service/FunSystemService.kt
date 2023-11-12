@@ -2,7 +2,7 @@ package com.example.daitssuapi.domain.notice.service
 
 import com.example.daitssuapi.common.DEFAULT_ENCODING
 import com.example.daitssuapi.common.enums.ErrorCode
-import com.example.daitssuapi.common.enums.FunSystemCategory
+import com.example.daitssuapi.domain.notice.enums.FunSystemCategory
 import com.example.daitssuapi.common.exception.DefaultException
 import com.example.daitssuapi.domain.notice.dto.FunSystemPageResponse
 import com.example.daitssuapi.domain.main.dto.request.CommentWriteRequest

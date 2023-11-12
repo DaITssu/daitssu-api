@@ -1,6 +1,6 @@
 package com.example.daitssuapi.domain.notice.dto
 
-import com.example.daitssuapi.common.enums.FunSystemCategory
+import com.example.daitssuapi.domain.notice.enums.FunSystemCategory
 import com.example.daitssuapi.domain.notice.model.entity.FunSystem
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDateTime
