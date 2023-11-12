@@ -10,7 +10,7 @@ class User(
 
     val name: String,
 
-    val nickname: String? = null,
+    var nickname: String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")
