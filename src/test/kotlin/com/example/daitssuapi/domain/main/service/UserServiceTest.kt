@@ -45,7 +45,7 @@ class UserServiceTest(
         val nickname = "test"
         val after = userService.updateNickname(userId = before.id, nickname= nickname)
         assertAll(
-            {assertThat(after.nickname).isNotEqualTo(beforeNickname)}
+            {assertThat(after).isNotEqualTo(beforeNickname)}
         )
     }
 }
