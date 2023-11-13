@@ -86,7 +86,7 @@ class NoticeService(
         }
 
         return PageNoticeResponse(
-            notice = noticeResponses.content,
+            notices = noticeResponses.content,
             totalPage = noticeResponses.totalPages
         )
     }

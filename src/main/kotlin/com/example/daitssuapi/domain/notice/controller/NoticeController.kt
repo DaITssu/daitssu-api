@@ -60,7 +60,6 @@ sort: [\"createdAt\"]
             pageable = pageable
         )
 
-
         return Response(
             data = notice
         )
