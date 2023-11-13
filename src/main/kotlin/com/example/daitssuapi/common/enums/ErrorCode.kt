@@ -15,6 +15,8 @@ enum class ErrorCode(val code: Int, val message: String) {
     COMMENT_NOT_FOUND(MAIN_NUMBERING + 6, "원 댓글이 없습니다"),
     COMMENT_TOO_LONG(MAIN_NUMBERING + 7, "댓글이 너무 깁니다"),
     DIFFERENT_ARTICLE(MAIN_NUMBERING + 8, "다른 게시글에 달린 댓글의 대댓글입니다"),
+    ALREADY_LIKED(MAIN_NUMBERING + 9, "이미 좋아요를 누른 게시글입니다"),
+    ALREADY_DISLIKED(MAIN_NUMBERING + 10, "이미 좋아요를 누르지 않은 게시글입니다"),
     NEW_SCRAP_ISACTIVE_NOT_FALSE(MAIN_NUMBERING + 9, "신규 스크랩은 항상 활성화입니다."),
 
     NOTICE_NOT_FOUND(NOTICE_NUMBERING + 1, "공지사항 내용을 찾을 수 없습니다"),
@@ -33,4 +35,5 @@ enum class ErrorCode(val code: Int, val message: String) {
     INVALID_GET_DATE_FORMAT(SERVER_NUMBERING + 4, "잘못된 날짜 형식입니다. yyyy-MM 형식으로 요청바랍니다."),
 
     S3_UPLOAD_FAILED(INFRA_NUMBERING + 1, "S3 객체 생성에 실패했습니다."),
+    S3_DELETE_FAILED(INFRA_NUMBERING + 2, "S3 객체 삭제에 실패했습니다."),
 }

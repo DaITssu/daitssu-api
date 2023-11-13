@@ -4,6 +4,7 @@ import com.example.daitssuapi.common.dto.Response
 import com.example.daitssuapi.common.enums.NoticeCategory
 import com.example.daitssuapi.domain.main.dto.request.CommentWriteRequest
 import com.example.daitssuapi.domain.main.dto.response.CommentResponse
+import com.example.daitssuapi.domain.notice.dto.NoticePageResponse
 import com.example.daitssuapi.domain.notice.dto.NoticeResponse
 import com.example.daitssuapi.domain.notice.dto.PageNoticeResponse
 import com.example.daitssuapi.domain.notice.service.NoticeService
@@ -17,22 +18,56 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/notice")
-class NoticeController(
-    private val noticeService: NoticeService,
-) {
+class NoticeController (
+    private val noticeService : NoticeService,
+){
+    @Operation(
+        summary = "전체 공지 조회",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
+    @GetMapping
+    fun getAllNoticeList(
+        @RequestParam searchKeyword:String? = null
+    ): Response<List<NoticeResponse>>{
+        return Response(data = noticeService.getAllNoticeList(searchKeyword))
+    }
 
     @GetMapping("/{category}")
     fun getNoticeList(
-        @PathVariable category: String,
+        @PathVariable category: NoticeCategory?,
         @PathVariable pageable: Pageable
     ): Response<Page<NoticeResponse>> =
-        Response(data = noticeService.getNoticeList(category, pageable))
+        Response(data = noticeService.getNoticeListByCategory(category, pageable))
 
-    @GetMapping("/page/{id}")
+    @Operation(
+        summary = "카테고리를 이용한 공지 조회",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
+    @GetMapping("/{category}") // TODO : 저게 Path로 들어가는게 맞을까요?
+    fun getNoticeListWithCategory(
+        @PathVariable category: NoticeCategory,
+        @RequestParam searchKeyword:String? = null,
+    ): Response<List<NoticeResponse>>{
+        return Response(data = noticeService.getNoticeList(category, searchKeyword))
+    }
+
+    @Operation(
+        summary = "N페이지의 공지 조회",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
+    @GetMapping("/page/{id}") // TODO : 페이지 기준이 없는데 이게 무슨 의미가 있나 싶습니다.
     fun getNoticePage(
         @PathVariable id: Long,
-    ): Response<NoticeResponse> =
-        Response(data = noticeService.getNoticePage(id))
+    ): Response<NoticePageResponse> {
+        noticeService.updateViews(id)
+        return Response(data = noticeService.getNoticePage(id))
+    }
 
     @GetMapping
     fun pageNoticeList(

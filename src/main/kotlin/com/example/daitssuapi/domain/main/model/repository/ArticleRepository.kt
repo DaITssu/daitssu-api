@@ -4,6 +4,7 @@ import com.example.daitssuapi.domain.main.model.entity.Article
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import java.time.LocalDateTime
 
 interface ArticleRepository : JpaRepository<Article, Long> {
     fun findAllByTitleContainingOrContentContaining(
@@ -11,4 +12,8 @@ interface ArticleRepository : JpaRepository<Article, Long> {
         content: String,
         pageable: Pageable,
     ): Page<Article>
+
+    fun findAllByCreatedAtIsLessThanEqual(
+        createdAt: LocalDateTime
+    ): List<Article>
 }

@@ -9,6 +9,7 @@ import com.example.daitssuapi.domain.main.dto.response.CommentResponse
 import com.example.daitssuapi.domain.main.model.entity.Comment
 import com.example.daitssuapi.domain.main.model.repository.CommentRepository
 import com.example.daitssuapi.domain.main.model.repository.UserRepository
+import com.example.daitssuapi.domain.notice.dto.NoticePageResponse
 import com.example.daitssuapi.domain.notice.dto.NoticeResponse
 import com.example.daitssuapi.domain.notice.dto.PageNoticeResponse
 import com.example.daitssuapi.domain.notice.model.entity.Notice
@@ -24,38 +25,63 @@ import java.nio.charset.Charset
 class NoticeService(
     private val commentRepository: CommentRepository,
     private val noticeRepository: NoticeRepository,
-    private val userRepository: UserRepository
-) {
-    fun getNoticeList(
-        category: String,
+    private val userRepository: UserRepository,
+){
+    fun getAllNoticeList(searchKeyword:String?):List<NoticeResponse>{
+        val notices: List<Notice>
+        if(searchKeyword==null){
+            notices = noticeRepository.findAll()
+        }else{
+            notices= noticeRepository.findByTitleContaining(searchKeyword)
+        }
+        return notices.map { NoticeResponse.fromNotice(it) }
+    }
+
+    fun getNoticeListByCategory(
+        category: NoticeCategory?,
         pageable: Pageable
     ): Page<NoticeResponse> {
 
         val notices: Page<Notice>
 
-        if (category == "ALL")
+        if (category == NoticeCategory.ALL)
             notices = noticeRepository.findAll(pageable)
         else {
-            val noticeCategory = NoticeCategory.fromCode(category)
-            if (noticeCategory != null) {
-                notices = noticeRepository.findByCategory(noticeCategory, pageable)
+            if (category != null) {
+                notices = noticeRepository.findByCategory(category, pageable)
             } else {
                 throw DefaultException(errorCode = ErrorCode.INVALID_CATEGORY)
             }
         }
-
-
         return notices.map { NoticeResponse.fromNotice(it) }
+    }
 
+    fun getNoticeList(
+        category: NoticeCategory,
+        searchKeyword: String?,
+    ):List<NoticeResponse>{
+        val notices : List<Notice>
+        if(searchKeyword==null){
+            notices = noticeRepository.findByCategory(category)
+        }else{
+            notices = noticeRepository.findByCategoryAndTitleContaining(category,searchKeyword)
+        }
+        return notices.map{ NoticeResponse.fromNotice(it)}
     }
 
     fun getNoticePage(
         id: Long
-    ): NoticeResponse {
-        val notice: Notice = noticeRepository.findByIdOrNull(id)
-            ?: throw DefaultException(errorCode = ErrorCode.NOTICE_NOT_FOUND)
-
-        return NoticeResponse.fromNotice(notice)
+    ): NoticePageResponse {
+        val notice :Notice = noticeRepository.findByIdOrNull(id)
+            ?: throw DefaultException(errorCode= ErrorCode.NOTICE_NOT_FOUND)
+        return NoticePageResponse.fromNotice(notice)
+    }
+    @Transactional
+    fun updateViews( id:Long ) {
+        val notice =noticeRepository.findByIdOrNull(id)
+            ?:throw DefaultException(ErrorCode.NOTICE_NOT_FOUND)
+        notice.views = notice.views +1
+        noticeRepository.save(notice)
     }
 
     fun pageNoticeList(
@@ -75,13 +101,9 @@ class NoticeService(
             NoticeResponse(
                 id = it.id,
                 title = it.title,
-                departmentId = it.departmentId,
-                content = it.content,
                 category = it.category,
-                imageUrl = it.imageUrl,
-                fileUrl = it.fileUrl,
                 createdAt = it.createdAt,
-                updatedAt = it.updatedAt
+                views = it.views,
             )
         }
 

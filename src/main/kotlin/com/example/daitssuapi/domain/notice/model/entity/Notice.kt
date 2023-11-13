@@ -29,7 +29,9 @@ class Notice (
     @Column(name = "file_url")
     val fileUrl : String,
 
-    // view 빠짐
+    @Column(name = "views", nullable = false)
+    var views : Int,
+
 ): BaseEntity(){
 
 }

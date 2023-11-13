@@ -26,5 +26,7 @@ class Comment(
 
     val content: String,
 
-    val originalId: Long? = null
+    val originalId: Long? = null,
+
+    var isDeleted: Boolean = false
 ) : BaseEntity()

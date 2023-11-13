@@ -7,6 +7,7 @@ import com.example.daitssuapi.domain.main.model.repository.UserRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class UserService(
@@ -23,5 +24,16 @@ class UserService(
             departmentName = user.department.name,
             term = user.term
         )
+    }
+    @Transactional
+    fun updateNickname(userId: Long, nickname:String):String?{
+
+        var user = (userRepository.findByIdOrNull(userId)?.apply{
+            this.nickname = nickname
+        }?.also {
+            userRepository.save(it)
+        } ?: throw DefaultException(errorCode = ErrorCode.USER_NOT_FOUND, httpStatus = HttpStatus.NOT_FOUND))
+
+        return user.nickname
     }
 }

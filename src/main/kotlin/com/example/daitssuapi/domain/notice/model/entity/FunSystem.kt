@@ -24,5 +24,6 @@ class FunSystem (
     @Column(name = "url", nullable = false)
     val url : String,
 
-    // view 빠짐
+    @Column(name = "views", nullable = false)
+    var views : Int,
 ):BaseEntity()
