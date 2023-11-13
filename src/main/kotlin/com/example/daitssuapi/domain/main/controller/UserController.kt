@@ -6,7 +6,9 @@ import com.example.daitssuapi.domain.main.service.UserService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/user")
@@ -47,4 +49,23 @@ class UserController(
         @RequestParam nickname: String,
     ): Response<String> =
         Response(data = userService.updateNickname(userId = userId, nickname = nickname))
+
+    @Operation(
+        summary = "유저 프로필 수정",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "OK"
+            )
+        ]
+    )
+    @PatchMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE], value = ["/image/{userId}"])
+    fun updateUserProfile(
+        @PathVariable userId: Long,
+        @RequestPart("profileImage") profileImage: MultipartFile
+    ): Response<String> {
+        userService.updateProfileImage(userId = userId, image = profileImage)
+        return Response(code = 0, message = "OK", data = null)
+    }
+
 }
