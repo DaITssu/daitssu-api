@@ -18,8 +18,8 @@ import java.time.LocalDateTime
 @Service
 class S3Service(
     private val profile: String,
-    @Value("daitssu-bucket") private val s3BucketName: String,
-    @Value("https://daitssu-bucket.s3.ap-northeast-2.amazonaws.com/") private val s3Endpoint: String,
+    @Value("\${aws.s3.bucket}") private val s3BucketName: String,
+    @Value("\${aws.s3.url}") private val s3Endpoint: String,
 ) {
     fun uploadImageToS3(
         userId: Long,
