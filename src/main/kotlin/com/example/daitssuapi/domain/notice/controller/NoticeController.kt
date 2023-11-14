@@ -54,8 +54,19 @@ class NoticeController (
     fun getNoticePage(
         @PathVariable id: Long,
     ): Response<NoticePageResponse> {
-        noticeService.updateViews(id)
         return Response(data = noticeService.getNoticePage(id))
+    }
+    @Operation(
+        summary = "N페이지의 공지 조회수 업데이트",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
+    @PatchMapping("/page/{id}")
+    fun updateNoticeView(
+        @PathVariable id: Long,
+    ){
+        noticeService.updateViews(id)
     }
 
     @Operation(

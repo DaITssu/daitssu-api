@@ -14,6 +14,7 @@ import com.example.daitssuapi.domain.notice.dto.NoticeResponse
 import com.example.daitssuapi.domain.notice.model.entity.Notice
 import com.example.daitssuapi.domain.notice.model.repository.NoticeRepository
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.nio.charset.Charset
@@ -55,12 +56,13 @@ class NoticeService(
             ?: throw DefaultException(errorCode= ErrorCode.NOTICE_NOT_FOUND)
         return NoticePageResponse.fromNotice(notice)
     }
-    @Transactional
+
     fun updateViews( id:Long ) {
-        val notice =noticeRepository.findByIdOrNull(id)
-            ?:throw DefaultException(ErrorCode.NOTICE_NOT_FOUND)
-        notice.views = notice.views +1
-        noticeRepository.save(notice)
+        noticeRepository.findByIdOrNull(id)?.apply {
+            this.views += 1
+        }?.also {
+            noticeRepository.save(it)
+        } ?:throw DefaultException(ErrorCode.NOTICE_NOT_FOUND)
     }
 
     @Transactional

@@ -53,12 +53,13 @@ class FunSystemService (
             ?: throw DefaultException(ErrorCode.FUNSYSTEM_NOT_FOUND)
         return FunSystemPageResponse.fromFunSystem(funSystem)
     }
-    @Transactional
+
     fun updateViews( id:Long ) {
-        val funSystem =funSystemRepository.findByIdOrNull(id)
-            ?:throw DefaultException(ErrorCode.FUNSYSTEM_NOT_FOUND)
-        funSystem.views = funSystem.views +1
-        funSystemRepository.save(funSystem)
+        funSystemRepository.findByIdOrNull(id)?.apply {
+            this.views +=1
+        }?.also {
+            funSystemRepository.save(it)
+        } ?:throw DefaultException(ErrorCode.FUNSYSTEM_NOT_FOUND)
     }
 
     @Transactional

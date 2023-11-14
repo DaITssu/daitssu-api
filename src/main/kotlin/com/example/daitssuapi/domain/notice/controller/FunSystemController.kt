@@ -55,10 +55,20 @@ class FunSystemController(
     fun getFunSystemPage(
         @PathVariable id : Long,
     ):Response<FunSystemPageResponse>{
-        funSystemService.updateViews(id)
         return Response(data = funSystemService.getFunSystemPage(id))
     }
-
+    @Operation(
+        summary = "N페이지의 펀시스템 조회수 업데이트",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
+    @PatchMapping("/page/{id}")
+    fun updateFunSystemView(
+        @PathVariable id : Long,
+    ){
+        funSystemService.updateViews(id)
+    }
     @Operation(
         summary = "댓글 작성",
         responses = [
