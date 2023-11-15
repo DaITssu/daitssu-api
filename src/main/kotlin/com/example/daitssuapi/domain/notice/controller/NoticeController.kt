@@ -29,17 +29,26 @@ class NoticeController (
     )
     @GetMapping
     fun getAllNoticeList(
+        @Parameter(
+            description = """
+<b>[필수]</b> 조회할 Page, Page 당 개수, 정렬 기준입니다. <br />
+`page`는 zero-indexed 입니다. <br />
+<b>[기본 값]</b><br />
+page: 0 <br />
+size: 5 <br />
+sort: [\"createdAt\"]
+            """,
+        )
+        @PageableDefault(
+            page = 0,
+            size = 10,
+            sort = ["createdAt"],
+        )
+        pageable: Pageable,
         @RequestParam searchKeyword:String? = null
-    ): Response<List<NoticeResponse>>{
-        return Response(data = noticeService.getAllNoticeList(searchKeyword))
+    ): Response<Page<NoticeResponse>>{
+        return Response(data = noticeService.getAllNoticeList(searchKeyword, pageable))
     }
-
-    @GetMapping("/{category}")
-    fun getNoticeList(
-        @PathVariable category: NoticeCategory?,
-        @PathVariable pageable: Pageable
-    ): Response<Page<NoticeResponse>> =
-        Response(data = noticeService.getNoticeListByCategory(category, pageable))
 
     @Operation(
         summary = "카테고리를 이용한 공지 조회",
@@ -48,12 +57,16 @@ class NoticeController (
         ]
     )
     @GetMapping("/{category}") // TODO : 저게 Path로 들어가는게 맞을까요?
-    fun getNoticeListWithCategory(
+    fun getNoticeList(
         @PathVariable category: NoticeCategory,
         @RequestParam searchKeyword:String? = null,
-    ): Response<List<NoticeResponse>>{
-        return Response(data = noticeService.getNoticeList(category, searchKeyword))
+        @PathVariable pageable: Pageable
+    ): Response<Page<NoticeResponse>> {
+        return Response(data = noticeService.getNoticeList(category, searchKeyword,pageable))
     }
+
+
+
 
     @Operation(
         summary = "N페이지의 공지 조회",
@@ -80,36 +93,7 @@ class NoticeController (
         noticeService.updateViews(id)
     }
 
-    @GetMapping
-    fun pageNoticeList(
-        @Parameter(
-            description = """
-<b>[필수]</b> 조회할 Page, Page 당 개수, 정렬 기준입니다. <br />
-`page`는 zero-indexed 입니다. <br />
-<b>[기본 값]</b><br />
-page: 0 <br />
-size: 5 <br />
-sort: [\"createdAt\"]
-            """,
-        )
-        @PageableDefault(
-            page = 0,
-            size = 10,
-            sort = ["createdAt"],
-        )
-        pageable: Pageable,
-        @RequestParam
-        category: NoticeCategory?
-    ): Response<PageNoticeResponse> {
-        val notice = noticeService.pageNoticeList(
-            category = category,
-            pageable = pageable
-        )
 
-        return Response(
-            data = notice
-        )
-    }
 
     @Operation(
         summary = "댓글 작성",
