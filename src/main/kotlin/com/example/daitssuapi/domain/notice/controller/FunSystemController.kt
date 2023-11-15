@@ -8,7 +8,11 @@ import com.example.daitssuapi.domain.notice.service.FunSystemService
 import com.example.daitssuapi.domain.main.dto.request.CommentWriteRequest
 import com.example.daitssuapi.domain.main.dto.response.CommentResponse
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -25,9 +29,25 @@ class FunSystemController(
     )
     @GetMapping
     fun getAllFunSystemList(
+        @Parameter(
+            description = """
+<b>[필수]</b> 조회할 Page, Page 당 개수, 정렬 기준입니다. <br />
+`page`는 zero-indexed 입니다. <br />
+<b>[기본 값]</b><br />
+page: 0 <br />
+size: 5 <br />
+sort: [\"createdAt\"]
+            """,
+        )
+        @PageableDefault(
+            page = 0,
+            size = 10,
+            sort = ["createdAt"],
+        )
+        pageable: Pageable,
         @RequestParam searchKeyword:String? = null
-    ):Response<List<FunSystemResponse>>{
-        return Response(data = funSystemService.getAllFunSystemList(searchKeyword))
+    ):Response<Page<FunSystemResponse>>{
+        return Response(data = funSystemService.getAllFunSystemList(searchKeyword,pageable))
     }
 
     @Operation(
@@ -40,9 +60,10 @@ class FunSystemController(
     fun getFunSystemListWithCategory(
         @PathVariable category:FunSystemCategory,
         @RequestParam searchKeyword:String? = null,
-    ): Response<List<FunSystemResponse>>{
+        @PathVariable pageable: Pageable,
+    ): Response<Page<FunSystemResponse>>{
 
-        return Response(data = funSystemService.getFunSystemList(category, searchKeyword))
+        return Response(data = funSystemService.getFunSystemList(category, searchKeyword, pageable))
     }
 
     @Operation(

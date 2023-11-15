@@ -11,13 +11,11 @@ import com.example.daitssuapi.domain.main.model.repository.CommentRepository
 import com.example.daitssuapi.domain.main.model.repository.UserRepository
 import com.example.daitssuapi.domain.notice.dto.NoticePageResponse
 import com.example.daitssuapi.domain.notice.dto.NoticeResponse
-import com.example.daitssuapi.domain.notice.dto.PageNoticeResponse
 import com.example.daitssuapi.domain.notice.model.entity.Notice
 import com.example.daitssuapi.domain.notice.model.repository.NoticeRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.nio.charset.Charset
