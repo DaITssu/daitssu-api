@@ -1,7 +1,10 @@
 package com.example.daitssuapi.domain.notice.dto
 
 import com.example.daitssuapi.common.enums.NoticeCategory
+import com.example.daitssuapi.domain.main.dto.response.ArticleResponse
 import com.example.daitssuapi.domain.notice.model.entity.Notice
+import io.swagger.v3.oas.annotations.media.Schema
+import java.io.Serializable
 import java.time.LocalDateTime
 
 data class NoticeResponse(
