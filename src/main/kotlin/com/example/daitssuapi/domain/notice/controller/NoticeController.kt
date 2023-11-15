@@ -2,15 +2,19 @@ package com.example.daitssuapi.domain.notice.controller
 
 import com.example.daitssuapi.common.dto.Response
 import com.example.daitssuapi.common.enums.NoticeCategory
-import com.example.daitssuapi.domain.notice.dto.NoticeResponse
-import com.example.daitssuapi.domain.notice.service.NoticeService
-import org.springframework.web.bind.annotation.*
 import com.example.daitssuapi.domain.main.dto.request.CommentWriteRequest
 import com.example.daitssuapi.domain.main.dto.response.CommentResponse
 import com.example.daitssuapi.domain.notice.dto.NoticePageResponse
+import com.example.daitssuapi.domain.notice.dto.NoticeResponse
+import com.example.daitssuapi.domain.notice.dto.PageNoticeResponse
+import com.example.daitssuapi.domain.notice.service.NoticeService
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.web.PageableDefault
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/notice")
@@ -29,6 +33,13 @@ class NoticeController (
     ): Response<List<NoticeResponse>>{
         return Response(data = noticeService.getAllNoticeList(searchKeyword))
     }
+
+    @GetMapping("/{category}")
+    fun getNoticeList(
+        @PathVariable category: NoticeCategory?,
+        @PathVariable pageable: Pageable
+    ): Response<Page<NoticeResponse>> =
+        Response(data = noticeService.getNoticeListByCategory(category, pageable))
 
     @Operation(
         summary = "카테고리를 이용한 공지 조회",
@@ -69,6 +80,37 @@ class NoticeController (
         noticeService.updateViews(id)
     }
 
+    @GetMapping
+    fun pageNoticeList(
+        @Parameter(
+            description = """
+<b>[필수]</b> 조회할 Page, Page 당 개수, 정렬 기준입니다. <br />
+`page`는 zero-indexed 입니다. <br />
+<b>[기본 값]</b><br />
+page: 0 <br />
+size: 5 <br />
+sort: [\"createdAt\"]
+            """,
+        )
+        @PageableDefault(
+            page = 0,
+            size = 10,
+            sort = ["createdAt"],
+        )
+        pageable: Pageable,
+        @RequestParam
+        category: NoticeCategory?
+    ): Response<PageNoticeResponse> {
+        val notice = noticeService.pageNoticeList(
+            category = category,
+            pageable = pageable
+        )
+
+        return Response(
+            data = notice
+        )
+    }
+
     @Operation(
         summary = "댓글 작성",
         responses = [
@@ -82,7 +124,8 @@ class NoticeController (
     fun writeComment(
         @PathVariable noticeId: Long,
         @RequestBody commentWriteRequest: CommentWriteRequest
-    ): Response<CommentResponse> = Response(data = noticeService.writeComment(noticeId = noticeId, request = commentWriteRequest))
+    ): Response<CommentResponse> =
+        Response(data = noticeService.writeComment(noticeId = noticeId, request = commentWriteRequest))
 
     @Operation(
         summary = "댓글 조회",
