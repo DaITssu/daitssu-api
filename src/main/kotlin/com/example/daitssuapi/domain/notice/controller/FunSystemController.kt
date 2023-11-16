@@ -60,7 +60,12 @@ sort: [\"createdAt\"]
     fun getFunSystemListWithCategory(
         @PathVariable category:FunSystemCategory,
         @RequestParam searchKeyword:String? = null,
-        @PathVariable pageable: Pageable,
+        @PageableDefault(
+            page = 0,
+            size = 10,
+            sort = ["createdAt"],
+        )
+        pageable: Pageable,
     ): Response<Page<FunSystemResponse>>{
 
         return Response(data = funSystemService.getFunSystemList(category, searchKeyword, pageable))

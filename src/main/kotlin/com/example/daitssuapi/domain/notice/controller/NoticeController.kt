@@ -60,7 +60,12 @@ sort: [\"createdAt\"]
     fun getNoticeList(
         @PathVariable category: NoticeCategory,
         @RequestParam searchKeyword:String? = null,
-        @PathVariable pageable: Pageable
+        @PageableDefault(
+            page = 0,
+            size = 10,
+            sort = ["createdAt"],
+        )
+        pageable: Pageable,
     ): Response<Page<NoticeResponse>> {
         return Response(data = noticeService.getNoticeList(category, searchKeyword,pageable))
     }
