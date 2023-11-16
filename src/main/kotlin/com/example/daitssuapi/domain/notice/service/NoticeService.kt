@@ -11,7 +11,6 @@ import com.example.daitssuapi.domain.main.model.repository.CommentRepository
 import com.example.daitssuapi.domain.main.model.repository.UserRepository
 import com.example.daitssuapi.domain.notice.dto.NoticePageResponse
 import com.example.daitssuapi.domain.notice.dto.NoticeResponse
-import com.example.daitssuapi.domain.notice.dto.PageNoticeResponse
 import com.example.daitssuapi.domain.notice.model.entity.Notice
 import com.example.daitssuapi.domain.notice.model.repository.NoticeRepository
 import org.springframework.data.domain.Page
@@ -27,31 +26,15 @@ class NoticeService(
     private val noticeRepository: NoticeRepository,
     private val userRepository: UserRepository,
 ){
-    fun getAllNoticeList(searchKeyword:String?):List<NoticeResponse>{
-        val notices: List<Notice>
-        if(searchKeyword==null){
-            notices = noticeRepository.findAll()
-        }else{
-            notices= noticeRepository.findByTitleContaining(searchKeyword)
-        }
-        return notices.map { NoticeResponse.fromNotice(it) }
-    }
-
-    fun getNoticeListByCategory(
-        category: NoticeCategory?,
-        pageable: Pageable
-    ): Page<NoticeResponse> {
-
+    fun getAllNoticeList(
+        searchKeyword:String?,
+        pageable: Pageable,
+    ):Page<NoticeResponse>{
         val notices: Page<Notice>
-
-        if (category == NoticeCategory.ALL)
+        if(searchKeyword==null){
             notices = noticeRepository.findAll(pageable)
-        else {
-            if (category != null) {
-                notices = noticeRepository.findByCategory(category, pageable)
-            } else {
-                throw DefaultException(errorCode = ErrorCode.INVALID_CATEGORY)
-            }
+        }else{
+            notices= noticeRepository.findByTitleContaining(searchKeyword=searchKeyword,pageable = pageable)
         }
         return notices.map { NoticeResponse.fromNotice(it) }
     }
@@ -59,12 +42,14 @@ class NoticeService(
     fun getNoticeList(
         category: NoticeCategory,
         searchKeyword: String?,
-    ):List<NoticeResponse>{
-        val notices : List<Notice>
+        pageable: Pageable,
+
+    ):Page<NoticeResponse>{
+        val notices : Page<Notice>
         if(searchKeyword==null){
-            notices = noticeRepository.findByCategory(category)
+            notices = noticeRepository.findByCategory(category,pageable)
         }else{
-            notices = noticeRepository.findByCategoryAndTitleContaining(category,searchKeyword)
+            notices = noticeRepository.findByCategoryAndTitleContaining(category,searchKeyword,pageable)
         }
         return notices.map{ NoticeResponse.fromNotice(it)}
     }
@@ -76,42 +61,15 @@ class NoticeService(
             ?: throw DefaultException(errorCode= ErrorCode.NOTICE_NOT_FOUND)
         return NoticePageResponse.fromNotice(notice)
     }
-    @Transactional
+
     fun updateViews( id:Long ) {
-        val notice =noticeRepository.findByIdOrNull(id)
-            ?:throw DefaultException(ErrorCode.NOTICE_NOT_FOUND)
-        notice.views = notice.views +1
-        noticeRepository.save(notice)
+        noticeRepository.findByIdOrNull(id)?.apply {
+            this.views += 1
+        }?.also {
+            noticeRepository.save(it)
+        } ?:throw DefaultException(ErrorCode.NOTICE_NOT_FOUND)
     }
 
-    fun pageNoticeList(
-        pageable: Pageable,
-        category: NoticeCategory?,
-    ): PageNoticeResponse {
-        val notice: Page<Notice> =
-            if (category == null)
-                noticeRepository.findAll(pageable)
-            else
-                noticeRepository.findByCategory(
-                    category = category,
-                    pageable = pageable
-                )
-
-        val noticeResponses = notice.map {
-            NoticeResponse(
-                id = it.id,
-                title = it.title,
-                category = it.category,
-                createdAt = it.createdAt,
-                views = it.views,
-            )
-        }
-
-        return PageNoticeResponse(
-            notices = noticeResponses.content,
-            totalPage = noticeResponses.totalPages
-        )
-    }
 
     @Transactional
     fun writeComment(noticeId: Long, request: CommentWriteRequest): CommentResponse {
