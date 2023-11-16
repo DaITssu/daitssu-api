@@ -8,7 +8,7 @@ import jakarta.persistence.*
 @Table(schema = "notice", name="notice_fs")
 class FunSystem (
 
-    @Column(name = "title", length= 256, nullable = false)
+    @Column(name = "title", length= 1024, nullable = false)
     val title:String,
 
     @Column(name = "content", nullable = false)

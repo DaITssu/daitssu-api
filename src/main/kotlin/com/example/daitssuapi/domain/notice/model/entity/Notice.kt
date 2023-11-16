@@ -7,7 +7,7 @@ import jakarta.persistence.*
 
 
 @Entity
-@Table(schema = "notice",name= "notice")
+@Table(schema = "notice")
 class Notice (
 
     @Column(name = "title", length= 1024, nullable = false)

@@ -29,6 +29,48 @@ class NoticeController (
     )
     @GetMapping
     fun getAllNoticeList(
+        @RequestParam searchKeyword:String? = null
+    ): Response<List<NoticeResponse>>{
+        return Response(data = noticeService.getAllNoticeList(searchKeyword))
+    }
+
+    @GetMapping("/{category}")
+    fun getNoticeList(
+        @PathVariable category: NoticeCategory?,
+        @PathVariable pageable: Pageable
+    ): Response<Page<NoticeResponse>> =
+        Response(data = noticeService.getNoticeListByCategory(category, pageable))
+
+    @Operation(
+        summary = "카테고리를 이용한 공지 조회",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
+    @GetMapping("/{category}") // TODO : 저게 Path로 들어가는게 맞을까요?
+    fun getNoticeListWithCategory(
+        @PathVariable category: NoticeCategory,
+        @RequestParam searchKeyword:String? = null,
+    ): Response<List<NoticeResponse>>{
+        return Response(data = noticeService.getNoticeList(category, searchKeyword))
+    }
+
+    @Operation(
+        summary = "N페이지의 공지 조회",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
+    @GetMapping("/page/{id}") // TODO : 페이지 기준이 없는데 이게 무슨 의미가 있나 싶습니다.
+    fun getNoticePage(
+        @PathVariable id: Long,
+    ): Response<NoticePageResponse> {
+        noticeService.updateViews(id)
+        return Response(data = noticeService.getNoticePage(id))
+    }
+
+    @GetMapping
+    fun pageNoticeList(
         @Parameter(
             description = """
 <b>[필수]</b> 조회할 Page, Page 당 개수, 정렬 기준입니다. <br />
@@ -45,55 +87,18 @@ sort: [\"createdAt\"]
             sort = ["createdAt"],
         )
         pageable: Pageable,
-        @RequestParam searchKeyword:String? = null
-    ): Response<Page<NoticeResponse>>{
-        return Response(data = noticeService.getAllNoticeList(searchKeyword, pageable))
+        @RequestParam
+        category: NoticeCategory?
+    ): Response<PageNoticeResponse> {
+        val notice = noticeService.pageNoticeList(
+            category = category,
+            pageable = pageable
+        )
+
+        return Response(
+            data = notice
+        )
     }
-
-    @Operation(
-        summary = "카테고리를 이용한 공지 조회",
-        responses = [
-            ApiResponse(responseCode = "200", description = "OK")
-        ]
-    )
-    @GetMapping("/{category}") // TODO : 저게 Path로 들어가는게 맞을까요?
-    fun getNoticeList(
-        @PathVariable category: NoticeCategory,
-        @RequestParam searchKeyword:String? = null,
-        @PathVariable pageable: Pageable
-    ): Response<Page<NoticeResponse>> {
-        return Response(data = noticeService.getNoticeList(category, searchKeyword,pageable))
-    }
-
-
-
-
-    @Operation(
-        summary = "N페이지의 공지 조회",
-        responses = [
-            ApiResponse(responseCode = "200", description = "OK")
-        ]
-    )
-    @GetMapping("/page/{id}") // TODO : 페이지 기준이 없는데 이게 무슨 의미가 있나 싶습니다.
-    fun getNoticePage(
-        @PathVariable id: Long,
-    ): Response<NoticePageResponse> {
-        return Response(data = noticeService.getNoticePage(id))
-    }
-    @Operation(
-        summary = "N페이지의 공지 조회수 업데이트",
-        responses = [
-            ApiResponse(responseCode = "200", description = "OK")
-        ]
-    )
-    @PatchMapping("/page/{id}")
-    fun updateNoticeView(
-        @PathVariable id: Long,
-    ){
-        noticeService.updateViews(id)
-    }
-
-
 
     @Operation(
         summary = "댓글 작성",

@@ -15,8 +15,8 @@ enum class FunSystemCategory(val categoryCode: String){
     COUNSELING("심리/상담/진단"),
     CAREER_SUPPORT("진로지원"),
     STARTUP_SUPPORT("창업지원"),
-    EMPLOYMENT_SUPPORT("취업지원"),
-    Unknown("해당없음"); // 왜 이게 있는지 모르겠음...
+    EMPLOYMENT_SUPPORT("취업지원");
+
 
 
 }
