@@ -3,10 +3,12 @@ package com.example.daitssuapi.domain.main.model.entity
 import com.example.daitssuapi.common.audit.BaseEntity
 import com.example.daitssuapi.domain.notice.model.entity.FunSystem
 import com.example.daitssuapi.domain.notice.model.entity.Notice
-import jakarta.persistence.*
+import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 
 @Entity
-@Table(schema = "main")
 class Comment(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

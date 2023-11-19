@@ -7,7 +7,6 @@ import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 
 @Entity
-@Table(schema = "main")
 class ArticleImage(
     @field:NotNull
     @Column(length = 2048)

@@ -5,25 +5,25 @@ import com.example.daitssuapi.common.enums.FunSystemCategory
 import jakarta.persistence.*
 
 @Entity
-@Table(schema = "notice", name="notice_fs")
-class FunSystem (
+@Table(name = "notice_fs")
+class FunSystem(
 
-    @Column(name = "title", length= 256, nullable = false)
-    val title:String,
+    @Column(name = "title", length = 256, nullable = false)
+    val title: String,
 
     @Column(name = "content", nullable = false)
-    val content : String,
+    val content: String,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category")
-    val category:FunSystemCategory?,
+    val category: FunSystemCategory?,
 
     @Column(name = "image_url")
-    val imageUrl :String,
+    val imageUrl: String,
 
     @Column(name = "url", nullable = false)
-    val url : String,
+    val url: String,
 
     @Column(name = "views", nullable = false)
-    var views : Int,
-):BaseEntity()
+    var views: Int,
+) : BaseEntity()
