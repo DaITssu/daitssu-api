@@ -6,7 +6,7 @@ import jakarta.persistence.*
 @Entity
 @Table(schema = "main", name = "users")
 class User(
-    val studentId: Int,
+    val studentId: String,
 
     val name: String,
 
@@ -18,5 +18,9 @@ class User(
 
     var imageUrl: String? = null,
 
-    val term: Int
+    var term: Int,
+    
+    var ssuToken: String?,
+
+    var refreshToken: String,
 ) : BaseEntity()
