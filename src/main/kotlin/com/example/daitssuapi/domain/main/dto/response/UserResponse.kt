@@ -5,5 +5,6 @@ data class UserResponse(
     val name: String,
     val nickname: String,
     val departmentName: String,
-    val term: Int
+    val term: Int,
+    val imageUrl : String?,
 )

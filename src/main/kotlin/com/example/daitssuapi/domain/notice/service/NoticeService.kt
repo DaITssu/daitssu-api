@@ -9,9 +9,12 @@ import com.example.daitssuapi.domain.main.dto.response.CommentResponse
 import com.example.daitssuapi.domain.main.model.entity.Comment
 import com.example.daitssuapi.domain.main.model.repository.CommentRepository
 import com.example.daitssuapi.domain.main.model.repository.UserRepository
+import com.example.daitssuapi.domain.notice.dto.NoticePageResponse
 import com.example.daitssuapi.domain.notice.dto.NoticeResponse
 import com.example.daitssuapi.domain.notice.model.entity.Notice
 import com.example.daitssuapi.domain.notice.model.repository.NoticeRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -21,38 +24,52 @@ import java.nio.charset.Charset
 class NoticeService(
     private val commentRepository: CommentRepository,
     private val noticeRepository: NoticeRepository,
-    private val userRepository: UserRepository
-) {
-    fun getNoticeList(
-        category: String
-    ): List<NoticeResponse> {
-
-        val notices: List<Notice>
-
-        if (category == "ALL")
-            notices = noticeRepository.findAll()
-        else {
-            val noticeCategory = NoticeCategory.fromCode(category)
-            if (noticeCategory != null) {
-                notices = noticeRepository.findByCategory(noticeCategory)
-            } else {
-                throw DefaultException(errorCode = ErrorCode.INVALID_CATEGORY)
-            }
+    private val userRepository: UserRepository,
+){
+    fun getAllNoticeList(
+        searchKeyword:String?,
+        pageable: Pageable,
+    ):Page<NoticeResponse>{
+        val notices: Page<Notice>
+        if(searchKeyword==null){
+            notices = noticeRepository.findAll(pageable)
+        }else{
+            notices= noticeRepository.findByTitleContaining(searchKeyword=searchKeyword,pageable = pageable)
         }
-
-
         return notices.map { NoticeResponse.fromNotice(it) }
+    }
 
+    fun getNoticeList(
+        category: NoticeCategory,
+        searchKeyword: String?,
+        pageable: Pageable,
+
+    ):Page<NoticeResponse>{
+        val notices : Page<Notice>
+        if(searchKeyword==null){
+            notices = noticeRepository.findByCategory(category,pageable)
+        }else{
+            notices = noticeRepository.findByCategoryAndTitleContaining(category,searchKeyword,pageable)
+        }
+        return notices.map{ NoticeResponse.fromNotice(it)}
     }
 
     fun getNoticePage(
         id: Long
-    ): NoticeResponse {
-        val notice: Notice = noticeRepository.findByIdOrNull(id)
-            ?: throw DefaultException(errorCode = ErrorCode.NOTICE_NOT_FOUND)
-
-        return NoticeResponse.fromNotice(notice)
+    ): NoticePageResponse {
+        val notice :Notice = noticeRepository.findByIdOrNull(id)
+            ?: throw DefaultException(errorCode= ErrorCode.NOTICE_NOT_FOUND)
+        return NoticePageResponse.fromNotice(notice)
     }
+
+    fun updateViews( id:Long ) {
+        noticeRepository.findByIdOrNull(id)?.apply {
+            this.views += 1
+        }?.also {
+            noticeRepository.save(it)
+        } ?:throw DefaultException(ErrorCode.NOTICE_NOT_FOUND)
+    }
+
 
     @Transactional
     fun writeComment(noticeId: Long, request: CommentWriteRequest): CommentResponse {
@@ -63,12 +80,14 @@ class NoticeService(
 
         validateComment(notice = notice, content = request.content, originalCommentId = request.originalCommentId)
 
-        val comment = commentRepository.save(Comment(
-            writer = user,
-            notice = notice,
-            content = request.content,
-            originalId = request.originalCommentId
-        ))
+        val comment = commentRepository.save(
+            Comment(
+                writer = user,
+                notice = notice,
+                content = request.content,
+                originalId = request.originalCommentId
+            )
+        )
 
         return CommentResponse(
             commentId = comment.id,
