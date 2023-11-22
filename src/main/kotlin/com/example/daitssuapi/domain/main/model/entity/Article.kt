@@ -20,6 +20,9 @@ class Article(
     @JoinColumn(name = "user_id")
     var writer: User,
 
+    @Column(columnDefinition = "JSON")
+    val imageUrl: List<String>? = null,
+
     @OneToMany(mappedBy = "article")
     var images: MutableSet<ArticleImage> = mutableSetOf(),
 

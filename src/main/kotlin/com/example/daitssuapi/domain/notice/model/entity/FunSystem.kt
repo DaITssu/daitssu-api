@@ -19,7 +19,7 @@ class FunSystem(
     val category: FunSystemCategory?,
 
     @Column(name = "image_url")
-    val imageUrl: String,
+    val imageUrl: List<String>,
 
     @Column(name = "url", nullable = false)
     val url: String,

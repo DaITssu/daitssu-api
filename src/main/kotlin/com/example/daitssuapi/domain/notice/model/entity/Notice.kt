@@ -21,10 +21,10 @@ class Notice(
     val category: NoticeCategory,
 
     @Column(name = "image_url")
-    val imageUrl: String,
+    val imageUrl: List<String>,
 
     @Column(name = "file_url")
-    val fileUrl: String,
+    val fileUrl: List<String>,
 
     @Column(name = "views", nullable = false)
     var views: Int,
