@@ -17,7 +17,7 @@ class Calendar(
     var course: String,
     var dueAt: LocalDateTime,
     var name: String,
-    var isCompleted: Boolean,
+    var isComplete: Boolean,
     val userId: Long? = null
 ) : BaseEntity() {
     fun updateCalendar(calendarRequest: CalendarRequest, dueAt: LocalDateTime) {
@@ -25,6 +25,6 @@ class Calendar(
         this.course = calendarRequest.course
         this.name = calendarRequest.name
         this.dueAt = dueAt
-        this.isCompleted = calendarRequest.isCompleted
+        this.isComplete = calendarRequest.isCompleted
     }
 }

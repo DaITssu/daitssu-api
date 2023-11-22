@@ -18,6 +18,12 @@ enum class ErrorCode(val code: Int, val message: String) {
     ALREADY_LIKED(MAIN_NUMBERING + 9, "이미 좋아요를 누른 게시글입니다"),
     ALREADY_DISLIKED(MAIN_NUMBERING + 10, "이미 좋아요를 누르지 않은 게시글입니다"),
     NEW_SCRAP_ISACTIVE_NOT_FALSE(MAIN_NUMBERING + 9, "신규 스크랩은 항상 활성화입니다."),
+    PASSWORD_INCORRECT(MAIN_NUMBERING + 11, "패스워드가 일치하지 않습니다."),
+    USER_ALREADY_EXISTS(MAIN_NUMBERING + 12, "이미 존재하는 유저입니다."),
+    REFRESH_TOKEN_NOT_FOUND(MAIN_NUMBERING + 13, "토큰을 리프레시 할 수 없습니다."),
+    TOKEN_INVALID(MAIN_NUMBERING + 14, "유효하지 않은 토큰입니다."),
+    TOKEN_EXPIRED(MAIN_NUMBERING + 15, "토큰이 만료되었습니다."),
+    TOKEN_NOT_FOUND(MAIN_NUMBERING + 16, "토큰이 존재하지 않습니다. 로그인 해주세요"),
 
     NOTICE_NOT_FOUND(NOTICE_NUMBERING + 1, "공지사항 내용을 찾을 수 없습니다"),
     FUNSYSTEM_NOT_FOUND(NOTICE_NUMBERING + 2, "펀시스템 내용을 찾을 수 없습니다"),

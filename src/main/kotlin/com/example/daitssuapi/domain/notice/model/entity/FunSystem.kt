@@ -8,7 +8,7 @@ import jakarta.persistence.*
 @Table(schema = "notice", name="notice_fs")
 class FunSystem (
 
-    @Column(name = "title", length= 1024, nullable = false)
+    @Column(name = "title", length= 256, nullable = false)
     val title:String,
 
     @Column(name = "content", nullable = false)
@@ -24,5 +24,6 @@ class FunSystem (
     @Column(name = "url", nullable = false)
     val url : String,
 
-    // view 빠짐
+    @Column(name = "views", nullable = false)
+    var views : Int,
 ):BaseEntity()

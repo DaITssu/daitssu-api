@@ -7,7 +7,7 @@ import jakarta.persistence.*
 
 
 @Entity
-@Table(schema = "notice")
+@Table(schema = "notice",name= "notice")
 class Notice (
 
     @Column(name = "title", length= 1024, nullable = false)
@@ -29,7 +29,9 @@ class Notice (
     @Column(name = "file_url")
     val fileUrl : String,
 
-    // view 빠짐
+    @Column(name = "views", nullable = false)
+    var views : Int,
+
 ): BaseEntity(){
 
 }
