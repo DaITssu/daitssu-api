@@ -29,8 +29,9 @@ class MypageServiceTest (
         assertAll(
             { assertThat(findArticles).isNotEmpty },
             { assertThat(findArticles.size).isEqualTo(articles.size) },
-            { assertThat(findArticles.get(0).id).isEqualTo(4)},
-            { assertThat(findArticles.get(2).commentSize).isEqualTo(1)}
+            { assertThat(findArticles.get(0).id).isEqualTo(4) },
+            { assertThat(findArticles.get(1).title).isEqualTo("대충 제목2") },
+            { assertThat(findArticles.get(2).commentSize).isEqualTo(2) }
         )
     }
     
