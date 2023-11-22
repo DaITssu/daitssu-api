@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
 @ControllerTest
-class MyPageControllerTest(
+class MyPageControllerTest @Autowired constructor(
     private val commentRepository: CommentRepository,
     private val userRepository: UserRepository
 ) {

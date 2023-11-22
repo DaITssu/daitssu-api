@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @ControllerTest
-class CourseControllerTest(
+class CourseControllerTest @Autowired constructor(
     private val userRepository: UserCourseRelationRepository
 ) {
     @Autowired
