@@ -32,7 +32,14 @@ class MyPageServiceUnitTest {
     @DisplayName("게시글이 있는 userId를 이용하여 게시글 조회시 _ 1개 이상의 게시글이 조회된다")
     fun get_my_articles_with_user_id(){
         val department = Department(name = "소프트웨어")
-        val user = User(studentId = 20330333, name = "김철수", department = department, term = 4)
+        val user = User(
+            studentId = "20330333",
+            name = "김철수",
+            department = department,
+            term = 4,
+            ssuToken = "",
+            refreshToken = ""
+        )
         val articles = listOf(Article(
             topic = Topic.CHAT,
             title = "하이",
@@ -59,7 +66,14 @@ class MyPageServiceUnitTest {
     @DisplayName("게시글이 없는 userId를 이용하여 게시글 조회시 _ 빈 리스트가 조회된다")
     fun get_my_articles_with_wrong_user_id(){
         val department = Department(name = "소프트웨어")
-        val user = User(studentId = 1, name = "김철수", department = department, term = 4)
+        val user = User(
+            studentId = "20330333",
+            name = "김철수",
+            department = department,
+            term = 4,
+            ssuToken = "",
+            refreshToken = ""
+        )
         every { userRepository.findByIdOrNull(user.studentId.toLong()) } returns user
         every { articleRepository.findAllByWriter(user) } returns emptyList()
         

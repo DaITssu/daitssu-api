@@ -30,7 +30,7 @@ class MypageServiceTest (
             { assertThat(findArticles).isNotEmpty },
             { assertThat(findArticles.size).isEqualTo(articles.size) },
             { assertThat(findArticles.get(0).id).isEqualTo(4)},
-            { assertThat(findArticles.get(2).commentSize).isEqualTo(1)}
+            { assertThat(findArticles.get(2).commentSize).isEqualTo(2)}
         )
     }
     
