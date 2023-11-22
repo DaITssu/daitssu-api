@@ -16,9 +16,5 @@ enum class NoticeCategory(val categoryCode: String) {
     COVID_19("코로나19"),
     UNDERGRADUATE("학부");
 
-    companion object {
-        fun fromCode(categoryName: String): NoticeCategory?{
-            return NoticeCategory.values().find{it.name == categoryName }
-        }
-    }
+
 }

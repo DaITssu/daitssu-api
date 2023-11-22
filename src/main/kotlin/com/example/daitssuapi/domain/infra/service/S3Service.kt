@@ -79,7 +79,11 @@ class S3Service(
             .key(key)
             .build()
 
-        amazonS3.deleteObject(deleteRequest)
+        runCatching {
+            amazonS3.deleteObject(deleteRequest)
+        }.onFailure {
+            throw DefaultException(errorCode = ErrorCode.S3_DELETE_FAILED)
+        }
 
         amazonS3.close()
     }

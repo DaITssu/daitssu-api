@@ -84,10 +84,11 @@ class CourseControllerTest(
     }
     
     @Test
-    @DisplayName("올바른 date로 캘린더 조회시_캘린더에 대한 정보가 조회된다")
+    @DisplayName("올바른 date와 userId로 캘린더 조회시_캘린더에 대한 정보가 조회된다")
     fun get_calendar_with_date() {
         val date = "2023-07"
-        val response = mockMvc.perform(get("$courseUrl/calendar/$date"))
+        val userId = 1L
+        val response = mockMvc.perform(get("$courseUrl/calendar/$date/$userId"))
             .andExpect(status().isOk)
             .andReturn().response
         
@@ -98,7 +99,8 @@ class CourseControllerTest(
     @DisplayName("잘못된 date로 캘린더 조회시_에러가 출력된다")
     fun get_calendar_with_wrong_date () {
         val wrongDate = "2023-07-31"
-        val response = mockMvc.perform(get("$courseUrl/calendar/$wrongDate"))
+        val userId = 1L
+        val response = mockMvc.perform(get("$courseUrl/calendar/$wrongDate/$userId"))
             .andExpect(status().isBadRequest)
             .andReturn().response
         
@@ -119,7 +121,8 @@ class CourseControllerTest(
             type = CalendarType.ASSIGNMENT,
             course = "do it",
             dueAt = "2023-07-27 23:59:59",
-            isCompleted = false
+            isCompleted = false,
+            userId = 1L
         )
         val response = mockMvc.perform(
             post("$courseUrl/calendar")
@@ -140,7 +143,8 @@ class CourseControllerTest(
             type = CalendarType.VIDEO,
             course = "choco",
             dueAt = "2023-07-27",
-            isCompleted = false
+            isCompleted = false,
+            userId = 1L
         )
         val response = mockMvc.perform(
             post("$courseUrl/calendar")
@@ -169,7 +173,8 @@ class CourseControllerTest(
             type = CalendarType.ASSIGNMENT,
             course = "do it",
             dueAt = "2023-07-27 23:59:59",
-            isCompleted = true
+            isCompleted = true,
+            userId = 1L
         )
         
         val response = mockMvc.perform(
@@ -193,7 +198,8 @@ class CourseControllerTest(
             type = CalendarType.VIDEO,
             course = "choco",
             dueAt = "2023-07-27",
-            isCompleted = true
+            isCompleted = true,
+            userId = 1L
         )
         
         val response = mockMvc.perform(
@@ -229,8 +235,9 @@ class CourseControllerTest(
     @Test
     @DisplayName("오늘 마감하는 과제, 강의 요청시_캘린더가 출력된다")
     fun get_today_calendar() {
+        val userId = 1L
         val response = mockMvc.perform(
-            get("$courseUrl/calendar/today")
+            get("$courseUrl/calendar/today/$userId")
         )
             .andExpect(status().isOk)
             .andReturn().response

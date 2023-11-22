@@ -21,6 +21,15 @@ class Article(
     @JoinColumn(name = "user_id")
     var writer: User,
 
+    @OneToMany(mappedBy = "article")
+    var images: MutableSet<ArticleImage> = mutableSetOf(),
+
+    @OneToMany(mappedBy = "article")
+    var likes: MutableSet<ArticleLike> = mutableSetOf(),
+
+    @OneToMany(mappedBy = "article")
+    var comments: MutableSet<Comment> = mutableSetOf(),
+
     @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
     var articleImages: MutableSet<ArticleImage> = mutableSetOf(),
 

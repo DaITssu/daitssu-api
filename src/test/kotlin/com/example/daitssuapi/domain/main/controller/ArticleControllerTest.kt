@@ -204,7 +204,7 @@ class ArticleControllerTest(
     @DisplayName("성공_올바른 정보를 넘겨줄 때_새로운 게시글을 스크랩한다")
     fun newScrapSuccess() {
         val userId = userRepository.findAll().sortedByDescending { it.id }[0].id
-        val articleId = commentRepository.findAll()[0].article.id
+        val articleId = commentRepository.findAll().filter { null != it.article }[0].id
         val url = "/community/article/${articleId}/scrap"
 
         mockMvc.perform(post(url)
@@ -217,7 +217,7 @@ class ArticleControllerTest(
     @DisplayName("실패_신규 스크랩에서 isActive가 false라면_스크랩에 실패한다")
     fun newScrapFailIsActiveFalse() {
         val userId = userRepository.findAll().sortedByDescending { it.id }[0].id
-        val articleId = commentRepository.findAll()[0].article.id
+        val articleId = commentRepository.findAll().filter { null != it.article }[0].id
         val url = "/community/article/${articleId}/scrap"
 
         mockMvc.perform(post(url)
@@ -230,7 +230,7 @@ class ArticleControllerTest(
     @DisplayName("실패_신규 스크랩에서 유저를 못 찾으면_스크랩에 실패한다")
     fun newScrapFailNoUser() {
         val userId = 0
-        val articleId = commentRepository.findAll()[0].article.id
+        val articleId = commentRepository.findAll().filter { null != it.article }[0].id
         val url = "/community/article/${articleId}/scrap"
 
         mockMvc.perform(post(url)

@@ -71,7 +71,7 @@ class CourseService(
         )
     }
 
-    fun getCalendar(dateRequest: String): Map<String, List<CalendarResponse>> {
+    fun getCalendar(dateRequest: String, userId: Long): Map<String, List<CalendarResponse>> {
         val date = "$dateRequest-01"
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val dateTime: LocalDate
@@ -86,7 +86,7 @@ class CourseService(
         val endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59)
 
         return calendarRepository.findByDueAtBetween(startDateTime, endDateTime).groupBy(
-            { it.course }, { CalendarResponse(it.id, it.type, it.dueAt, it.name, it.isCompleted) }
+            { it.course }, { CalendarResponse(it.id, it.type, it.dueAt, it.name, it.isComplete) }
         )
     }
 
@@ -98,7 +98,7 @@ class CourseService(
             course = calendarRequest.course,
             dueAt = dateTime,
             name = calendarRequest.name,
-            isCompleted = calendarRequest.isCompleted
+            isComplete = calendarRequest.isCompleted
         ).also { calendarRepository.save(it) }
 
         return CalendarResponse(
@@ -106,7 +106,7 @@ class CourseService(
             type = calendar.type,
             dueAt = calendar.dueAt,
             name = calendar.name,
-            isCompleted = calendar.isCompleted
+            isCompleted = calendar.isComplete
         )
     }
 
@@ -190,7 +190,7 @@ class CourseService(
             type = calendar.type,
             dueAt = calendar.dueAt,
             name = calendar.name,
-            isCompleted = calendar.isCompleted
+            isCompleted = calendar.isComplete
         )
     }
     
@@ -206,7 +206,7 @@ class CourseService(
         return dateTime
     }
     
-    fun getTodayDueAtCalendars() : TodayCalendarResponse {
+    fun getTodayDueAtCalendars(userId: Long) : TodayCalendarResponse {
         val day = LocalDate.now()
         val startTime = LocalTime.of(0, 0, 0)
         val endTime = LocalTime.of(23, 59, 59)
@@ -215,24 +215,27 @@ class CourseService(
         val videos: MutableList<TodayCalendarDataDto> = mutableListOf()
         val assignments: MutableList<TodayCalendarDataDto> = mutableListOf()
         
-        val videoCourses = calendarRepository.findDistinctTop2ByTypeAndDueAtBetweenOrderByDueAtAsc(
+        val videoCourses = calendarRepository.findDistinctTop2ByUserIdAndTypeAndDueAtBetweenOrderByDueAtAsc(
             startDateTime = todayStart,
             endDateTime = todayEnd,
-            type = CalendarType.VIDEO
+            type = CalendarType.VIDEO,
+            userId = userId
         )
         
-        val assignmentCourses = calendarRepository.findDistinctTop2ByTypeAndDueAtBetweenOrderByDueAtAsc(
+        val assignmentCourses = calendarRepository.findDistinctTop2ByUserIdAndTypeAndDueAtBetweenOrderByDueAtAsc(
             startDateTime = todayStart,
             endDateTime = todayEnd,
-            type = CalendarType.ASSIGNMENT
+            type = CalendarType.ASSIGNMENT,
+            userId = userId
         )
         
         for (calendar: Calendar in videoCourses) {
-            val calendars = calendarRepository.findByTypeAndCourseAndDueAtBetween(
+            val calendars = calendarRepository.findByUserIdAndTypeAndCourseAndDueAtBetween(
                 type = CalendarType.VIDEO,
                 course = calendar.course,
                 startDateTime = todayStart,
-                endDateTime = todayEnd
+                endDateTime = todayEnd,
+                userId = userId
             )
             
             val todayCalendarDataDto = TodayCalendarDataDto(
@@ -245,11 +248,12 @@ class CourseService(
         }
         
         for (calendar: Calendar in assignmentCourses) {
-            val calendars = calendarRepository.findByTypeAndCourseAndDueAtBetween(
+            val calendars = calendarRepository.findByUserIdAndTypeAndCourseAndDueAtBetween(
                 type = CalendarType.ASSIGNMENT,
                 course = calendar.course,
                 startDateTime = todayStart,
-                endDateTime = todayEnd
+                endDateTime = todayEnd,
+                userId = userId
             )
             
             val todayCalendarDataDto = TodayCalendarDataDto(

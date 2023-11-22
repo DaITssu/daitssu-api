@@ -21,7 +21,6 @@ import com.example.daitssuapi.utils.UnitTest
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
-import io.mockk.verify
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
@@ -38,7 +37,13 @@ class CourseServiceUnitTest {
     private val calendarRepository: CalendarRepository = mockk(relaxed = true)
     private val userCourseRelationRepository: UserCourseRelationRepository = mockk(relaxed = true)
     private val courseService: CourseService = spyk(
-        objToCopy = CourseService(assignmentRepository, courseRepository, videoRepository, calendarRepository, userCourseRelationRepository),
+        objToCopy = CourseService(
+            assignmentRepository,
+            courseRepository,
+            videoRepository,
+            calendarRepository,
+            userCourseRelationRepository
+        ),
         recordPrivateCalls = true
     )
 
@@ -46,9 +51,25 @@ class CourseServiceUnitTest {
     @DisplayName("성공_올바른 userId를 이용하여 과목 조회 시_1개 이상의 과목이 조회될 수 있다")
     fun success_get_course_with_user_id() {
         val department = Department("computer")
-        val user = User(studentId = 20230803, name = "user", department = department, term = 1)
+        val user = User(
+            studentId = "20230803",
+            name = "user",
+            department = department,
+            term = 1,
+            password = "",
+            refreshToken = "",
+            ssuToken = ""
+        )
         val course = Course("eat anything", 16)
-        every { userCourseRelationRepository.findByUserIdOrderByCreatedAtDesc(any()) }.returns(listOf(UserCourseRelation(user, course, RegisterStatus.ACTIVE)))
+        every { userCourseRelationRepository.findByUserIdOrderByCreatedAtDesc(any()) }.returns(
+            listOf(
+                UserCourseRelation(
+                    user,
+                    course,
+                    RegisterStatus.ACTIVE
+                )
+            )
+        )
 
         val findCourses = courseService.getUserCourses(userId = user.id)
 
@@ -147,12 +168,12 @@ class CourseServiceUnitTest {
             type = CalendarType.ASSIGNMENT,
             name = "kotlin-첫번째 과제",
             dueAt = LocalDateTime.of(2023,2,28,23,59,59),
-            isCompleted = false
+            isComplete = false
         ))
         
-        every { calendarRepository.findByDueAtBetween(any(), any()) } returns calendar
+        every { calendarRepository.findByUserIdAndDueAtBetween(any(), any(), any()) } returns calendar
         
-        val result = courseService.getCalendar("2023-02")
+        val result = courseService.getCalendar(dateRequest = "2023-02", userId = 1L)
         val expectedCalendar = mapOf("kotlin" to
             calendar.map {
                 CalendarResponse(
@@ -160,7 +181,7 @@ class CourseServiceUnitTest {
                     dueAt = it.dueAt,
                     type = it.type,
                     id = it.id,
-                    isCompleted = it.isCompleted
+                    isCompleted = it.isComplete
                 )
             }
         )
@@ -173,9 +194,10 @@ class CourseServiceUnitTest {
     fun get_calendar_with_invalidate_local_date_time() {
         val date = "2023 02"
         val expectedErrorCode = ErrorCode.INVALID_GET_DATE_FORMAT
+        val userId = 1L
         
         val result = assertThrows<DefaultException> {
-            courseService.getCalendar(date)
+            courseService.getCalendar(dateRequest =  date, userId = userId)
         }
         
         assertThat(expectedErrorCode).isEqualTo(result.errorCode)
@@ -189,7 +211,8 @@ class CourseServiceUnitTest {
             course = "kotlin",
             dueAt = "2023-02-28 23:59:59",
             name = "4주차 강의",
-            isCompleted = false
+            isCompleted = false,
+            userId = 1L
         )
         val expectedCalendar = CalendarResponse (
             type = calendarRequest.type,
@@ -205,7 +228,7 @@ class CourseServiceUnitTest {
                 course = calendarRequest.course,
                 dueAt = LocalDateTime.of(2023,2,28,23,59,59),
                 name = calendarRequest.name,
-                isCompleted = calendarRequest.isCompleted
+                isComplete = calendarRequest.isCompleted
             )
         }
         
@@ -222,7 +245,8 @@ class CourseServiceUnitTest {
             course = "kotlin",
             dueAt = "2023-08-15",
             name = "8주차 강의",
-            isCompleted = false
+            isCompleted = false,
+            userId = 1L
         )
         val expectedErrorCode = ErrorCode.INVALID_DATE_FORMAT
         
@@ -341,21 +365,22 @@ class CourseServiceUnitTest {
             course = "Kotlin",
             dueAt = LocalDateTime.of(2023,7,27,23,59,59),
             name = "4주차 강의",
-            isCompleted = false
+            isComplete = false
         )
         val calendarRequest = CalendarRequest(
             type = CalendarType.ASSIGNMENT,
             course = "JAVA",
             dueAt = "2023-08-28 23:59:59",
             name = "8주차 강의",
-            isCompleted = true
+            isCompleted = true,
+            userId = 1L
         )
         val updateCalendar = Calendar(
             type = CalendarType.ASSIGNMENT,
             course = "JAVA",
             dueAt = LocalDateTime.of(2023,8,28,23,59,59),
             name = "8주차 강의",
-            isCompleted = true
+            isComplete = true
         )
         
         every { calendarRepository.findByIdOrNull(any()) } returns calendar
@@ -382,7 +407,7 @@ class CourseServiceUnitTest {
             course = "Kotlin",
             dueAt = LocalDateTime.of(2023,7,27,23,59,59),
             name = "4주차 강의",
-            isCompleted = false
+            isComplete = false
         )
         
         val wrongCalendarRequest = CalendarRequest(
@@ -390,7 +415,8 @@ class CourseServiceUnitTest {
             course = "JAVA",
             dueAt = "2023-08-28",
             name = "8주차 강의",
-            isCompleted = true
+            isCompleted = true,
+            userId = 1L
         )
         
         val calendarRequest = CalendarRequest(
@@ -398,7 +424,8 @@ class CourseServiceUnitTest {
             course = "JAVA",
             dueAt = "2023-08-28 23:59:59",
             name = "8주차 강의",
-            isCompleted = true
+            isCompleted = true,
+            userId = 1L
         )
         
         every { calendarRepository.findByIdOrNull(courseId) } returns calendar
@@ -421,20 +448,21 @@ class CourseServiceUnitTest {
     @Test
     @DisplayName("오늘 마감인 과제, 강의가 있으면 올바르게 출력된다")
     fun get_today_calendar_not_empty() {
+        val userId = 1L
         val videoCourses = listOf(
             Calendar(
                 course = "just",
                 dueAt = LocalDateTime.of(2023,10,2,9,0,0),
                 type = CalendarType.VIDEO,
                 name = "강의 1",
-                isCompleted = false
+                isComplete = false
             ),
             Calendar(
                 course = "do it",
                 dueAt = LocalDateTime.of(2023,10,2,16,0,0),
                 type = CalendarType.VIDEO,
                 name = "강의 1",
-                isCompleted = false
+                isComplete = false
             )
         )
         
@@ -444,7 +472,7 @@ class CourseServiceUnitTest {
                 dueAt = LocalDateTime.of(2023,10,2,14,0,0),
                 type = CalendarType.ASSIGNMENT,
                 name = "강의 1",
-                isCompleted = false
+                isComplete = false
             )
         )
         
@@ -454,14 +482,14 @@ class CourseServiceUnitTest {
                 dueAt = LocalDateTime.of(2023,10,2,14,0,0),
                 type = CalendarType.VIDEO,
                 name = "강의 1",
-                isCompleted = false
+                isComplete = false
             ),
             Calendar(
                 course = "just",
                 dueAt = LocalDateTime.of(2023,10,2,23,59,59),
                 type = CalendarType.VIDEO,
                 name = "강의 2",
-                isCompleted = true
+                isComplete = true
             )
         )
         
@@ -471,7 +499,7 @@ class CourseServiceUnitTest {
                 dueAt = LocalDateTime.of(2023,10,2,16,0,0),
                 type = CalendarType.VIDEO,
                 name = "강의 1",
-                isCompleted = false
+                isComplete = false
             )
         )
         
@@ -481,30 +509,52 @@ class CourseServiceUnitTest {
                 dueAt = LocalDateTime.of(2023,10,2,14,0,0),
                 type = CalendarType.ASSIGNMENT,
                 name = "강의 1",
-                isCompleted = false
+                isComplete = false
             ),
             Calendar(
                 course = "i study",
                 dueAt = LocalDateTime.of(2023,10,2,23,59,59),
                 type = CalendarType.ASSIGNMENT,
                 name = "강의 2",
-                isCompleted = true
+                isComplete = true
             )
         )
         
         
-        every { calendarRepository.findDistinctTop2ByTypeAndDueAtBetweenOrderByDueAtAsc(
-            type = CalendarType.VIDEO, any(), any()) } returns videoCourses
-        every { calendarRepository.findDistinctTop2ByTypeAndDueAtBetweenOrderByDueAtAsc(
-            type = CalendarType.ASSIGNMENT, any(), any()) } returns assignmentCourses
-        every { calendarRepository.findByTypeAndCourseAndDueAtBetween(
-            type = CalendarType.VIDEO, course = "just", any(), any()) } returns justVideos
-        every { calendarRepository.findByTypeAndCourseAndDueAtBetween(
-            type = CalendarType.VIDEO, course = "do it", any(), any()) } returns doitCalendars
-        every { calendarRepository.findByTypeAndCourseAndDueAtBetween(
-            type = CalendarType.ASSIGNMENT, course = "i study", any(), any()) } returns iStudyVideos
+        every { calendarRepository.findDistinctTop2ByUserIdAndTypeAndDueAtBetweenOrderByDueAtAsc(
+            type = CalendarType.VIDEO,
+            userId = any(),
+            startDateTime = any(),
+            endDateTime = any()
+        ) } returns videoCourses
+        every { calendarRepository.findDistinctTop2ByUserIdAndTypeAndDueAtBetweenOrderByDueAtAsc(
+            type = CalendarType.ASSIGNMENT,
+            userId = any(),
+            startDateTime = any(),
+            endDateTime = any()
+        ) } returns assignmentCourses
+        every { calendarRepository.findByUserIdAndTypeAndCourseAndDueAtBetween(
+            type = CalendarType.VIDEO, course = "just",
+            startDateTime = any(),
+            endDateTime = any(),
+            userId = any()
+        ) } returns justVideos
+        every { calendarRepository.findByUserIdAndTypeAndCourseAndDueAtBetween(
+            type = CalendarType.VIDEO,
+            course = "do it",
+            startDateTime = any(),
+            endDateTime = any(),
+            userId = any()
+        ) } returns doitCalendars
+        every { calendarRepository.findByUserIdAndTypeAndCourseAndDueAtBetween(
+            type = CalendarType.ASSIGNMENT,
+            course = "i study",
+            startDateTime = any(),
+            endDateTime = any(),
+            userId = any()
+        ) } returns iStudyVideos
         
-        val todayCalendar = courseService.getTodayDueAtCalendars()
+        val todayCalendar = courseService.getTodayDueAtCalendars(userId = userId)
         
         assertAll(
             { assertThat(todayCalendar.videos.size).isEqualTo(2) },
