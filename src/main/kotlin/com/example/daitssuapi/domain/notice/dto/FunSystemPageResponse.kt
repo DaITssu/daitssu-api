@@ -9,7 +9,7 @@ data class FunSystemPageResponse (
     val title: String,
     val content: String,
     val category: FunSystemCategory?,
-    val imageUrl: String?,
+    val imageUrl: List<String>,
     val url: String?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
