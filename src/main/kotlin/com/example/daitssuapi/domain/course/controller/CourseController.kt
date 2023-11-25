@@ -54,7 +54,7 @@ class CourseController(
             ApiResponse(responseCode = "200", description = "OK")
         ]
     )
-    @GetMapping("/calendar/{date}")
+    @GetMapping("/calendar/{date}") // TODO : calendar에 저장된 course로 group by, 실제 강의와 연결 불가
     fun getCalendar(
         @PathVariable("date") date: String
     ): Response<Map<String, List<CalendarResponse>>> =
@@ -66,7 +66,7 @@ class CourseController(
             ApiResponse(responseCode = "200", description = "OK")
         ]
     )
-    @PostMapping("/calendar")
+    @PostMapping("/calendar") // TODO : course를 String으로 박는데, 실제 강의와 연결을 못 시키고 있음. courseId 등으로 대체 필요
     fun postCreateCalendar(
         @RequestBody calendarRequest: CalendarRequest
     ): Response<CalendarResponse> =
@@ -78,7 +78,7 @@ class CourseController(
             ApiResponse(responseCode = "200", description = "OK")
         ]
     )
-    @PostMapping("/video")
+    @PostMapping("/video") // TODO : due가 강제로 7일 이후로 처리되는거 수정
     fun postCreateVideo(
         @RequestBody videoRequest: VideoRequest
     ): Response<VideoResponse> =
@@ -127,7 +127,7 @@ class CourseController(
             ApiResponse(responseCode = "200", description = "OK")
         ]
     )
-    @PutMapping("/calendar/{calendarId}")
+    @PutMapping("/calendar/{calendarId}") // TODO : 이거도 동일하게 강의와 Mapping 불가
     fun updateCalendar(
         @RequestBody calendarRequest: CalendarRequest,
         @PathVariable calendarId: Long
