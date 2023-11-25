@@ -1,6 +1,7 @@
 package com.example.daitssuapi.domain.notice.model.entity
 
 import com.example.daitssuapi.common.audit.BaseEntity
+import com.example.daitssuapi.common.converter.JsonParsingConverter
 import com.example.daitssuapi.common.enums.NoticeCategory
 import jakarta.persistence.*
 
@@ -20,11 +21,11 @@ class Notice(
     @Column(name = "category")
     val category: NoticeCategory,
 
-    @Column(name = "image_url")
-    val imageUrl: List<String>,
+    @Convert(converter = JsonParsingConverter::class)
+    val imageUrl: List<String> = emptyList(),
 
-    @Column(name = "file_url")
-    val fileUrl: List<String>,
+    @Convert(converter = JsonParsingConverter::class)
+    val fileUrl: List<String> = emptyList(),
 
     @Column(name = "views", nullable = false)
     var views: Int,

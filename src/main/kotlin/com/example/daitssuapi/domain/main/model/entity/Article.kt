@@ -1,6 +1,7 @@
 package com.example.daitssuapi.domain.main.model.entity
 
 import com.example.daitssuapi.common.audit.BaseEntity
+import com.example.daitssuapi.common.converter.JsonParsingConverter
 import com.example.daitssuapi.domain.main.enums.Topic
 import jakarta.persistence.*
 
@@ -20,8 +21,8 @@ class Article(
     @JoinColumn(name = "user_id")
     var writer: User,
 
-    @Column(columnDefinition = "JSON")
-    val imageUrl: List<String>? = null,
+    @Convert(converter = JsonParsingConverter::class)
+    val imageUrl: List<String> = emptyList(),
 
     @OneToMany(mappedBy = "article")
     var images: MutableSet<ArticleImage> = mutableSetOf(),
