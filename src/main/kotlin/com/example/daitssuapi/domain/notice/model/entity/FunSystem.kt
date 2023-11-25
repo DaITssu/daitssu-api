@@ -17,7 +17,7 @@ class FunSystem(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category")
-    val category: FunSystemCategory?,
+    val category: FunSystemCategory,
 
     @Convert(converter = JsonParsingConverter::class)
     val imageUrl: List<String> = emptyList(),
