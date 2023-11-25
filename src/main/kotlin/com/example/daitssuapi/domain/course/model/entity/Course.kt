@@ -10,6 +10,8 @@ class Course(
 
     val term: Int,
 
+    val courseCode: String,
+
     @OneToMany(mappedBy = "course")
     val videos: MutableList<Video> = mutableListOf(),
 
