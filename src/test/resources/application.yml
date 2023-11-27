@@ -27,3 +27,9 @@ aws:
 logging:
   level:
     root: DEBUG
+
+app:
+  jwt:
+    accessTokenValidMS: 3600000
+    refreshTokenValidMS: 604800000
+    secret: temp
