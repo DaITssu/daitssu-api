@@ -18,7 +18,7 @@ class JwtVerifier(
     private val tokenAlgorithm: Algorithm,
     @Value("\${spring.profiles.active}") private val profile: String
 ) {
-    private val alwaysAllowProfiles = listOf("dev", "local", "test")
+    private val alwaysAllowProfiles = listOf("test")
 
     val tokenVerifier: JWTVerifier = JWT
         .require(tokenAlgorithm)
@@ -27,6 +27,10 @@ class JwtVerifier(
         .build()
 
     fun verify(request: HttpServletRequest): TokenDto? {
+        if (profile in alwaysAllowProfiles) {
+            return TokenDto(userId = 2, userRole = "STUDENT")
+        }
+
         val bearerToken = request.getHeader("Authorization") ?: return null
         if (!bearerToken.startsWith("Bearer ")) {
             return null
