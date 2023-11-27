@@ -5,7 +5,12 @@ import com.example.daitssuapi.domain.course.dto.request.AssignmentRequest
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
 import com.example.daitssuapi.domain.course.dto.request.CourseRequest
 import com.example.daitssuapi.domain.course.dto.request.VideoRequest
-import com.example.daitssuapi.domain.course.dto.response.*
+import com.example.daitssuapi.domain.course.dto.response.AssignmentResponse
+import com.example.daitssuapi.domain.course.dto.response.CalendarResponse
+import com.example.daitssuapi.domain.course.dto.response.CourseResponse
+import com.example.daitssuapi.domain.course.dto.response.TodayCalendarResponse
+import com.example.daitssuapi.domain.course.dto.response.UserCourseResponse
+import com.example.daitssuapi.domain.course.dto.response.VideoResponse
 import com.example.daitssuapi.domain.course.service.CourseService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -49,7 +54,7 @@ class CourseController(
             ApiResponse(responseCode = "200", description = "OK")
         ]
     )
-    @GetMapping("/calendar/{date}")
+    @GetMapping("/calendar/{date}") // TODO : calendar에 저장된 course로 group by, 실제 강의와 연결 불가
     fun getCalendar(
         @PathVariable("date") date: String
     ): Response<Map<String, List<CalendarResponse>>> =
@@ -61,7 +66,7 @@ class CourseController(
             ApiResponse(responseCode = "200", description = "OK")
         ]
     )
-    @PostMapping("/calendar")
+    @PostMapping("/calendar") // TODO : course를 String으로 박는데, 실제 강의와 연결을 못 시키고 있음. courseId 등으로 대체 필요
     fun postCreateCalendar(
         @RequestBody calendarRequest: CalendarRequest
     ): Response<CalendarResponse> =
@@ -73,7 +78,7 @@ class CourseController(
             ApiResponse(responseCode = "200", description = "OK")
         ]
     )
-    @PostMapping("/video")
+    @PostMapping("/video") // TODO : due가 강제로 7일 이후로 처리되는거 수정
     fun postCreateVideo(
         @RequestBody videoRequest: VideoRequest
     ): Response<VideoResponse> =
@@ -97,7 +102,7 @@ class CourseController(
             ApiResponse(responseCode = "200", description = "OK")
         ]
     )
-    @PostMapping("/course")
+    @PostMapping
     fun postCreateCourse(
         @RequestBody courseRequest: CourseRequest
     ): Response<CourseResponse> =
@@ -122,11 +127,11 @@ class CourseController(
             ApiResponse(responseCode = "200", description = "OK")
         ]
     )
-    @PutMapping("/calendar/{calendarId}")
+    @PutMapping("/calendar/{calendarId}") // TODO : 이거도 동일하게 강의와 Mapping 불가
     fun updateCalendar(
         @RequestBody calendarRequest: CalendarRequest,
         @PathVariable calendarId: Long
-    ) : Response<CalendarResponse> =
+    ): Response<CalendarResponse> =
         Response(data = courseService.updateCalendar(calendarRequest = calendarRequest, calendarId = calendarId))
 
     @Operation(
@@ -136,7 +141,7 @@ class CourseController(
         ]
     )
     @GetMapping("/calendar/today")
-    fun getTodayCalendar() : Response<TodayCalendarResponse> =
+    fun getTodayCalendar(): Response<TodayCalendarResponse> =
         Response(data = courseService.getTodayDueAtCalendars())
 
 }

@@ -2,16 +2,16 @@ app:
   jwt:
     accessTokenValidMS: 3600000
     refreshTokenValidMS: 604800000
-    secret: ${APP_JWT_SECRET}
 
 spring:
   jpa:
     properties:
       hibernate:
-        show_sql: true
-        format_sql: true
+        show_sql: false
+        format_sql: false
         use_sql_comments: true
         default_batch_fetch_size: 100
+        ddl-auto: none
       jakarta:
         persistence:
           query:

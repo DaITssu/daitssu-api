@@ -4,7 +4,7 @@ import com.example.daitssuapi.common.audit.BaseEntity
 import jakarta.persistence.*
 
 @Entity
-@Table(schema = "main", name = "users")
+@Table(name = "users")
 class User(
     val studentId: String,
 

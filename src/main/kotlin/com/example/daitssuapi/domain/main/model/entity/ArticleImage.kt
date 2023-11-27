@@ -6,8 +6,7 @@ import jakarta.validation.constraints.NotNull
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 
-@Entity
-@Table(schema = "main")
+@Entity // TODO : 왜 있는지 모르는거. Table 생성 안 했음
 class ArticleImage(
     @field:NotNull
     @Column(length = 2048)
