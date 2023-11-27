@@ -3,7 +3,6 @@ package com.example.daitssuapi.common.security.configuration
 import com.example.daitssuapi.common.security.bean.JwtAccessDeniedHandler
 import com.example.daitssuapi.common.security.bean.JwtAuthenticationEntryPoint
 import com.example.daitssuapi.common.security.bean.JwtFilter
-import com.example.daitssuapi.common.security.component.CustomPasswordEncoder
 import com.example.daitssuapi.common.security.component.JwtVerifier
 import com.example.daitssuapi.common.security.type.AuthorizeRequestsApplier
 import org.springframework.beans.factory.annotation.Qualifier
@@ -14,6 +13,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
@@ -34,7 +34,7 @@ class SecurityConfiguration(
     private val jwtVerifier: JwtVerifier,
 ) {
     @Bean
-    fun passwordEncoder() = CustomPasswordEncoder()
+    fun passwordEncoder() = BCryptPasswordEncoder()
 
     @Bean
     fun authenticationEntryPoint(): AuthenticationEntryPoint = JwtAuthenticationEntryPoint()

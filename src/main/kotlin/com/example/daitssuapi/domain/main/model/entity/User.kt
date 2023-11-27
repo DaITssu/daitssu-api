@@ -16,7 +16,11 @@ class User(
     @JoinColumn(name = "department_id")
     val department: Department,
 
-    val imageUrl: String? = null,
+    var imageUrl: String? = null,
 
-    val term: Int
+    var term: Int,
+    
+    var ssuToken: String?,
+
+    var refreshToken: String,
 ) : BaseEntity()
