@@ -2,7 +2,6 @@ app:
   jwt:
     accessTokenValidMS: 3600000
     refreshTokenValidMS: 604800000
-    secret: ${APP_JWT_SECRET}
 
 spring:
   jpa:

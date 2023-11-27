@@ -39,12 +39,10 @@ class AuthService(
                         student_id = studentId,
                         password = password,
                     )
-                )
+                ).replace("\"", "")
             } catch (e: Exception) {
                 throw DefaultException(ErrorCode.PASSWORD_INCORRECT, HttpStatus.BAD_REQUEST)
             }
-        print("------")
-        print(user.id)
 
         val accessToken = tokenProvider.createAccessToken(user.id)
         val refreshToken = tokenProvider.createRefreshToken(user.id)

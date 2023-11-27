@@ -36,8 +36,9 @@ class JwtVerifier(
     }
 
     fun verifyToken(bearerToken: String): TokenDto {
+        // TODO: 실제 토큰을 넣어도 무시해버림 수정 필요
         if (profile in alwaysAllowProfiles) {
-            return TokenDto(userId = 0, userRole = "STUDENT")
+            return TokenDto(userId = 2, userRole = "STUDENT")
         }
 
         try {
