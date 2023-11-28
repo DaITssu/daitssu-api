@@ -22,7 +22,6 @@ import java.time.LocalDateTime
 
 @Service
 class ArticleService(
-    private val articleImageRepository: ArticleImageRepository,
     private val articleLikeRepository: ArticleLikeRepository,
     private val articleRepository: ArticleRepository,
     private val commentRepository: CommentRepository,
@@ -42,7 +41,7 @@ class ArticleService(
             content = article.content,
             writerNickName = article.writer.nickname!!,
             updatedAt = article.updatedAt,
-            imageUrls = article.images.map { it.url },
+            imageUrls = article.imageUrl,
             likes = article.likes.size,
             comments = article.comments.size,
             scrapCount = article.scraps.size
@@ -71,7 +70,7 @@ class ArticleService(
                 content = it.content,
                 writerNickName = it.writer.nickname!!,
                 updatedAt = it.updatedAt,
-                imageUrls = it.images.map { image -> image.url },
+                imageUrls = it.imageUrl,
                 likes = it.likes.size,
                 comments = it.comments.size
             )
@@ -84,7 +83,7 @@ class ArticleService(
     }
 
     fun getPopularArticles(): List<ArticleResponse> {
-        val articles: List<Article> = articleRepository.findAllByCreatedAtIsLessThanEqual(
+        val articles: List<Article> = articleRepository.findAllByCreatedAtIsGreaterThanEqual(
             createdAt = LocalDateTime.now().minusDays(1)
         )
 
@@ -98,7 +97,7 @@ class ArticleService(
                 content = it.content,
                 writerNickName = it.writer.nickname!!,
                 updatedAt = it.updatedAt,
-                imageUrls = it.images.map { image -> image.url },
+                imageUrls = it.imageUrl,
                 likes = it.likes.size,
                 comments = it.comments.size
             )
@@ -125,19 +124,11 @@ class ArticleService(
             title = articleCreateRequest.title,
             content = articleCreateRequest.content,
             writer = user,
+            imageUrl = imageUrls,
         )
 
-        val articleImages = imageUrls.map {
-            ArticleImage(
-                url = it,
-                article = article
-            )
-        }
-
-        articleRepository.save(article)
-
         runCatching {
-            articleImageRepository.saveAll(articleImages)
+            articleRepository.save(article)
         }.onFailure {
             imageUrls.map { url ->
                 s3Service.deleteFromS3ByUrl(url)
@@ -150,8 +141,8 @@ class ArticleService(
         val article: Article = articleRepository.findByIdOrNull(articleId)
             ?: throw DefaultException(ErrorCode.ARTICLE_NOT_FOUND)
 
-        article.images.map {
-            s3Service.deleteFromS3ByUrl(it.url)
+        article.imageUrl.map {
+            s3Service.deleteFromS3ByUrl(it)
         }
 
         articleRepository.delete(article)

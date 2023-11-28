@@ -50,9 +50,9 @@ class NoticeController(
             ApiResponse(responseCode = "200", description = "OK")
         ]
     )
-    @GetMapping("/{category}") // TODO : 저게 Path로 들어가는게 맞을까요?
+    @GetMapping("/category") // TODO : 저게 Path로 들어가는게 맞을까요? - 제가 RequestParam으로 수정했습니다 참고해주세요
     fun getNoticeList(
-        @PathVariable category: NoticeCategory,
+        @RequestParam category: NoticeCategory,
         @RequestParam searchKeyword: String? = null,
         @PageableDefault(page = 0, size = 10, sort = ["createdAt"]) pageable: Pageable, // TODO : 이거 swagger에서 조작 불가
     ): Response<Page<NoticeResponse>> {

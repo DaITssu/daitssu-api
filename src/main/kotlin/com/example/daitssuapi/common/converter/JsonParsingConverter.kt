@@ -7,8 +7,15 @@ import jakarta.persistence.Converter
 @Converter
 class JsonParsingConverter: AttributeConverter<List<String>, String> {
     override fun convertToDatabaseColumn(attribute: List<String>): String =
-        """{"url" : [${attribute.joinToString(", ")}]}"""
+            attribute.let { jacksonObjectMapper().writeValueAsString(mapOf("url" to it)) }
 
-    override fun convertToEntityAttribute(dbData: String): List<String> =
-        jacksonObjectMapper().readTree(dbData).findValuesAsText("url")
+    override fun convertToEntityAttribute(dbData: String): List<String> {
+        val urlNode = jacksonObjectMapper().readTree(dbData).findValues("url").firstOrNull()
+
+        return if (urlNode != null && urlNode.isArray && urlNode.size() > 0) {
+            urlNode.map { it.textValue() }
+        } else {
+            emptyList()
+        }
+    }
 }

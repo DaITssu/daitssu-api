@@ -1,16 +1,12 @@
 package com.example.daitssuapi.domain.course.controller
 
 import com.example.daitssuapi.common.dto.Response
+import com.example.daitssuapi.common.security.component.ArgumentResolver
 import com.example.daitssuapi.domain.course.dto.request.AssignmentRequest
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
 import com.example.daitssuapi.domain.course.dto.request.CourseRequest
 import com.example.daitssuapi.domain.course.dto.request.VideoRequest
-import com.example.daitssuapi.domain.course.dto.response.AssignmentResponse
-import com.example.daitssuapi.domain.course.dto.response.CalendarResponse
-import com.example.daitssuapi.domain.course.dto.response.CourseResponse
-import com.example.daitssuapi.domain.course.dto.response.TodayCalendarResponse
-import com.example.daitssuapi.domain.course.dto.response.UserCourseResponse
-import com.example.daitssuapi.domain.course.dto.response.VideoResponse
+import com.example.daitssuapi.domain.course.dto.response.*
 import com.example.daitssuapi.domain.course.service.CourseService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -22,6 +18,7 @@ import org.springframework.web.bind.annotation.*
 @Tag(name = "Course", description = "강의, 일정 API")
 class CourseController(
     private val courseService: CourseService,
+    private val argumentResolver: ArgumentResolver,
 ) {
     @Operation(
         summary = "강의 리스트형식 출력",
@@ -42,7 +39,7 @@ class CourseController(
             ApiResponse(responseCode = "200", description = "OK")
         ]
     )
-    @GetMapping("{courseId}")
+    @GetMapping("/{courseId}")
     fun getCourse(
         @PathVariable courseId: Long
     ): Response<CourseResponse> =
@@ -108,18 +105,19 @@ class CourseController(
     ): Response<CourseResponse> =
         Response(data = courseService.postCourse(courseRequest = courseRequest))
 
-    //TODO : 유저 토큰 기능 구현 후 토큰에서 userId 가져오도록 변경
     @Operation(
         summary = "유저의 강의 조회",
         responses = [
             ApiResponse(responseCode = "200", description = "OK")
         ]
     )
-    @GetMapping("/user/{userId}")
-    fun getUserCourse(
-        @PathVariable userId: Long
-    ): Response<List<UserCourseResponse>> =
-        Response(data = courseService.getUserCourses(userId = userId))
+    @GetMapping("/user")
+    fun getUserCourse(): Response<List<UserCourseResponse>> {
+        val userId = argumentResolver.resolveUserId()
+
+        return Response(data = courseService.getUserCourses(userId = userId))
+    }
+
 
     @Operation(
         summary = "강의 일정 수정",

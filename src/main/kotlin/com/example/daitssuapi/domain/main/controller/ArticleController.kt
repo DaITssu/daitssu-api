@@ -1,6 +1,7 @@
 package com.example.daitssuapi.domain.main.controller
 
 import com.example.daitssuapi.common.dto.Response
+import com.example.daitssuapi.common.security.component.ArgumentResolver
 import com.example.daitssuapi.domain.main.dto.request.ArticleCreateRequest
 import com.example.daitssuapi.domain.main.dto.request.CommentWriteRequest
 import com.example.daitssuapi.domain.main.dto.response.ArticleResponse
@@ -21,7 +22,8 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/community/article")
 @Tag(name = "article", description = "커뮤니티 게시글 API")
 class ArticleController(
-    private val articleService: ArticleService
+    private val articleService: ArticleService,
+    private val argumentResolver: ArgumentResolver,
 ) {
     @Operation(
         summary = "게시글 단일 조회",
@@ -165,14 +167,35 @@ class ArticleController(
             )
         ]
     )
-    @PostMapping("/{articleId}/user/{userId}/like")
+    @PostMapping("/{articleId}/like")
     fun like(
         @PathVariable
         articleId: Long,
-        @PathVariable
-        userId: Long
     ): Response<Nothing> {
+        val userId = argumentResolver.resolveUserId()
+
         articleService.like(articleId = articleId, userId = userId)
+
+        return Response(code = 0, message = "OK", data = null)
+    }
+
+    @Operation(
+            summary = "게시글 좋아요 취소",
+            responses = [
+                ApiResponse(
+                        responseCode = "200",
+                        description = "OK"
+                )
+            ]
+    )
+    @PostMapping("/{articleId}/dislike")
+    fun dislike(
+            @PathVariable
+            articleId: Long,
+    ): Response<Nothing> {
+        val userId = argumentResolver.resolveUserId()
+
+        articleService.dislike(articleId = articleId, userId = userId)
 
         return Response(code = 0, message = "OK", data = null)
     }
@@ -189,9 +212,10 @@ class ArticleController(
     @PostMapping("/{articleId}/scrap")
     fun scrapArticle(
         @PathVariable articleId: Long,
-        @RequestParam userId: Long,
         @RequestParam isActive: Boolean
     ): Response<Nothing> {
+        val userId = argumentResolver.resolveUserId()
+
         articleService.scrapArticle(articleId = articleId, userId = userId, isActive = isActive)
 
         return Response(code = 0, message = "OK", data = null)

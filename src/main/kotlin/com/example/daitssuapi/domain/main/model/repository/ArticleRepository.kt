@@ -13,7 +13,7 @@ interface ArticleRepository : JpaRepository<Article, Long> {
         pageable: Pageable,
     ): Page<Article>
 
-    fun findAllByCreatedAtIsLessThanEqual(
+    fun findAllByCreatedAtIsGreaterThanEqual(
         createdAt: LocalDateTime
     ): List<Article>
 }

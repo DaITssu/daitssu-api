@@ -2,11 +2,11 @@ package com.example.daitssuapi.domain.notice.controller
 
 import com.example.daitssuapi.common.dto.Response
 import com.example.daitssuapi.common.enums.FunSystemCategory
+import com.example.daitssuapi.domain.main.dto.request.CommentWriteRequest
+import com.example.daitssuapi.domain.main.dto.response.CommentResponse
 import com.example.daitssuapi.domain.notice.dto.FunSystemPageResponse
 import com.example.daitssuapi.domain.notice.dto.FunSystemResponse
 import com.example.daitssuapi.domain.notice.service.FunSystemService
-import com.example.daitssuapi.domain.main.dto.request.CommentWriteRequest
-import com.example.daitssuapi.domain.main.dto.response.CommentResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -56,13 +56,12 @@ class FunSystemController(
             ApiResponse(responseCode = "200", description = "OK")
         ]
     )
-    @GetMapping("/{category}") // TODO : 저게 Path로 들어가는게 맞을까요?
+    @GetMapping("/category") // TODO : 저게 Path로 들어가는게 맞을까요? -> 제가 request param으로 변경했습니다 참고해주세요
     fun getFunSystemListWithCategory(
-        @PathVariable category:FunSystemCategory,
+        @RequestParam category: FunSystemCategory,
         @RequestParam searchKeyword:String? = null,
         @PageableDefault(page = 0, size = 10, sort = ["createdAt"]) pageable: Pageable, // TODO : 이거 swagger에서 조작 불가
     ): Response<Page<FunSystemResponse>>{
-
         return Response(data = funSystemService.getFunSystemList(category, searchKeyword, pageable))
     }
 
