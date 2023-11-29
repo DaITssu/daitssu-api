@@ -47,7 +47,7 @@ class MyPageServiceUnitTest {
             writer = user
         ))
         every { userRepository.findByIdOrNull(user.studentId.toLong()) } returns user
-        every { articleRepository.findAllByWriter(user) } returns articles
+        every { articleRepository.findAllByWriterOrderByCreatedAtDesc(user) } returns articles
         
         val findArticles = mypageService.getMyArticle(userId = user.studentId.toLong())
         
@@ -75,7 +75,7 @@ class MyPageServiceUnitTest {
             refreshToken = ""
         )
         every { userRepository.findByIdOrNull(user.studentId.toLong()) } returns user
-        every { articleRepository.findAllByWriter(user) } returns emptyList()
+        every { articleRepository.findAllByWriterOrderByCreatedAtDesc(user) } returns emptyList()
         
         val findArticles = mypageService.getMyArticle(userId = user.studentId.toLong())
         

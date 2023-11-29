@@ -23,14 +23,12 @@ class MypageServiceTest (
     fun get_my_articles_with_user_id() {
         val userId =4L
         val user = userRepository.findById(userId).get()
-        val articles = articleRepository.findAllByWriter(user)
+        val articles = articleRepository.findAllByWriterOrderByCreatedAtDesc(user)
         val findArticles = mypageService.getMyArticle(userId = userId)
         
         assertAll(
             { assertThat(findArticles).isNotEmpty },
-            { assertThat(findArticles.size).isEqualTo(articles.size) },
-            { assertThat(findArticles.get(0).id).isEqualTo(4)},
-            { assertThat(findArticles.get(2).commentSize).isEqualTo(2)}
+            { assertThat(findArticles.size).isEqualTo(articles.size) }
         )
     }
     

@@ -22,6 +22,7 @@ class MypageControllerTest {
         
         mockMvc.perform(get("$url/$userId/articles"))
             .andExpect(status().isOk)
+            .andExpect(jsonPath("$.data").isNotEmpty)
      
     }
     
