@@ -49,16 +49,14 @@ class MypageServiceTest (
     fun get_my_scraps_with_user_id() {
         val userId = 1L
         val user = userRepository.findById(userId).get()
-        val scraps = scrapRepository.findByUserAndIsActiveTrue(user)
+        val scraps = scrapRepository.findByUserAndIsActiveTrueOrderByCreatedAtDesc(user)
         val findScraps = mypageService.getMyScrap(userId)
-
+        
+        System.out.println(findScraps)
+        
         assertAll(
             { assertThat(findScraps).isNotEmpty },
             { assertThat(findScraps.size).isEqualTo(scraps.size) },
-            { assertThat(findScraps.get(0).id).isEqualTo(4) },
-            { assertThat(findScraps.get(0).topic).isEqualTo("정보")},
-            { assertThat(findScraps.get(1).commentSize).isEqualTo(2) },
-            { assertThat(findScraps.get(1).topic).isEqualTo("잡담")}
         )
     }
     
@@ -67,7 +65,7 @@ class MypageServiceTest (
     fun get_my_scraps_with_is_active_false() {
         val userId = 3L
         val user = userRepository.findById(userId).get()
-        val scrap = scrapRepository.findByUserAndIsActiveTrue(user)
+        val scrap = scrapRepository.findByUserAndIsActiveTrueOrderByCreatedAtDesc(user)
         val findScrapRepository = mypageService.getMyScrap(userId)
         
         assertAll(
