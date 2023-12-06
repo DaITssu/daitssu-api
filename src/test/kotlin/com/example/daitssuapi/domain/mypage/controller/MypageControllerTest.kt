@@ -43,7 +43,6 @@ class MypageControllerTest {
         mockMvc.perform(get("$url/service-notice"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.data").isNotEmpty)
-            .andReturn()
     }
     
 }
