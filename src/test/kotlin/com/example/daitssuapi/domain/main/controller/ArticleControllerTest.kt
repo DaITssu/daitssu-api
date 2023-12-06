@@ -68,20 +68,19 @@ class ArticleControllerTest(
     @Test
     @DisplayName("article get controller with topic and_search_test")
     fun article_get_controller_with_topic_and_search_test() {
-        // given
-        val baseUri = "/community/article/topic/QUESTION?inquery=4"
-        val article = articleRepository.findAll()[3] //내용 4 포함하는 QUESTION 주제 article 나와야함
 
-        // when & then
+        val baseUri = "/community/article/topic?topic=INFORMATION&inquery=3"
+        val article = articleRepository.findAll()[2] //내용 3 포함하는 QUESTION 주제 article 나와야함
+        print("article : $article")
+
         mockMvc.perform(
             get("$baseUri")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer test")
         ).andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.data.title").value(article.title))
-            .andExpect(jsonPath("$.data.content").value(article.content))
-            .andExpect(jsonPath("$.data.writerNickName").value(article.writer.nickname))
-            .andExpect(jsonPath("$.data.topic").value(article.topic.value))
+            .andExpect(jsonPath("$.data.articles[0].title").value(article.title))
+            .andExpect(jsonPath("$.data.articles[0].content").value(article.content))
+            .andExpect(jsonPath("$.data.articles[0].topic").value(article.topic.value))
     }
     @Test
     @DisplayName("성공_올바른 정보를 넘겨줄 때_댓글이 작성된다")

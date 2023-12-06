@@ -75,7 +75,7 @@ class ArticleController(
         )
     }
 
-    @GetMapping("/topic/{topic}")
+    @GetMapping("/topic")
     fun pageArticleListWithTopic(
 
         @PageableDefault(
@@ -84,7 +84,7 @@ class ArticleController(
             sort = ["createdAt"],
         )
         pageable: Pageable,
-        @PathVariable topic: Topic,
+        @RequestParam topic: Topic,
         @RequestParam
         inquiry: String? = null,
     ): Response<PageArticlesResponse> {
