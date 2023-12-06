@@ -4,15 +4,17 @@ import com.example.daitssuapi.common.DEFAULT_ENCODING
 import com.example.daitssuapi.common.enums.ErrorCode
 import com.example.daitssuapi.domain.notice.enums.NoticeCategory
 import com.example.daitssuapi.common.exception.DefaultException
-import com.example.daitssuapi.domain.notice.dto.NoticePageResponse
 import com.example.daitssuapi.domain.main.dto.request.CommentWriteRequest
 import com.example.daitssuapi.domain.main.dto.response.CommentResponse
 import com.example.daitssuapi.domain.main.model.entity.Comment
 import com.example.daitssuapi.domain.main.model.repository.CommentRepository
 import com.example.daitssuapi.domain.main.model.repository.UserRepository
+import com.example.daitssuapi.domain.notice.dto.NoticePageResponse
 import com.example.daitssuapi.domain.notice.dto.NoticeResponse
 import com.example.daitssuapi.domain.notice.model.entity.Notice
 import com.example.daitssuapi.domain.notice.model.repository.NoticeRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -24,26 +26,30 @@ class NoticeService(
     private val noticeRepository: NoticeRepository,
     private val userRepository: UserRepository,
 ){
-    fun getAllNoticeList(searchKeyword:String?):List<NoticeResponse>{
-        val notices: List<Notice>
+    fun getAllNoticeList(
+        searchKeyword:String?,
+        pageable: Pageable,
+    ):Page<NoticeResponse>{
+        val notices: Page<Notice>
         if(searchKeyword==null){
-            notices = noticeRepository.findAll()
+            notices = noticeRepository.findAll(pageable)
         }else{
-            notices= noticeRepository.findByTitleContaining(searchKeyword)
+            notices= noticeRepository.findByTitleContaining(searchKeyword=searchKeyword,pageable = pageable)
         }
         return notices.map { NoticeResponse.fromNotice(it) }
     }
 
-
     fun getNoticeList(
         category: NoticeCategory,
         searchKeyword: String?,
-    ):List<NoticeResponse>{
-        val notices : List<Notice>
+        pageable: Pageable,
+
+    ):Page<NoticeResponse>{
+        val notices : Page<Notice>
         if(searchKeyword==null){
-            notices = noticeRepository.findByCategory(category)
+            notices = noticeRepository.findByCategory(category,pageable)
         }else{
-            notices = noticeRepository.findByCategoryAndTitleContaining(category,searchKeyword)
+            notices = noticeRepository.findByCategoryAndTitleContaining(category,searchKeyword,pageable)
         }
         return notices.map{ NoticeResponse.fromNotice(it)}
     }
@@ -55,13 +61,15 @@ class NoticeService(
             ?: throw DefaultException(errorCode= ErrorCode.NOTICE_NOT_FOUND)
         return NoticePageResponse.fromNotice(notice)
     }
-    @Transactional
+
     fun updateViews( id:Long ) {
-        val notice =noticeRepository.findByIdOrNull(id)
-            ?:throw DefaultException(ErrorCode.NOTICE_NOT_FOUND)
-        notice.views = notice.views +1
-        noticeRepository.save(notice)
+        noticeRepository.findByIdOrNull(id)?.apply {
+            this.views += 1
+        }?.also {
+            noticeRepository.save(it)
+        } ?:throw DefaultException(ErrorCode.NOTICE_NOT_FOUND)
     }
+
 
     @Transactional
     fun writeComment(noticeId: Long, request: CommentWriteRequest): CommentResponse {
@@ -72,12 +80,14 @@ class NoticeService(
 
         validateComment(notice = notice, content = request.content, originalCommentId = request.originalCommentId)
 
-        val comment = commentRepository.save(Comment(
-            writer = user,
-            notice = notice,
-            content = request.content,
-            originalId = request.originalCommentId
-        ))
+        val comment = commentRepository.save(
+            Comment(
+                writer = user,
+                notice = notice,
+                content = request.content,
+                originalId = request.originalCommentId
+            )
+        )
 
         return CommentResponse(
             commentId = comment.id,

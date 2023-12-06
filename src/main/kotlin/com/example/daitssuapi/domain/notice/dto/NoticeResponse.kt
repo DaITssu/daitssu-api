@@ -1,8 +1,10 @@
 package com.example.daitssuapi.domain.notice.dto
 
+
 import com.example.daitssuapi.domain.notice.enums.NoticeCategory
 import com.example.daitssuapi.domain.notice.model.entity.Notice
 import io.swagger.v3.oas.annotations.media.Schema
+
 import java.time.LocalDateTime
 @Schema(description = "공지사항 리스트 아이템 정보")
 data class NoticeResponse(

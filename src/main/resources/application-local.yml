@@ -1,6 +1,10 @@
+app:
+  jwt:
+    secret: ${APP_JWT_SECRET}
+
 spring:
   datasource:
-    driver-class-name: org.postgresql.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${DATASOURCE_URL}
     username: ${DATASOURCE_USERNAME}
     password: ${DATASOURCE_PASSWORD}

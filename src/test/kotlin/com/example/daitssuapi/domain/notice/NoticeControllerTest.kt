@@ -1,7 +1,8 @@
 package com.example.daitssuapi.domain.notice
-import com.example.daitssuapi.domain.notice.model.repository.NoticeRepository
+
 import com.example.daitssuapi.domain.notice.service.NoticeService
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
@@ -12,29 +13,31 @@ import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
-import org.springframework.test.web.servlet.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import org.springframework.web.filter.CharacterEncodingFilter
+
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 class NoticeControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
+
     @Autowired
     private lateinit var noticeService: NoticeService
 
     @Autowired
-    private lateinit var ctx : WebApplicationContext
+    private lateinit var ctx: WebApplicationContext
+
     @BeforeEach
     fun setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
             .addFilters<DefaultMockMvcBuilder>(CharacterEncodingFilter("UTF-8", true))
             .build()
     }
-    @Sql("classpath:schema.sql")
+
     @Test
     @WithMockUser
     @DisplayName("Notice 리스트 컨트롤러 로직 확인")
@@ -46,7 +49,7 @@ class NoticeControllerTest {
             .andReturn()
         println(result.response.contentAsString)
     }
-    @Sql("classpath:schema.sql")
+
     @Sql("classpath:h2-data.sql")
     @Test
     @WithMockUser
@@ -56,17 +59,17 @@ class NoticeControllerTest {
         val result = mockMvc.get("/notice?searchKeyword=4")
             .andExpect {
                 status { isOk() }
-                content{
+                content {
                     jsonPath("$.data[0].id").value(expected.id)
                 }
             }
     }
-    @Sql("classpath:schema.sql")
+
     @Test
     @WithMockUser
     @DisplayName("Notice 리스트 카테고리 검색 확인")
     fun getSomeNoticeList() {
-        mockMvc.get("/notice/SUBSCRIPTION")
+        mockMvc.get("/notice?category=SUBSCRIPTION")
             .andExpect {
                 status { isOk() }
                 content {
@@ -77,25 +80,25 @@ class NoticeControllerTest {
                 }
             }
     }
-    @Sql("classpath:schema.sql")
+
     @Sql("classpath:h2-data.sql")
     @Test
     @WithMockUser
     @DisplayName("Notice 페이징 확인")
     fun getNoticePage() {
-        val test= mockMvc.get("/notice/page/1")
+        val test = mockMvc.get("/notice/1")
             .andExpect {
                 status { isOk() }
 
             }.andReturn()
         println(test)
     }
-    @Sql("classpath:schema.sql")
+
     @Test
     @WithMockUser
     @DisplayName("Notice 리스트 카테고리별 검색 확인") // 같은 카테고리로 4번과 5번이 있는데 둘중 5 하나만 검색해서 나오게 함
     fun getSearchedNoticeList() {
-        mockMvc.get("/notice/INTERNATIONAL_EXCHANGE?searchKeyword=5")
+        mockMvc.get("/notice?category=INTERNATIONAL_EXCHANGE&searchKeyword=5")
             .andExpect {
                 status { isOk() }
                 content {
@@ -111,16 +114,16 @@ class NoticeControllerTest {
                 }
             }
     }
-    @Sql("classpath:schema.sql")
+
     @Sql("classpath:h2-data.sql")
     @Test
     @WithMockUser
     @DisplayName("Notice view 증가 테스팅")
     fun getNoticePageViewsTest() {
-        val result = mockMvc.get("/notice/page/1")
+        val result = mockMvc.get("/notice/1")
             .andExpect {
                 status { isOk() }
-                content{
+                content {
                     jsonPath("$.data[0].views").value(1)
                 }
             }

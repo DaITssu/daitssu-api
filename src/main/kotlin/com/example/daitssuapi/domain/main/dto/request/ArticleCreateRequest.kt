@@ -24,6 +24,4 @@ data class ArticleCreateRequest(
 
     @Schema(description = "게시글 사진 리스트입니다.")
     val images: List<MultipartFile>
-//    val studentId: Int,
-//    val images, // image 데이터
 )

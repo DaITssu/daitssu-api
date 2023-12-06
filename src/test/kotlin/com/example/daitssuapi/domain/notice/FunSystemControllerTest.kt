@@ -1,6 +1,7 @@
 package com.example.daitssuapi.domain.notice
 
 import com.example.daitssuapi.utils.ControllerTest
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -32,12 +33,11 @@ class FunSystemControllerTest {
     }
 
     @Test
-
     @WithMockUser
     @DisplayName("Funsystem 리스트 카테고리 확인")
     fun getSomeFunSystemList() {
 
-        mockMvc.get("/funsystem/SUBSCRIPTION")
+        mockMvc.get("/funsystem?category=SUBSCRIPTION")
             .andExpect {
                 status { isOk() }
                 content {
@@ -48,22 +48,22 @@ class FunSystemControllerTest {
                 }
             }
     }
-    @Sql("classpath:schema.sql")
+
     @Sql("classpath:h2-data.sql")
     @Test
     @WithMockUser
     @DisplayName("FunSystem 리스트 카테고리별 검색 확인") // 같은 카테고리로 4번과 5번이 있는데 둘중 5 하나만 검색해서 나오게 함
     fun getSearchedFunSystemList() {
 
-        val result = mockMvc.get("/funsystem/EXPERIENTIAL_ACTIVITIES?searchKeyword=5")
+        val result = mockMvc.get("/funsystem?category=EXPERIENTIAL_ACTIVITIES&searchKeyword=5")
             .andExpect {
                 status { isOk() }
-                content{
+                content {
                     jsonPath("$.data[0].id").value(5)
                 }
             }
     }
-    @Sql("classpath:schema.sql")
+
     @Sql("classpath:h2-data.sql")
     @Test
     @WithMockUser
@@ -72,7 +72,7 @@ class FunSystemControllerTest {
 
         val result = mockMvc.get("/funsystem/INVALID")
             .andExpect {
-                status{is5xxServerError()}
+                status { is5xxServerError() }
             }.andReturn()
         println(result.response.contentAsString)
     }
@@ -80,7 +80,7 @@ class FunSystemControllerTest {
     @Test
     @DisplayName("Funsystem 페이징 확인")
     fun getFunSystemPage() {
-        mockMvc.get("/funsystem/page/1")
+        mockMvc.get("/funsystem/1")
             .andExpect {
                 status { isOk() }
                 content {
@@ -96,16 +96,15 @@ class FunSystemControllerTest {
             }
     }
 
-    @Sql("classpath:schema.sql")
     @Sql("classpath:h2-data.sql")
     @Test
     @WithMockUser
     @DisplayName("FunSyetem view 증가 테스팅")
     fun getFunSystemPageViewsTest() {
-        val result = mockMvc.get("/funsystem/page/1")
+        val result = mockMvc.get("/funsystem/1")
             .andExpect {
                 status { isOk() }
-                content{
+                content {
                     jsonPath("$.data[0].views").value(1)
                 }
             }

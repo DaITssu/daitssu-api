@@ -4,9 +4,9 @@ import com.example.daitssuapi.common.audit.BaseEntity
 import jakarta.persistence.*
 
 @Entity
-@Table(schema = "main", name = "users")
+@Table(name = "users")
 class User(
-    val studentId: Int,
+    val studentId: String,
 
     val name: String,
 
@@ -16,7 +16,11 @@ class User(
     @JoinColumn(name = "department_id")
     val department: Department,
 
-    val imageUrl: String? = null,
+    var imageUrl: String? = null,
 
-    val term: Int
+    var term: Int,
+    
+    var ssuToken: String?,
+
+    var refreshToken: String,
 ) : BaseEntity()

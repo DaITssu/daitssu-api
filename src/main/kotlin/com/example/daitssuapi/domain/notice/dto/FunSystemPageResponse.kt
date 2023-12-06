@@ -15,8 +15,9 @@ data class FunSystemPageResponse (
     val content: String,
     @Schema(description = "카테고리")
     val category: FunSystemCategory?,
+
     @Schema(description = "이미지 주소")
-    val imageUrl: String?,
+    val imageUrl: List<String>,
     @Schema(description = "링크")
     val url: String?,
 
