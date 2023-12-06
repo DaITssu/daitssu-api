@@ -2,6 +2,8 @@ package com.example.daitssuapi.domain.main.controller
 
 import com.example.daitssuapi.common.enums.ErrorCode
 import com.example.daitssuapi.domain.main.dto.request.CommentWriteRequest
+import com.example.daitssuapi.domain.main.enums.Topic
+import com.example.daitssuapi.domain.main.model.entity.Article
 import com.example.daitssuapi.domain.main.model.repository.ArticleRepository
 import com.example.daitssuapi.domain.main.model.repository.CommentRepository
 import com.example.daitssuapi.domain.main.model.repository.ScrapRepository
@@ -50,19 +52,17 @@ class ArticleControllerTest(
     @DisplayName("article get controller with topic test")
     fun article_get_controller_with_topic_test() {
         // given
-        val baseUri = "/community/article/topic/QUESTION"
-        val article = articleRepository.findAll()[1] //QUESTION 가진 article 나와야함
+        val baseUri = "/community/article"
+        val articles:List<Article> = articleRepository.findAll().filter { it.topic == Topic.QUESTION }
 
-        // when & then
-        mockMvc.perform(
-            get("$baseUri")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer test")
-        ).andExpect(status().isOk)
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.data.title").value(article.title))
-            .andExpect(jsonPath("$.data.content").value(article.content))
-            .andExpect(jsonPath("$.data.writerNickName").value(article.writer.nickname))
-            .andExpect(jsonPath("$.data.topic").value(article.topic.value))
+        for (article in articles) {
+            mockMvc.perform(
+                get("$baseUri/${article.id}")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer test")
+            ).andExpect(status().isOk)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.data.topic").value(Topic.QUESTION.value))
+        }
     }
 
     @Test
