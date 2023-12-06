@@ -4,6 +4,7 @@ import com.example.daitssuapi.common.dto.Response
 import com.example.daitssuapi.common.security.component.ArgumentResolver
 import com.example.daitssuapi.domain.main.dto.request.CommentDeleteRequest
 import com.example.daitssuapi.domain.main.dto.response.CommentResponse
+import com.example.daitssuapi.domain.main.dto.response.ServiceNoticeResponse
 import com.example.daitssuapi.domain.main.service.MyPageService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -46,4 +47,15 @@ class MyPageController(
 
         return Response(data = "Delete Ok")
     }
+    @Operation(
+        summary = "서비스 공지사항 전체 조회",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
+    @GetMapping("/service-notice")
+    fun getServiceNotice(): Response<List<ServiceNoticeResponse>> =
+        Response(data = myPageService.getServiceNotice())
+
+
 }
