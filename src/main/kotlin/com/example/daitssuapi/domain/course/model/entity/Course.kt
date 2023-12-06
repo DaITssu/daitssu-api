@@ -3,14 +3,14 @@ package com.example.daitssuapi.domain.course.model.entity
 import com.example.daitssuapi.common.audit.BaseEntity
 import jakarta.persistence.Entity
 import jakarta.persistence.OneToMany
-import jakarta.persistence.Table
 
 @Entity
-@Table(schema = "course")
 class Course(
     val name: String,
 
     val term: Int,
+
+    val courseCode: String,
 
     @OneToMany(mappedBy = "course")
     val videos: MutableList<Video> = mutableListOf(),

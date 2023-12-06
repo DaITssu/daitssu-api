@@ -47,7 +47,7 @@ dependencies {
     implementation("org.springframework.boot", "spring-boot-starter-web")
     implementation("org.springframework.boot", "spring-boot-configuration-processor")
 
-    implementation("org.postgresql", "postgresql", "42.6.0")
+    implementation("com.mysql", "mysql-connector-j")
 
     implementation("org.springframework.cloud", "spring-cloud-starter-aws", "2.2.6.RELEASE")
     implementation("org.springframework.cloud:spring-cloud-starter-aws-messaging:2.2.1.RELEASE")
@@ -93,7 +93,7 @@ dependencies {
     developmentOnly("org.springframework.boot", "spring-boot-devtools")
     annotationProcessor("org.springframework.boot", "spring-boot-configuration-processor")
 
-    testRuntimeOnly("com.h2database", "h2")
+//    testRuntimeOnly("com.h2database", "h2")
     testRuntimeOnly("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.6.4")
     testRuntimeOnly("org.jetbrains.kotlinx", "kotlinx-coroutines-test", "1.6.4")
     testImplementation("org.springframework.boot", "spring-boot-starter-test")

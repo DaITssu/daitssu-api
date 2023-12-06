@@ -1,11 +1,11 @@
 package com.example.daitssuapi.domain.main.model.entity
 
 import com.example.daitssuapi.common.audit.BaseEntity
+import com.example.daitssuapi.common.converter.JsonParsingConverter
 import com.example.daitssuapi.domain.main.enums.Topic
 import jakarta.persistence.*
 
 @Entity
-@Table(schema = "main")
 class Article(
     @Enumerated(value = EnumType.STRING)
     @Column(length = 16)
@@ -21,6 +21,15 @@ class Article(
     @JoinColumn(name = "user_id")
     var writer: User,
 
+    @Convert(converter = JsonParsingConverter::class)
+    val imageUrl: List<String> = emptyList(),
+
     @OneToMany(mappedBy = "article")
-    var articleImages: MutableSet<ArticleImage> = mutableSetOf()
+    var likes: MutableSet<ArticleLike> = mutableSetOf(),
+
+    @OneToMany(mappedBy = "article")
+    var comments: MutableSet<Comment> = mutableSetOf(),
+
+    @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
+    val scraps: List<Scrap> = emptyList()
 ) : BaseEntity()

@@ -7,5 +7,8 @@ data class CourseRequest(
     val name: String,
 
     @NotNull
-    val term: Int
+    val term: Int,
+
+    @NotNull
+    val courseCode: String
 )

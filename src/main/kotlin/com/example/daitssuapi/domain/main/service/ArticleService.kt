@@ -12,29 +12,31 @@ import com.example.daitssuapi.domain.main.dto.response.CommentResponse
 import com.example.daitssuapi.domain.main.dto.response.PageArticlesResponse
 import com.example.daitssuapi.domain.main.enums.Topic
 import com.example.daitssuapi.domain.main.model.entity.Article
-import com.example.daitssuapi.domain.main.model.entity.ArticleImage
 import com.example.daitssuapi.domain.main.model.entity.Comment
 import com.example.daitssuapi.domain.main.model.entity.User
-import com.example.daitssuapi.domain.main.model.repository.ArticleImageRepository
 import com.example.daitssuapi.domain.main.model.repository.ArticleRepository
 import com.example.daitssuapi.domain.main.model.repository.CommentRepository
 import com.example.daitssuapi.domain.main.model.repository.UserRepository
+import com.example.daitssuapi.domain.main.model.entity.*
+import com.example.daitssuapi.domain.main.model.repository.*
 import jakarta.transaction.Transactional
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.PathVariable
 import java.nio.charset.Charset
+import java.time.LocalDateTime
 
 @Service
 class ArticleService(
-    private val articleImageRepository: ArticleImageRepository,
+    private val articleLikeRepository: ArticleLikeRepository,
     private val articleRepository: ArticleRepository,
     private val commentRepository: CommentRepository,
+    private val scrapRepository: ScrapRepository,
     private val userRepository: UserRepository,
     private val s3Service: S3Service,
 ) {
+    // TODO : 게시글 조회 시, 해당 유저의 스크랩 여부도 노출해야함
     fun getArticle(id: Long): ArticleResponse {
         val article: Article = articleRepository.findByIdOrNull(id)
             ?: throw DefaultException(ErrorCode.ARTICLE_NOT_FOUND)
@@ -46,7 +48,10 @@ class ArticleService(
             content = article.content,
             writerNickName = article.writer.nickname!!,
             updatedAt = article.updatedAt,
-            imageUrls = article.articleImages.map { it.url }
+            imageUrls = article.imageUrl,
+            likes = article.likes.size,
+            comments = article.comments.size,
+            scrapCount = article.scraps.size
         )
     }
 
@@ -72,7 +77,9 @@ class ArticleService(
                 content = it.content,
                 writerNickName = it.writer.nickname!!,
                 updatedAt = it.updatedAt,
-                imageUrls = it.articleImages.map { image -> image.url }
+                imageUrls = it.imageUrl,
+                likes = it.likes.size,
+                comments = it.comments.size
             )
         }
 
@@ -108,7 +115,10 @@ class ArticleService(
                 content = it.content,
                 writerNickName = it.writer.nickname!!,
                 updatedAt = it.updatedAt,
-                imageUrls = it.articleImages.map { image -> image.url }
+                imageUrls = it.imageUrl,
+                comments = it.comments.size,
+                scrapCount = it.scraps.size,
+                likes = it.likes.size
             )
         }
 
@@ -117,6 +127,29 @@ class ArticleService(
             totalPages = articleResponses.totalPages
         )
     }
+
+    fun getPopularArticles(): List<ArticleResponse> {
+        val articles: List<Article> = articleRepository.findAllByCreatedAtIsGreaterThanEqual(
+            createdAt = LocalDateTime.now().minusDays(1)
+        )
+
+        articles.sortedBy { it.likes.size }
+
+        return articles.map {
+            ArticleResponse(
+                id = it.id,
+                topic = it.topic.value,
+                title = it.title,
+                content = it.content,
+                writerNickName = it.writer.nickname!!,
+                updatedAt = it.updatedAt,
+                imageUrls = it.imageUrl,
+                likes = it.likes.size,
+                comments = it.comments.size
+            )
+        }
+    }
+
 
     @Transactional
     fun createArticle(articleCreateRequest: ArticleCreateRequest) {
@@ -136,25 +169,29 @@ class ArticleService(
             topic = articleCreateRequest.topic,
             title = articleCreateRequest.title,
             content = articleCreateRequest.content,
-            writer = user
+            writer = user,
+            imageUrl = imageUrls,
         )
 
-        val articleImages = imageUrls.map {
-            ArticleImage(
-                url = it,
-                article = article
-            )
-        }
-
-        articleRepository.save(article)
-
         runCatching {
-            articleImageRepository.saveAll(articleImages)
+            articleRepository.save(article)
         }.onFailure {
             imageUrls.map { url ->
                 s3Service.deleteFromS3ByUrl(url)
             }
         }.getOrThrow()
+    }
+
+    @Transactional
+    fun deleteArticle(articleId: Long) {
+        val article: Article = articleRepository.findByIdOrNull(articleId)
+            ?: throw DefaultException(ErrorCode.ARTICLE_NOT_FOUND)
+
+        article.imageUrl.map {
+            s3Service.deleteFromS3ByUrl(it)
+        }
+
+        articleRepository.delete(article)
     }
 
     @Transactional
@@ -166,12 +203,14 @@ class ArticleService(
 
         validateComment(article = article, content = request.content, originalCommentId = request.originalCommentId)
 
-        val comment = commentRepository.save(Comment(
-            writer = user,
-            article = article,
-            content = request.content,
-            originalId = request.originalCommentId
-        ))
+        val comment = commentRepository.save(
+            Comment(
+                writer = user,
+                article = article,
+                content = request.content,
+                originalId = request.originalCommentId
+            )
+        )
 
         return CommentResponse(
             commentId = comment.id,
@@ -181,6 +220,47 @@ class ArticleService(
             createdAt = comment.createdAt,
             updatedAt = comment.updatedAt
         )
+    }
+
+    @Transactional
+    fun like(
+        articleId: Long,
+        userId: Long,
+    ) {
+        val article = articleRepository.findByIdOrNull(articleId)
+            ?: throw DefaultException(errorCode = ErrorCode.ARTICLE_NOT_FOUND)
+
+        val user = userRepository.findByIdOrNull(userId)
+            ?: throw DefaultException(errorCode = ErrorCode.USER_NOT_FOUND)
+
+        val articleLike =
+            if (articleLikeRepository.findByUserAndArticle(article = article, user = user) != null) {
+                throw DefaultException(errorCode = ErrorCode.ALREADY_LIKED)
+            } else {
+                ArticleLike(
+                    article = article,
+                    user = user
+                )
+            }
+
+        articleLikeRepository.save(articleLike)
+    }
+
+    @Transactional
+    fun dislike(
+        articleId: Long,
+        userId: Long,
+    ) {
+        val article = articleRepository.findByIdOrNull(articleId)
+            ?: throw DefaultException(errorCode = ErrorCode.ARTICLE_NOT_FOUND)
+
+        val user = userRepository.findByIdOrNull(userId)
+            ?: throw DefaultException(errorCode = ErrorCode.USER_NOT_FOUND)
+
+        val articleLike = articleLikeRepository.findByUserAndArticle(article = article, user = user)
+            ?: throw DefaultException(errorCode = ErrorCode.ALREADY_DISLIKED)
+
+        articleLikeRepository.delete(articleLike)
     }
 
     private fun validateComment(article: Article, content: String, originalCommentId: Long?) {
@@ -212,5 +292,20 @@ class ArticleService(
                 updatedAt = it.updatedAt
             )
         }
+    }
+
+    @Transactional
+    fun scrapArticle(articleId: Long, userId: Long, isActive: Boolean) {
+        val scrap = scrapRepository.findByArticleIdAndUserId(articleId = articleId, userId = userId)
+            ?: Scrap(
+                user = userRepository.findByIdOrNull(id = userId)
+                    ?: throw DefaultException(errorCode = ErrorCode.USER_NOT_FOUND),
+                article = articleRepository.findByIdOrNull(id = articleId)
+                    ?: throw DefaultException(errorCode = ErrorCode.ARTICLE_NOT_FOUND),
+                isActive = if (isActive) true else throw DefaultException(errorCode = ErrorCode.NEW_SCRAP_ISACTIVE_NOT_FALSE)
+            )
+
+        scrap.isActive = isActive
+        scrapRepository.save(scrap)
     }
 }

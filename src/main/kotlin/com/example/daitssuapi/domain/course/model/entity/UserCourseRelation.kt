@@ -6,7 +6,6 @@ import com.example.daitssuapi.domain.main.model.entity.User
 import jakarta.persistence.*
 
 @Entity
-@Table(schema = "course")
 class UserCourseRelation(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
