@@ -114,8 +114,8 @@ class ArticleService(
 
 
     @Transactional
-    fun createArticle(articleCreateRequest: ArticleCreateRequest) {
-        val user: User = userRepository.findByIdOrNull(articleCreateRequest.userId)
+    fun createArticle(articleCreateRequest: ArticleCreateRequest, userId: Long) {
+        val user: User = userRepository.findByIdOrNull(userId)
             ?: throw DefaultException(ErrorCode.USER_NOT_FOUND)
 
         val imageUrls = articleCreateRequest.images.map {
@@ -157,8 +157,8 @@ class ArticleService(
     }
 
     @Transactional
-    fun writeComment(articleId: Long, request: CommentWriteRequest): CommentResponse {
-        val user = userRepository.findByIdOrNull(request.userId)
+    fun writeComment(articleId: Long, request: CommentWriteRequest, userId: Long): CommentResponse {
+        val user = userRepository.findByIdOrNull(userId)
             ?: throw DefaultException(errorCode = ErrorCode.USER_NOT_FOUND)
         val article = articleRepository.findByIdOrNull(articleId)
             ?: throw DefaultException(errorCode = ErrorCode.ARTICLE_NOT_FOUND)

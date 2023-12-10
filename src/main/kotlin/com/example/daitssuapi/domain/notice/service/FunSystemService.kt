@@ -71,8 +71,8 @@ class FunSystemService(
     }
 
     @Transactional
-    fun writeComment(funSystemId: Long, request: CommentWriteRequest): CommentResponse {
-        val user = userRepository.findByIdOrNull(request.userId)
+    fun writeComment(funSystemId: Long, request: CommentWriteRequest, userId: Long): CommentResponse {
+        val user = userRepository.findByIdOrNull(userId)
             ?: throw DefaultException(errorCode = ErrorCode.USER_NOT_FOUND)
         val funSystem = funSystemRepository.findByIdOrNull(funSystemId)
             ?: throw DefaultException(errorCode = ErrorCode.FUNSYSTEM_NOT_FOUND)

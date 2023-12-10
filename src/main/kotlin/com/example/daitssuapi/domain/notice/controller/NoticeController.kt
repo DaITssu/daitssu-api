@@ -2,6 +2,7 @@ package com.example.daitssuapi.domain.notice.controller
 
 import com.example.daitssuapi.common.dto.Response
 import com.example.daitssuapi.common.enums.NoticeCategory
+import com.example.daitssuapi.common.security.component.ArgumentResolver
 import com.example.daitssuapi.domain.article.dto.request.CommentWriteRequest
 import com.example.daitssuapi.domain.article.dto.response.CommentResponse
 import com.example.daitssuapi.domain.notice.dto.NoticePageResponse
@@ -18,7 +19,8 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/notice")
 class NoticeController(
-    private val noticeService: NoticeService,
+    private val argumentResolver: ArgumentResolver,
+    private val noticeService: NoticeService
 ) {
     @Operation(
         summary = "전체 공지 조회",
@@ -99,8 +101,11 @@ class NoticeController(
     fun writeComment(
         @PathVariable noticeId: Long,
         @RequestBody commentWriteRequest: CommentWriteRequest
-    ): Response<CommentResponse> =
-        Response(data = noticeService.writeComment(noticeId = noticeId, request = commentWriteRequest))
+    ): Response<CommentResponse> {
+        val userId = argumentResolver.resolveUserId()
+
+        return Response(data = noticeService.writeComment(noticeId = noticeId, request = commentWriteRequest, userId = userId))
+    }
 
     @Operation(
         summary = "댓글 조회",
@@ -116,5 +121,6 @@ class NoticeController(
         @PathVariable noticeId: Long
     ): Response<List<CommentResponse>> = Response(data = noticeService.getComments(noticeId = noticeId))
 }
+
 
 

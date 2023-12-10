@@ -2,6 +2,7 @@ package com.example.daitssuapi.domain.notice.controller
 
 import com.example.daitssuapi.common.dto.Response
 import com.example.daitssuapi.common.enums.FunSystemCategory
+import com.example.daitssuapi.common.security.component.ArgumentResolver
 import com.example.daitssuapi.domain.article.dto.request.CommentWriteRequest
 import com.example.daitssuapi.domain.article.dto.response.CommentResponse
 import com.example.daitssuapi.domain.notice.dto.FunSystemPageResponse
@@ -18,8 +19,8 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/funsystem")
 class FunSystemController(
-    private val funSystemService: FunSystemService
-
+    private val funSystemService: FunSystemService,
+    private val argumentResolver: ArgumentResolver
 ) {
     @Operation(
         summary = "펀시스템 공지 전체 조회",
@@ -104,7 +105,11 @@ class FunSystemController(
     fun writeComment(
         @PathVariable funSystemId: Long,
         @RequestBody commentWriteRequest: CommentWriteRequest
-    ): Response<CommentResponse> = Response(data = funSystemService.writeComment(funSystemId = funSystemId, request = commentWriteRequest))
+    ): Response<CommentResponse> {
+        val userId = argumentResolver.resolveUserId()
+
+        return Response(data = funSystemService.writeComment(funSystemId = funSystemId, request = commentWriteRequest, userId = userId))
+    }
 
     @Operation(
         summary = "댓글 조회",

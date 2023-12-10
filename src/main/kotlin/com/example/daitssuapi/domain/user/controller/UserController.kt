@@ -49,10 +49,12 @@ class UserController(
     )
     @PatchMapping("/nickname")
     fun updateNickname(
-        @RequestParam userId: Long,
         @RequestParam nickname: String,
-    ): Response<String> =
-        Response(data = userService.updateNickname(userId = userId, nickname = nickname))
+    ): Response<String> {
+        val userId = argumentResolver.resolveUserId()
+
+        return Response(data = userService.updateNickname(userId = userId, nickname = nickname))
+    }
 
     @Operation(
         summary = "유저 프로필 수정",

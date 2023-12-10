@@ -104,8 +104,11 @@ class ArticleController(
     fun writeComment(
         @PathVariable articleId: Long,
         @RequestBody commentWriteRequest: CommentWriteRequest
-    ): Response<CommentResponse> =
-        Response(data = articleService.writeComment(articleId = articleId, request = commentWriteRequest))
+    ): Response<CommentResponse> {
+        val userId = argumentResolver.resolveUserId()
+
+        return Response(data = articleService.writeComment(articleId = articleId, request = commentWriteRequest, userId = userId))
+    }
 
     @Operation(
         summary = "댓글 조회",
@@ -134,7 +137,9 @@ class ArticleController(
     fun createArticle(
         @ModelAttribute articleCreateRequest: ArticleCreateRequest
     ): Response<String> {
-        articleService.createArticle(articleCreateRequest)
+        val userId = argumentResolver.resolveUserId()
+
+        articleService.createArticle(articleCreateRequest = articleCreateRequest, userId = userId)
 
         return Response(code = 0, message = "OK", data = null)
     }
@@ -221,3 +226,4 @@ class ArticleController(
         return Response(code = 0, message = "OK", data = null)
     }
 }
+

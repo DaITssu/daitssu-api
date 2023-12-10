@@ -70,10 +70,9 @@ class NoticeService(
         } ?: throw DefaultException(ErrorCode.NOTICE_NOT_FOUND)
     }
 
-
     @Transactional
-    fun writeComment(noticeId: Long, request: CommentWriteRequest): CommentResponse {
-        val user = userRepository.findByIdOrNull(request.userId)
+    fun writeComment(noticeId: Long, request: CommentWriteRequest, userId: Long): CommentResponse {
+        val user = userRepository.findByIdOrNull(userId)
             ?: throw DefaultException(errorCode = ErrorCode.USER_NOT_FOUND)
         val notice = noticeRepository.findByIdOrNull(noticeId)
             ?: throw DefaultException(errorCode = ErrorCode.NOTICE_NOT_FOUND)
