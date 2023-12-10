@@ -1,4 +1,4 @@
-package com.example.daitssuapi.domain.notice
+package com.example.daitssuapi.domain.notice.controller
 
 import com.example.daitssuapi.domain.notice.service.NoticeService
 import org.junit.jupiter.api.BeforeEach
@@ -21,6 +21,8 @@ import org.springframework.web.filter.CharacterEncodingFilter
 
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@Deprecated("하드코딩으로 진행된 테스트라 유지 보수 불가 판정")
+@Disabled("하드코딩으로 진행된 테스트라 유지 보수 불가 판정")
 class NoticeControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc

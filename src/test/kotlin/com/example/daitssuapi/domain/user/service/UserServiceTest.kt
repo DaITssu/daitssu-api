@@ -1,7 +1,7 @@
-package com.example.daitssuapi.domain.main.service
+package com.example.daitssuapi.domain.user.service
 
 import com.example.daitssuapi.common.exception.DefaultException
-import com.example.daitssuapi.domain.main.model.repository.UserRepository
+import com.example.daitssuapi.domain.user.model.repository.UserRepository
 import com.example.daitssuapi.utils.IntegrationTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.*
@@ -37,15 +37,16 @@ class UserServiceTest(
 
         assertThrows<DefaultException> { userService.getUser(userId = wrongUserId) }
     }
+
     @Test
     @DisplayName("user 닉네임 변환 테스트")
-    fun update_nickname_test(){
+    fun update_nickname_test() {
         val before = userRepository.findAll()[0]
         val beforeNickname = before.nickname
         val nickname = "test"
-        val after = userService.updateNickname(userId = before.id, nickname= nickname)
+        val after = userService.updateNickname(userId = before.id, nickname = nickname)
         assertAll(
-            {assertThat(after).isNotEqualTo(beforeNickname)}
+            { assertThat(after).isNotEqualTo(beforeNickname) }
         )
     }
 }

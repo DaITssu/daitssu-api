@@ -1,15 +1,15 @@
-package com.example.daitssuapi.domain.main.service
+package com.example.daitssuapi.domain.article.service
 
 import com.example.daitssuapi.common.exception.DefaultException
-import com.example.daitssuapi.domain.main.dto.request.ArticleCreateRequest
-import com.example.daitssuapi.domain.main.dto.request.CommentWriteRequest
-import com.example.daitssuapi.domain.main.dto.response.ArticleResponse
-import com.example.daitssuapi.domain.main.enums.Topic
-import com.example.daitssuapi.domain.main.model.entity.Article
-import com.example.daitssuapi.domain.main.model.repository.ArticleRepository
-import com.example.daitssuapi.domain.main.model.repository.CommentRepository
-import com.example.daitssuapi.domain.main.model.repository.ScrapRepository
-import com.example.daitssuapi.domain.main.model.repository.UserRepository
+import com.example.daitssuapi.domain.article.dto.request.ArticleCreateRequest
+import com.example.daitssuapi.domain.article.dto.request.CommentWriteRequest
+import com.example.daitssuapi.domain.article.dto.response.ArticleResponse
+import com.example.daitssuapi.domain.article.enums.Topic
+import com.example.daitssuapi.domain.article.model.entity.Article
+import com.example.daitssuapi.domain.article.model.repository.ArticleRepository
+import com.example.daitssuapi.domain.article.model.repository.CommentRepository
+import com.example.daitssuapi.domain.article.model.repository.ScrapRepository
+import com.example.daitssuapi.domain.user.model.repository.UserRepository
 import com.example.daitssuapi.utils.IntegrationTest
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -34,14 +34,13 @@ class ArticleServiceTest(
 
         // when
         val articleCreateRequest = ArticleCreateRequest(
-            userId = user.id,
             topic = Topic.CHAT,
             title = "테스트 제목",
             content = "테스트 내용",
             images = emptyList()
         )
 
-        articleService.createArticle(articleCreateRequest)
+        articleService.createArticle(articleCreateRequest = articleCreateRequest, userId = user.id)
     }
 
     @Test
@@ -75,11 +74,10 @@ class ArticleServiceTest(
         val user = userRepository.findAll()[0]
         val request = CommentWriteRequest(
             content = "댓글 추가",
-            userId = user.id,
             originalCommentId = null
         )
 
-        val response = articleService.writeComment(articleId = article.id, request = request)
+        val response = articleService.writeComment(articleId = article.id, request = request, userId = user.id)
 
         assertAll(
             { assertThat(response.userId).isEqualTo(user.id) },
@@ -94,11 +92,10 @@ class ArticleServiceTest(
         val user = userRepository.findAll()[0]
         val request = CommentWriteRequest(
             content = "댓글 추가",
-            userId = user.id,
             originalCommentId = null
         )
 
-        assertThrows<DefaultException> { articleService.writeComment(articleId = 0, request = request) }
+        assertThrows<DefaultException> { articleService.writeComment(articleId = 0, request = request, userId = user.id) }
     }
 
     @Test
@@ -107,11 +104,10 @@ class ArticleServiceTest(
         val article = articleRepository.findAll()[0]
         val request = CommentWriteRequest(
             content = "댓글 추가",
-            userId = 0,
             originalCommentId = null
         )
 
-        assertThrows<DefaultException> { articleService.writeComment(articleId = article.id, request = request) }
+        assertThrows<DefaultException> { articleService.writeComment(articleId = article.id, request = request, userId = 0L) }
     }
 
     @Test
@@ -128,11 +124,10 @@ class ArticleServiceTest(
                 512Byte 넘기기 위해 대충 반복512Byte 넘기기 위해 대충 반복512Byte 넘기기 위해 대충 반복
                 512Byte 넘기기 위해 대충 반복512Byte 넘기기 위해 대충 반복512Byte 넘기기 위해 대충 반복
             """.trimIndent(),
-            userId = user.id,
             originalCommentId = null
         )
 
-        assertThrows<DefaultException> { articleService.writeComment(articleId = article.id, request = request) }
+        assertThrows<DefaultException> { articleService.writeComment(articleId = article.id, request = request, userId = user.id) }
     }
 
     @Test
@@ -142,11 +137,10 @@ class ArticleServiceTest(
         val user = userRepository.findAll()[0]
         val request = CommentWriteRequest(
             content = "대충 댓글 내용",
-            userId = user.id,
             originalCommentId = 0
         )
 
-        assertThrows<DefaultException> { articleService.writeComment(articleId = article.id, request = request) }
+        assertThrows<DefaultException> { articleService.writeComment(articleId = article.id, request = request, userId = user.id) }
     }
 
     @Test
@@ -159,11 +153,10 @@ class ArticleServiceTest(
         val user = userRepository.findAll()[0]
         val request = CommentWriteRequest(
             content = "대충 댓글 내용",
-            userId = user.id,
             originalCommentId = originalComment.id
         )
 
-        assertThrows<DefaultException> { articleService.writeComment(articleId = article.id, request = request) }
+        assertThrows<DefaultException> { articleService.writeComment(articleId = article.id, request = request, userId = user.id) }
     }
 
     @Test

@@ -1,11 +1,12 @@
-package com.example.daitssuapi.domain.main.controller
+package com.example.daitssuapi.domain.article.controller
 
 import com.example.daitssuapi.common.enums.ErrorCode
-import com.example.daitssuapi.domain.main.dto.request.CommentWriteRequest
-import com.example.daitssuapi.domain.main.model.repository.ArticleRepository
-import com.example.daitssuapi.domain.main.model.repository.CommentRepository
-import com.example.daitssuapi.domain.main.model.repository.ScrapRepository
-import com.example.daitssuapi.domain.main.model.repository.UserRepository
+import com.example.daitssuapi.common.security.component.TokenProvider
+import com.example.daitssuapi.domain.article.dto.request.CommentWriteRequest
+import com.example.daitssuapi.domain.article.model.repository.ArticleRepository
+import com.example.daitssuapi.domain.article.model.repository.CommentRepository
+import com.example.daitssuapi.domain.article.model.repository.ScrapRepository
+import com.example.daitssuapi.domain.user.model.repository.UserRepository
 import com.example.daitssuapi.utils.ControllerTest
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.junit.jupiter.api.DisplayName
@@ -23,7 +24,8 @@ class ArticleControllerTest(
     private val articleRepository: ArticleRepository,
     private val commentRepository: CommentRepository,
     private val scrapRepository: ScrapRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val tokenProvider: TokenProvider
 ) {
     @Autowired
     private lateinit var mockMvc: MockMvc
@@ -55,15 +57,15 @@ class ArticleControllerTest(
         val url = "/community/article/${article.id}/comments"
         val articleWriteRequest = CommentWriteRequest(
             content = "댓글 추가",
-            userId = user.id,
             originalCommentId = null
         )
         val request = jacksonObjectMapper().writeValueAsString(articleWriteRequest)
+        val accessToken = tokenProvider.createAccessToken(id = user.id).token
 
         mockMvc.perform(
-            post(url)
-                .content(request)
+            post(url).content(request)
                 .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
         ).andExpect(status().isOk)
     }
 
@@ -74,15 +76,15 @@ class ArticleControllerTest(
         val url = "/community/article/0/comments"
         val articleWriteRequest = CommentWriteRequest(
             content = "댓글 추가",
-            userId = user.id,
             originalCommentId = null
         )
         val request = jacksonObjectMapper().writeValueAsString(articleWriteRequest)
+        val accessToken = tokenProvider.createAccessToken(id = user.id).token
 
-        mockMvc.perform(
-            post(url)
-                .content(request)
-                .contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post(url)
+            .content(request)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
         ).andExpect(status().isBadRequest)
             .andExpect(jsonPath("$.code").value(ErrorCode.ARTICLE_NOT_FOUND.code))
     }
@@ -94,15 +96,15 @@ class ArticleControllerTest(
         val url = "/community/article/${article.id}/comments"
         val articleWriteRequest = CommentWriteRequest(
             content = "댓글 추가",
-            userId = 0,
             originalCommentId = null
         )
         val request = jacksonObjectMapper().writeValueAsString(articleWriteRequest)
+        val accessToken = tokenProvider.createAccessToken(id = 0).token
 
         mockMvc.perform(
-            post(url)
-                .content(request)
+            post(url).content(request)
                 .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
         ).andExpect(status().isBadRequest)
             .andExpect(jsonPath("$.code").value(ErrorCode.USER_NOT_FOUND.code))
     }
@@ -122,15 +124,15 @@ class ArticleControllerTest(
                 512Byte 넘기기 위해 대충 반복512Byte 넘기기 위해 대충 반복512Byte 넘기기 위해 대충 반복
                 512Byte 넘기기 위해 대충 반복512Byte 넘기기 위해 대충 반복512Byte 넘기기 위해 대충 반복
             """.trimIndent(),
-            userId = user.id,
             originalCommentId = null
         )
         val request = jacksonObjectMapper().writeValueAsString(articleWriteRequest)
+        val accessToken = tokenProvider.createAccessToken(id = user.id).token
 
-        mockMvc.perform(
-            post(url)
-                .content(request)
-                .contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post(url)
+            .content(request)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
         ).andExpect(status().isBadRequest)
             .andExpect(jsonPath("$.code").value(ErrorCode.COMMENT_TOO_LONG.code))
     }
@@ -143,15 +145,15 @@ class ArticleControllerTest(
         val url = "/community/article/${article.id}/comments"
         val articleWriteRequest = CommentWriteRequest(
             content = "대충 댓글 내용",
-            userId = user.id,
             originalCommentId = 0
         )
         val request = jacksonObjectMapper().writeValueAsString(articleWriteRequest)
+        val accessToken = tokenProvider.createAccessToken(id = user.id).token
 
-        mockMvc.perform(
-            post(url)
-                .content(request)
-                .contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post(url)
+            .content(request)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
         ).andExpect(status().isBadRequest)
             .andExpect(jsonPath("$.code").value(ErrorCode.COMMENT_NOT_FOUND.code))
     }
@@ -167,15 +169,15 @@ class ArticleControllerTest(
         val url = "/community/article/${article.id}/comments"
         val articleWriteRequest = CommentWriteRequest(
             content = "대충 댓글 내용",
-            userId = user.id,
             originalCommentId = originalComment.id
         )
         val request = jacksonObjectMapper().writeValueAsString(articleWriteRequest)
+        val accessToken = tokenProvider.createAccessToken(id = user.id).token
 
-        mockMvc.perform(
-            post(url)
-                .content(request)
-                .contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post(url)
+            .content(request)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
         ).andExpect(status().isBadRequest)
             .andExpect(jsonPath("$.code").value(ErrorCode.DIFFERENT_ARTICLE.code))
     }
@@ -186,8 +188,9 @@ class ArticleControllerTest(
         val articleId = commentRepository.findAll().filter { null != it.article }[0].article!!.id
         val url = "/community/article/${articleId}/comments"
 
-        mockMvc.perform(get(url))
-            .andExpect(status().isOk)
+        mockMvc.perform(get(url)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer test")
+        ).andExpect(status().isOk)
     }
 
     @Test
@@ -195,8 +198,9 @@ class ArticleControllerTest(
     fun getCommentFailNoArticle() {
         val url = "/community/article/0/comments"
 
-        mockMvc.perform(get(url))
-            .andExpect(status().isBadRequest)
+        mockMvc.perform(get(url)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer test")
+        ).andExpect(status().isBadRequest)
             .andExpect(jsonPath("$.code").value(ErrorCode.ARTICLE_NOT_FOUND.code))
     }
 
@@ -206,10 +210,12 @@ class ArticleControllerTest(
         val userId = userRepository.findAll().sortedByDescending { it.id }[0].id
         val articleId = commentRepository.findAll().filter { null != it.article }[0].id
         val url = "/community/article/${articleId}/scrap"
+        val accessToken = tokenProvider.createAccessToken(id = userId).token
 
         mockMvc.perform(post(url)
             .param("userId", userId.toString())
             .param("isActive", true.toString())
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
         ).andExpect(status().isOk)
     }
 
@@ -219,23 +225,27 @@ class ArticleControllerTest(
         val userId = userRepository.findAll().sortedByDescending { it.id }[0].id
         val articleId = commentRepository.findAll().filter { null != it.article }[0].id
         val url = "/community/article/${articleId}/scrap"
+        val accessToken = tokenProvider.createAccessToken(id = userId).token
 
         mockMvc.perform(post(url)
             .param("userId", userId.toString())
             .param("isActive", false.toString())
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
         ).andExpect(status().isBadRequest)
     }
 
     @Test
     @DisplayName("실패_신규 스크랩에서 유저를 못 찾으면_스크랩에 실패한다")
     fun newScrapFailNoUser() {
-        val userId = 0
+        val userId = 0L
         val articleId = commentRepository.findAll().filter { null != it.article }[0].id
         val url = "/community/article/${articleId}/scrap"
+        val accessToken = tokenProvider.createAccessToken(id = userId).token
 
         mockMvc.perform(post(url)
             .param("userId", userId.toString())
             .param("isActive", false.toString())
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
         ).andExpect(status().isBadRequest)
     }
 
@@ -245,10 +255,12 @@ class ArticleControllerTest(
         val userId = userRepository.findAll()[0].id
         val articleId = 0
         val url = "/community/article/${articleId}/scrap"
+        val accessToken = tokenProvider.createAccessToken(id = userId).token
 
         mockMvc.perform(post(url)
             .param("userId", userId.toString())
             .param("isActive", false.toString())
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
         ).andExpect(status().isBadRequest)
     }
 
@@ -257,10 +269,11 @@ class ArticleControllerTest(
     fun editScrapSuccess() {
         val scrap = scrapRepository.findAll()[0]
         val url = "/community/article/${scrap.article.id}/scrap"
+        val accessToken = tokenProvider.createAccessToken(id = scrap.user.id).token
 
         mockMvc.perform(post(url)
-            .param("userId", scrap.user.id.toString())
             .param("isActive", (!scrap.isActive).toString())
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
         ).andExpect(status().isOk)
     }
 }

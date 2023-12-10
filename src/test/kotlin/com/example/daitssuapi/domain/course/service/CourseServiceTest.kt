@@ -6,7 +6,7 @@ import com.example.daitssuapi.common.exception.DefaultException
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
 import com.example.daitssuapi.domain.course.model.repository.CourseRepository
 import com.example.daitssuapi.domain.course.model.repository.UserCourseRelationRepository
-import com.example.daitssuapi.domain.main.model.repository.UserRepository
+import com.example.daitssuapi.domain.user.model.repository.UserRepository
 import com.example.daitssuapi.utils.IntegrationTest
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Assertions.*
