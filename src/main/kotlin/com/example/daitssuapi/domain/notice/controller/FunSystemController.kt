@@ -2,8 +2,8 @@ package com.example.daitssuapi.domain.notice.controller
 
 import com.example.daitssuapi.common.dto.Response
 import com.example.daitssuapi.common.enums.FunSystemCategory
-import com.example.daitssuapi.domain.main.dto.request.CommentWriteRequest
-import com.example.daitssuapi.domain.main.dto.response.CommentResponse
+import com.example.daitssuapi.domain.article.dto.request.CommentWriteRequest
+import com.example.daitssuapi.domain.article.dto.response.CommentResponse
 import com.example.daitssuapi.domain.notice.dto.FunSystemPageResponse
 import com.example.daitssuapi.domain.notice.dto.FunSystemResponse
 import com.example.daitssuapi.domain.notice.service.FunSystemService
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*
 class FunSystemController(
     private val funSystemService: FunSystemService
 
-){
+) {
     @Operation(
         summary = "펀시스템 공지 전체 조회",
         responses = [
@@ -45,9 +45,9 @@ class FunSystemController(
             sort = ["createdAt"],
         )
         pageable: Pageable,
-        @RequestParam searchKeyword:String? = null
-    ):Response<Page<FunSystemResponse>>{
-        return Response(data = funSystemService.getAllFunSystemList(searchKeyword,pageable))
+        @RequestParam searchKeyword: String? = null
+    ): Response<Page<FunSystemResponse>> {
+        return Response(data = funSystemService.getAllFunSystemList(searchKeyword, pageable))
     }
 
     @Operation(
@@ -59,9 +59,9 @@ class FunSystemController(
     @GetMapping("/category") // TODO : 저게 Path로 들어가는게 맞을까요? -> 제가 request param으로 변경했습니다 참고해주세요
     fun getFunSystemListWithCategory(
         @RequestParam category: FunSystemCategory,
-        @RequestParam searchKeyword:String? = null,
+        @RequestParam searchKeyword: String? = null,
         @PageableDefault(page = 0, size = 10, sort = ["createdAt"]) pageable: Pageable, // TODO : 이거 swagger에서 조작 불가
-    ): Response<Page<FunSystemResponse>>{
+    ): Response<Page<FunSystemResponse>> {
         return Response(data = funSystemService.getFunSystemList(category, searchKeyword, pageable))
     }
 
@@ -73,10 +73,11 @@ class FunSystemController(
     )
     @GetMapping("/page/{id}") // TODO : 페이지 기준이 없는데 이게 무슨 의미가 있나 싶습니다.
     fun getFunSystemPage(
-        @PathVariable id : Long,
-    ):Response<FunSystemPageResponse>{
+        @PathVariable id: Long,
+    ): Response<FunSystemPageResponse> {
         return Response(data = funSystemService.getFunSystemPage(id))
     }
+
     @Operation(
         summary = "N페이지의 펀시스템 조회수 업데이트",
         responses = [
@@ -85,10 +86,11 @@ class FunSystemController(
     )
     @PatchMapping("/page/{id}")
     fun updateFunSystemView(
-        @PathVariable id : Long,
-    ){
+        @PathVariable id: Long,
+    ) {
         funSystemService.updateViews(id)
     }
+
     @Operation(
         summary = "댓글 작성",
         responses = [

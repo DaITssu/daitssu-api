@@ -7,9 +7,9 @@ import com.example.daitssuapi.domain.auth.client.SmartCampusCrawlerClient
 import com.example.daitssuapi.domain.auth.client.request.CrawlBaseInformationRequest
 import com.example.daitssuapi.domain.auth.client.request.SmartCampusSignInRequest
 import com.example.daitssuapi.domain.auth.controller.response.AuthResponse
-import com.example.daitssuapi.domain.main.model.entity.User
-import com.example.daitssuapi.domain.main.model.repository.DepartmentRepository
-import com.example.daitssuapi.domain.main.model.repository.UserRepository
+import com.example.daitssuapi.domain.user.model.entity.User
+import com.example.daitssuapi.domain.user.model.repository.DepartmentRepository
+import com.example.daitssuapi.domain.user.model.repository.UserRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -17,10 +17,10 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class AuthService(
-        private val smartCampusCrawlerClient: SmartCampusCrawlerClient,
-        private val tokenProvider: TokenProvider,
-        private val userRepository: UserRepository,
-        private val departmentRepository: DepartmentRepository,
+    private val smartCampusCrawlerClient: SmartCampusCrawlerClient,
+    private val tokenProvider: TokenProvider,
+    private val userRepository: UserRepository,
+    private val departmentRepository: DepartmentRepository,
 ) {
     @Transactional
     fun signIn(
@@ -128,7 +128,7 @@ class AuthService(
             else
                 smartCampusCrawlerClient.crawlBaseInformation(
                     crawlBaseInformationRequest = CrawlBaseInformationRequest(user.ssuToken!!)
-               )
+                )
         } catch (e: Exception) {
             throw DefaultException(ErrorCode.TOKEN_EXPIRED, HttpStatus.BAD_REQUEST)
         }

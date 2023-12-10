@@ -2,8 +2,8 @@ package com.example.daitssuapi.domain.notice.controller
 
 import com.example.daitssuapi.common.dto.Response
 import com.example.daitssuapi.common.enums.NoticeCategory
-import com.example.daitssuapi.domain.main.dto.request.CommentWriteRequest
-import com.example.daitssuapi.domain.main.dto.response.CommentResponse
+import com.example.daitssuapi.domain.article.dto.request.CommentWriteRequest
+import com.example.daitssuapi.domain.article.dto.response.CommentResponse
 import com.example.daitssuapi.domain.notice.dto.NoticePageResponse
 import com.example.daitssuapi.domain.notice.dto.NoticeResponse
 import com.example.daitssuapi.domain.notice.service.NoticeService

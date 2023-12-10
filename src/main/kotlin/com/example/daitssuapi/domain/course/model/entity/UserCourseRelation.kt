@@ -2,7 +2,7 @@ package com.example.daitssuapi.domain.course.model.entity
 
 import com.example.daitssuapi.common.audit.BaseEntity
 import com.example.daitssuapi.common.enums.RegisterStatus
-import com.example.daitssuapi.domain.main.model.entity.User
+import com.example.daitssuapi.domain.user.model.entity.User
 import jakarta.persistence.*
 
 @Entity
