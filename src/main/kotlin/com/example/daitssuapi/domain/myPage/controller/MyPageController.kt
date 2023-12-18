@@ -5,6 +5,7 @@ import com.example.daitssuapi.common.security.component.ArgumentResolver
 import com.example.daitssuapi.domain.article.dto.response.CommentResponse
 import com.example.daitssuapi.domain.myPage.dto.request.CommentDeleteRequest
 import com.example.daitssuapi.domain.myPage.dto.response.MyArticleResponse
+import com.example.daitssuapi.domain.myPage.dto.response.MyScrapResponse
 import com.example.daitssuapi.domain.myPage.service.MyPageService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -56,5 +57,18 @@ class MyPageController(
         val userId = argumentResolver.resolveUserId()
 
         return Response(data = myPageService.getMyArticle(userId = userId))
+    }
+    
+    @Operation(
+        summary = "내가 스크랩한 글 조회",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
+    @GetMapping("/scraps")
+    fun getMyScraps() : Response<List<MyScrapResponse>> {
+        val userId = argumentResolver.resolveUserId()
+        
+        return Response(data = myPageService.getMyScrap(userId = userId))
     }
 }
