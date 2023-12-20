@@ -8,15 +8,21 @@ import java.time.LocalDateTime
 
 @Repository
 interface CalendarRepository : JpaRepository<Calendar, Long> {
-    fun findByDueAtBetween(startDateTime: LocalDateTime, endDateTime: LocalDateTime): List<Calendar>
+    fun findByUserIdAndDueAtBetween(
+        userId:Long,
+        startDateTime: LocalDateTime,
+        endDateTime: LocalDateTime
+    ): List<Calendar>
     
-    fun findDistinctTop2ByTypeAndDueAtBetweenOrderByDueAtAsc(
+    fun findDistinctTop2ByUserIdAndTypeAndDueAtBetweenOrderByDueAtAsc(
+        userId: Long,
         type: CalendarType,
         startDateTime: LocalDateTime,
         endDateTime: LocalDateTime,
     ) : List<Calendar>
     
-    fun findByTypeAndCourseAndDueAtBetween(
+    fun findByUserIdAndTypeAndCourseAndDueAtBetween(
+        userId: Long,
         type: CalendarType,
         course: String,
         startDateTime: LocalDateTime,
