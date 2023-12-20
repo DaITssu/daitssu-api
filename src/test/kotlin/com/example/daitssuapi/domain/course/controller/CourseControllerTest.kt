@@ -94,12 +94,13 @@ class CourseControllerTest(
     }
 
     @Test
-    @DisplayName("올바른 date로 캘린더 조회시_캘린더에 대한 정보가 조회된다")
+    @DisplayName("올바른 date와 userId로 캘린더 조회시_캘린더에 대한 정보가 조회된다")
     fun get_calendar_with_date() {
         val date = "2023-07"
+        val accessToken = tokenProvider.createAccessToken(id = 1L).token
 
-        val response = mockMvc.perform(get("$baseUrl/calendar/$date")
-            .header(HttpHeaders.AUTHORIZATION, "Bearer test")
+        val response = mockMvc.perform(get("$baseUrl/calendar?date=$date")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
         ).andExpect(status().isOk)
             .andReturn().response
 
@@ -111,7 +112,7 @@ class CourseControllerTest(
     fun get_calendar_with_wrong_date() {
         val wrongDate = "2023-07-31"
 
-        val response = mockMvc.perform(get("$baseUrl/calendar/$wrongDate")
+        val response = mockMvc.perform(get("$baseUrl/calendar?date=$wrongDate")
             .header(HttpHeaders.AUTHORIZATION, "Bearer test")
         ).andExpect(status().isBadRequest)
             .andReturn().response
@@ -240,8 +241,10 @@ class CourseControllerTest(
     @Test
     @DisplayName("오늘 마감하는 과제, 강의 요청시_캘린더가 출력된다")
     fun get_today_calendar() {
-        val response = mockMvc.perform(get("$baseUrl/calendar/today")
-            .header(HttpHeaders.AUTHORIZATION, "Bearer test")
+        val accessToken = tokenProvider.createAccessToken(1L).token
+        
+        val response = mockMvc.perform(get("$baseUrl/calendar:today")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
         ).andExpect(status().isOk)
             .andReturn().response
 
