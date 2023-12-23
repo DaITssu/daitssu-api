@@ -16,11 +16,11 @@ INSERT INTO department(id, name) VALUES
     (2, 'media'),
     (3, 'electronic');
 
-INSERT INTO users(id, student_id, name, nickname, department_id, term) VALUES
-    (1, 1001, 'Alpha', null, 1, 1),
-    (2, 2002, 'Bravo', 'B', 2, 2),
-    (3, 3003, 'Charlie', null, 2, 2),
-    (4, 4004, 'Delta', 'D', 3, 3);
+INSERT INTO users(id, student_id, name, nickname, department_id, term, is_deleted) VALUES
+    (1, 1001, 'Alpha', null, 1, 1, false),
+    (2, 2002, 'Bravo', 'B', 2, 2, false),
+    (3, 3003, 'Charlie', null, 2, 2, false),
+    (4, 4004, 'Delta', 'D', 3, 3, false);
 
 INSERT INTO article(id, topic, title, content, user_id, image_url, created_at, updated_at) VALUES
     (1, 'CHAT', '대충 제목1', '대충 내용1', 2, '{"url": []}', '2023-09-16 10:00:00.000', '2023-09-16 10:00:00.000'),

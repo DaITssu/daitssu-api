@@ -49,4 +49,24 @@ class UserServiceTest(
             { assertThat(after).isNotEqualTo(beforeNickname) }
         )
     }
+    
+    @Test
+    @DisplayName("user 삭제 테스트")
+    fun delete_user_with_user_id() {
+        val user = userRepository.findAll()[0]
+        
+        userService.deleteUser(userId = user.id)
+        
+        assertThat(user.isDeleted).isTrue()
+    }
+    
+    @Test
+    @DisplayName("없는 user 삭제시 에러가 발생한다")
+    fun delete_user_with_wrong_user_id() {
+        val userId = 999L
+        
+        assertThrows<DefaultException> {
+            userService.deleteUser(userId)
+        }
+    }
 }
