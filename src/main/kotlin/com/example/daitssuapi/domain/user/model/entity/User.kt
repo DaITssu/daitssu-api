@@ -27,4 +27,6 @@ class User(
     var ssuToken: String?,
 
     var refreshToken: String,
+    
+    var isDeleted: Boolean = false
 ) : BaseEntity()
