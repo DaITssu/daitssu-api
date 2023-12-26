@@ -3,6 +3,7 @@ package com.example.daitssuapi.domain.myPage.service
 import com.example.daitssuapi.common.exception.DefaultException
 import com.example.daitssuapi.domain.article.model.repository.ArticleRepository
 import com.example.daitssuapi.domain.article.model.repository.CommentRepository
+import com.example.daitssuapi.domain.article.model.repository.ScrapRepository
 import com.example.daitssuapi.domain.myPage.dto.request.CommentDeleteRequest
 import com.example.daitssuapi.domain.user.model.repository.UserRepository
 import com.example.daitssuapi.utils.IntegrationTest
@@ -17,7 +18,8 @@ class MyPageServiceTest(
     private val articleRepository: ArticleRepository,
     private val commentRepository: CommentRepository,
     private val userRepository: UserRepository,
-    private val myPageService: MyPageService
+    private val myPageService: MyPageService,
+    private val scrapRepository: ScrapRepository,
 ) {
     @Test
     @DisplayName("성공_자신의 userId를 넘겨줄 때_자신의 댓글이 조회된다")
@@ -88,4 +90,43 @@ class MyPageServiceTest(
             myPageService.getMyArticle(userId = wrongUserId)
         }
     }
+    
+    @Test
+    @DisplayName("올바른 userId를 받으면 스크랩한 게시글이 조회된다")
+    fun get_my_scraps_with_user_id() {
+        val userId = 1L
+        val user = userRepository.findById(userId).get()
+        val scraps = scrapRepository.findByUserAndIsActiveTrueOrderByCreatedAtDesc(user)
+        val findArticles = myPageService.getMyScrap(userId = userId)
+        
+        assertAll(
+            { assertThat(findArticles).isNotEmpty },
+            { assertThat(findArticles.size).isEqualTo(scraps.size) }
+        )
+    }
+    
+    @Test
+    @DisplayName("스크랩이 false이면 스크랩한 게시글이 조회가 안된다")
+    fun get_my_scraps_with_is_active_false() {
+        val userId = 3L
+        val user = userRepository.findById(userId).get()
+        val scrap = scrapRepository.findByUserAndIsActiveTrueOrderByCreatedAtDesc(user)
+        val findScrapRepository = myPageService.getMyScrap(userId)
+        
+        assertAll(
+            { assertThat(scrap).isEmpty()},
+            { assertThat(findScrapRepository).isEmpty()}
+        )
+    }
+    
+    @Test
+    @DisplayName("없는 userId를 받으면 USER_NOT_FOUND 에러가 발생한다")
+    fun get_my_scraps_with_wrong_user_id() {
+        val wrongUserId = 999L
+        
+        assertThrows<DefaultException> {
+            myPageService.getMyScrap(userId = wrongUserId)
+        }
+    }
+    
 }

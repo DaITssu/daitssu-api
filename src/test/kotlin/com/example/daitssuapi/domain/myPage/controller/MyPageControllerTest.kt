@@ -104,10 +104,31 @@ class MyPageControllerTest(
     fun get_my_articles_with_wrong_user_id() {
         val accessToken = tokenProvider.createAccessToken(id = 1L).token
 
-        mockMvc.perform(get("$baseUrl/articles")
+        mockMvc.perform(get("$baseUrl/artices")
             .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
         ).andExpect(status().isOk)
             .andExpect(jsonPath("$.data").isEmpty)
     }
-
+    
+    @Test
+    @DisplayName("스크랩한 userId를 이용하여 게시글 조회시 _ 1개 이상의 게시글이 조회된다")
+    fun get_my_scraps_with_user_id() {
+        val accessToken = tokenProvider.createAccessToken(id = 1L).token
+        
+        mockMvc.perform(get("$baseUrl/scraps")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
+        ).andExpect(status().isOk)
+            .andExpect(jsonPath("$.data").isNotEmpty)
+    }
+    
+    @Test
+    @DisplayName("스크랩하지 않은 userId를 이용하여 게시글 조회시 _ 빈 리스트가 출력된다")
+    fun get_my_scraps_with_wrong_user_id() {
+        val accessToken = tokenProvider.createAccessToken(id = 3L).token
+        
+        mockMvc.perform(get("$baseUrl/scraps")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
+        ).andExpect(status().isOk)
+            .andExpect(jsonPath("$.data").isEmpty)
+    }
 }
