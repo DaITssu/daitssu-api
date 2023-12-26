@@ -3,6 +3,7 @@ package com.example.daitssuapi.domain.user.controller
 import com.example.daitssuapi.common.security.component.TokenProvider
 import com.example.daitssuapi.domain.user.model.repository.UserRepository
 import com.example.daitssuapi.utils.ControllerTest
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -57,6 +58,20 @@ class UserControllerTest(
             .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
         ).andExpect(status().isOk)
             .andExpect(jsonPath("$.code").value(0))
+    }
+    
+    @Test
+    @DisplayName("userId를 이용하여 유저를 삭제한다")
+    fun delete_user_with_user_id() {
+        val user = userRepository.findAll()[0]
+        val accessToken = tokenProvider.createAccessToken(id = user.id).token
+        
+        mockMvc.perform(patch("$baseUrl")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
+        ).andExpect(status().isOk)
+            .andExpect(jsonPath("$.data").isNotEmpty)
+        
+        Assertions.assertThat(user.isDeleted).isTrue()
     }
 }
 

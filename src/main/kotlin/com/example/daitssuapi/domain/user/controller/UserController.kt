@@ -74,5 +74,21 @@ class UserController(
         userService.updateProfileImage(userId = userId, image = profileImage)
         return Response(code = 0, message = "OK", data = null)
     }
-
+    
+    @Operation(
+        summary = "유저 삭제",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "OK"
+            )
+        ]
+    )
+    @PatchMapping
+    fun deleteUser() : Response<String> {
+        val userId = argumentResolver.resolveUserId()
+        
+        userService.deleteUser(userId = userId)
+        return Response(data = "User Delete Ok")
+    }
 }

@@ -68,4 +68,10 @@ class UserService(
             s3Service.deleteFromS3ByUrl(url)
         }.getOrThrow()
     }
+    
+    @Transactional
+    fun deleteUser(userId: Long) {
+        userRepository.findByIdOrNull(userId)?.apply { isDeleted = true }
+            ?: throw DefaultException(ErrorCode.USER_NOT_FOUND)
+    }
 }
