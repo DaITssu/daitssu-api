@@ -5,6 +5,7 @@ import com.example.daitssuapi.common.enums.ErrorCode
 import com.example.daitssuapi.common.enums.RegisterStatus
 import com.example.daitssuapi.common.exception.DefaultException
 import com.example.daitssuapi.domain.course.dto.request.AssignmentCreateRequest
+import com.example.daitssuapi.domain.course.dto.request.AssignmentUpdateRequest
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
 import com.example.daitssuapi.domain.course.dto.request.CourseRequest
 import com.example.daitssuapi.domain.course.dto.request.VideoRequest
@@ -26,6 +27,7 @@ import com.example.daitssuapi.domain.course.model.repository.UserCourseRelationR
 import com.example.daitssuapi.domain.course.model.repository.VideoRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -105,6 +107,7 @@ class CourseService(
         )
     }
 
+    @Transactional
     fun postCalendar(calendarRequest: CalendarRequest): CalendarResponse {
         val dateTime = checkDateReturnDate(calendarRequest.dueAt)
 
@@ -125,6 +128,7 @@ class CourseService(
         )
     }
 
+    @Transactional
     fun postVideo(
         videoRequest: VideoRequest
     ): VideoResponse {
@@ -148,6 +152,7 @@ class CourseService(
         )
     }
 
+    @Transactional
     fun postAssignment(
         request: AssignmentCreateRequest
     ): AssignmentResponse {
@@ -183,6 +188,26 @@ class CourseService(
         }
     }
 
+    @Transactional
+    fun updateAssignment(request: AssignmentUpdateRequest): AssignmentResponse {
+        val assignment = assignmentRepository.findByIdOrNull(id = request.id)?.also { it.update(request) }
+            ?: throw DefaultException(errorCode = ErrorCode.ASSIGNMENT_NOT_FOUND)
+
+        return with(assignment) {
+            AssignmentResponse(
+                id = id,
+                courseId = course.id,
+                name = name,
+                dueAt = dueAt,
+                startAt = startAt,
+                submitAt = submitAt,
+                detail = detail,
+                comments = comments
+            )
+        }
+    }
+
+    @Transactional
     fun postCourse(courseRequest: CourseRequest): CourseResponse {
         val course = Course(courseRequest.name, courseRequest.term, courseRequest.courseCode)
             .also { courseRepository.save(it) }
@@ -202,6 +227,7 @@ class CourseService(
             )
         }
 
+    @Transactional
     fun updateCalendar(calendarRequest: CalendarRequest, calendarId: Long): CalendarResponse {
         val calendar = calendarRepository.findByIdOrNull(calendarId)
             ?: throw DefaultException(ErrorCode.CALENDAR_NOT_FOUND)

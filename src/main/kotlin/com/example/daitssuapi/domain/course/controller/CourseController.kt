@@ -3,6 +3,7 @@ package com.example.daitssuapi.domain.course.controller
 import com.example.daitssuapi.common.dto.Response
 import com.example.daitssuapi.common.security.component.ArgumentResolver
 import com.example.daitssuapi.domain.course.dto.request.AssignmentCreateRequest
+import com.example.daitssuapi.domain.course.dto.request.AssignmentUpdateRequest
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
 import com.example.daitssuapi.domain.course.dto.request.CourseRequest
 import com.example.daitssuapi.domain.course.dto.request.VideoRequest
@@ -92,6 +93,18 @@ class CourseController(
         @RequestBody assignmentCreateRequest: AssignmentCreateRequest
     ): Response<AssignmentResponse> =
         Response(data = courseService.postAssignment(request = assignmentCreateRequest))
+
+    @Operation(
+        summary = "과제 수정",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
+    @PutMapping("/assignment")
+    fun updateAssignment(
+        @RequestBody assignmentUpdateRequest: AssignmentUpdateRequest
+    ): Response<AssignmentResponse> =
+        Response(data = courseService.updateAssignment(request = assignmentUpdateRequest))
 
     @Operation(
         summary = "과목 추가",

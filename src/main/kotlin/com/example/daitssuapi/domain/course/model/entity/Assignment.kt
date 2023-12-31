@@ -1,6 +1,7 @@
 package com.example.daitssuapi.domain.course.model.entity
 
 import com.example.daitssuapi.common.audit.BaseEntity
+import com.example.daitssuapi.domain.course.dto.request.AssignmentUpdateRequest
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
 import jakarta.persistence.JoinColumn
@@ -11,17 +12,35 @@ import java.time.LocalDateTime
 class Assignment(
     val name: String,
 
-    val dueAt: LocalDateTime? = null,
+    var dueAt: LocalDateTime? = null,
 
-    val startAt: LocalDateTime? = null,
+    var startAt: LocalDateTime? = null,
 
-    val submitAt: LocalDateTime? = null,
+    var submitAt: LocalDateTime? = null,
 
-    val detail: String? = null,
+    var detail: String? = null,
 
-    val comments: String? = null,
+    var comments: String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")
     var course: Course,
-) : BaseEntity()
+) : BaseEntity() {
+    fun update(request: AssignmentUpdateRequest) {
+        request.dueAt?.also {
+            this.dueAt = it
+        }
+        request.startAt?.also {
+            this.startAt = it
+        }
+        request.submitAt?.also {
+            this.submitAt = it
+        }
+        request.detail?.also {
+            this.detail = it
+        }
+        request.comments?.also {
+            this.comments = it
+        }
+    }
+}
