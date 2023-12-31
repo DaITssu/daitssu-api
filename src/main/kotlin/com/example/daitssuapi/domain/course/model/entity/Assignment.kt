@@ -9,13 +9,19 @@ import java.time.LocalDateTime
 
 @Entity
 class Assignment(
-    val dueAt: LocalDateTime,
-
-    val startAt: LocalDateTime,
-
     val name: String,
+
+    val dueAt: LocalDateTime? = null,
+
+    val startAt: LocalDateTime? = null,
+
+    val submitAt: LocalDateTime? = null,
+
+    val detail: String? = null,
+
+    val comments: String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")
-    var course: Course? = null,
+    var course: Course,
 ) : BaseEntity()
