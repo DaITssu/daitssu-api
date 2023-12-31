@@ -6,7 +6,11 @@ import com.example.daitssuapi.domain.article.dto.response.CommentResponse
 import com.example.daitssuapi.domain.article.model.repository.ArticleRepository
 import com.example.daitssuapi.domain.article.model.repository.CommentRepository
 import com.example.daitssuapi.domain.article.model.repository.ScrapRepository
+import com.example.daitssuapi.domain.course.model.repository.CourseRepository
+import com.example.daitssuapi.domain.course.model.repository.UserCourseRelationRepository
 import com.example.daitssuapi.domain.myPage.dto.response.MyArticleResponse
+import com.example.daitssuapi.domain.myPage.dto.response.MyAssignmentResponse
+import com.example.daitssuapi.domain.myPage.dto.response.MyCourseSimpleResponse
 import com.example.daitssuapi.domain.myPage.dto.response.MyScrapResponse
 import com.example.daitssuapi.domain.user.model.repository.UserRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -19,6 +23,8 @@ class MyPageService(
     private val articleRepository: ArticleRepository,
     private val commentRepository: CommentRepository,
     private val scrapRepository: ScrapRepository,
+    private val courseRepository: CourseRepository,
+    private val userCourseRelationRepository: UserCourseRelationRepository
 ) {
     fun getComments(userId: Long): List<CommentResponse> {
         userRepository.findByIdOrNull(id = userId) ?: throw DefaultException(errorCode = ErrorCode.USER_NOT_FOUND)
@@ -49,8 +55,8 @@ class MyPageService(
             )
         }
     }
-    
-    fun getMyScrap(userId: Long) : List<MyScrapResponse> {
+
+    fun getMyScrap(userId: Long): List<MyScrapResponse> {
         val user = userRepository.findByIdOrNull(userId)
             ?: throw DefaultException(errorCode = ErrorCode.USER_NOT_FOUND)
         return scrapRepository.findByUserAndIsActiveTrueOrderByCreatedAtDesc(user).map {
@@ -63,6 +69,38 @@ class MyPageService(
                 commentSize = it.article.comments.count { comment -> !comment.isDeleted }
             )
         }
-        
+
+    }
+
+    fun getAssignments(userId: Long, courseId: Long? = null): List<MyAssignmentResponse> {
+        userRepository.findByIdOrNull(userId)
+            ?: throw DefaultException(errorCode = ErrorCode.USER_NOT_FOUND)
+
+        val courses = courseId?.let {
+            listOf(courseRepository.findByIdOrNull(courseId)
+                ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND))
+        } ?: userCourseRelationRepository.findByUserIdOrderByCreatedAtDesc(userId = userId).map { it.course }
+
+        return courses.flatMap { course ->
+            val courseResponse = MyCourseSimpleResponse(
+                id = course.id,
+                name = course.name,
+                term = course.term,
+                courseCode = course.courseCode
+            )
+
+            course.assignments.map { assignment ->
+                MyAssignmentResponse(
+                    id = assignment.id,
+                    course = courseResponse,
+                    name = assignment.name,
+                    dueAt = assignment.dueAt,
+                    startAt = assignment.startAt,
+                    submitAt = assignment.submitAt,
+                    detail = assignment.detail,
+                    comments = assignment.comments
+                )
+            }
+        }
     }
 }

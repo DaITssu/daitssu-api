@@ -2,11 +2,15 @@ package com.example.daitssuapi.domain.course.controller
 
 import com.example.daitssuapi.common.enums.CalendarType
 import com.example.daitssuapi.common.enums.ErrorCode
+import com.example.daitssuapi.common.objectMapper
 import com.example.daitssuapi.common.security.component.TokenProvider
+import com.example.daitssuapi.domain.course.dto.request.AssignmentCreateRequest
+import com.example.daitssuapi.domain.course.dto.request.AssignmentUpdateRequest
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
-import com.example.daitssuapi.domain.course.model.repository.UserCourseRelationRepository
+import com.example.daitssuapi.domain.course.model.repository.AssignmentRepository
+import com.example.daitssuapi.domain.course.model.repository.CourseRepository
+import com.example.daitssuapi.domain.user.model.repository.UserRepository
 import com.example.daitssuapi.utils.ControllerTest
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
@@ -17,10 +21,13 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import java.time.LocalDateTime
 
 @ControllerTest
 class CourseControllerTest(
-    private val userRepository: UserCourseRelationRepository,
+    private val assignmentRepository: AssignmentRepository,
+    private val courseRepository: CourseRepository,
+    private val userRepository: UserRepository,
     private val tokenProvider: TokenProvider
 ) {
     @Autowired
@@ -59,7 +66,7 @@ class CourseControllerTest(
         ).andExpect(status().isOk)
             .andReturn().response
 
-        assertThat(jacksonObjectMapper().readTree(response.contentAsString)["data"].isEmpty).isFalse
+        assertThat(objectMapper.readTree(response.contentAsString)["data"].isEmpty).isFalse
     }
 
     @Test
@@ -72,7 +79,7 @@ class CourseControllerTest(
         ).andExpect(status().isOk)
             .andReturn().response
 
-        assertThat(jacksonObjectMapper().readTree(response.contentAsString)["data"].isEmpty).isFalse
+        assertThat(objectMapper.readTree(response.contentAsString)["data"].isEmpty).isFalse
     }
 
     @Test
@@ -85,7 +92,7 @@ class CourseControllerTest(
         ).andExpect(status().isBadRequest)
             .andReturn().response
 
-        val responseBody = jacksonObjectMapper().readTree(response.contentAsByteArray)
+        val responseBody = objectMapper.readTree(response.contentAsByteArray)
         assertAll(
             { assertThat(responseBody["code"].intValue()).isEqualTo(ErrorCode.COURSE_NOT_FOUND.code) },
             { assertThat(responseBody["message"].textValue()).isEqualTo(ErrorCode.COURSE_NOT_FOUND.message) },
@@ -103,7 +110,7 @@ class CourseControllerTest(
         ).andExpect(status().isOk)
             .andReturn().response
 
-        assertThat(jacksonObjectMapper().readTree(response.contentAsString).isEmpty).isFalse
+        assertThat(objectMapper.readTree(response.contentAsString).isEmpty).isFalse
     }
 
     @Test
@@ -116,7 +123,7 @@ class CourseControllerTest(
         ).andExpect(status().isBadRequest)
             .andReturn().response
 
-        val responseBody = jacksonObjectMapper().readTree(response.contentAsByteArray)
+        val responseBody = objectMapper.readTree(response.contentAsByteArray)
         assertAll(
             { assertThat(responseBody["code"].intValue()).isEqualTo(ErrorCode.INVALID_GET_DATE_FORMAT.code) },
             { assertThat(responseBody["message"].textValue()).isEqualTo(ErrorCode.INVALID_GET_DATE_FORMAT.message) },
@@ -138,12 +145,12 @@ class CourseControllerTest(
         val response = mockMvc.perform(
             post("$baseUrl/calendar")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(jacksonObjectMapper().writeValueAsString(calendarRequest))
+                .content(objectMapper.writeValueAsString(calendarRequest))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer test")
         ).andExpect(status().isOk)
             .andReturn().response
 
-        assertThat(jacksonObjectMapper().readTree(response.contentAsString)["data"].isEmpty).isFalse
+        assertThat(objectMapper.readTree(response.contentAsString)["data"].isEmpty).isFalse
     }
 
     @Test
@@ -160,12 +167,12 @@ class CourseControllerTest(
         val response = mockMvc.perform(
             post("$baseUrl/calendar")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(jacksonObjectMapper().writeValueAsString(calendarRequest))
+                .content(objectMapper.writeValueAsString(calendarRequest))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer test")
         ).andExpect(status().isBadRequest)
             .andReturn().response
 
-        val responseBody = jacksonObjectMapper().readTree(response.contentAsByteArray)
+        val responseBody = objectMapper.readTree(response.contentAsByteArray)
         assertAll(
             { assertThat(responseBody["code"].intValue()).isEqualTo(ErrorCode.INVALID_DATE_FORMAT.code) },
             { assertThat(responseBody["message"].textValue()).isEqualTo(ErrorCode.INVALID_DATE_FORMAT.message) },
@@ -189,12 +196,12 @@ class CourseControllerTest(
         val response = mockMvc.perform(
             put("$baseUrl/calendar/$calendarId")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(jacksonObjectMapper().writeValueAsString(calendarRequest))
+                .content(objectMapper.writeValueAsString(calendarRequest))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer test")
         ).andExpect(status().isOk)
             .andReturn().response
 
-        assertThat(jacksonObjectMapper().readTree(response.contentAsString)["data"].isEmpty).isFalse
+        assertThat(objectMapper.readTree(response.contentAsString)["data"].isEmpty).isFalse
     }
 
     @Test
@@ -213,20 +220,20 @@ class CourseControllerTest(
         val response = mockMvc.perform(
             put("$baseUrl/calendar/$courseId")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(jacksonObjectMapper().writeValueAsString(calendarRequest))
+                .content(objectMapper.writeValueAsString(calendarRequest))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer test")
         ).andExpect(status().isBadRequest)
             .andReturn().response
         val responseWrongId = mockMvc.perform(
             put("$baseUrl/calendar/$wrongCourseId")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(jacksonObjectMapper().writeValueAsString(calendarRequest))
+                .content(objectMapper.writeValueAsString(calendarRequest))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer test")
         ).andExpect(status().isBadRequest)
             .andReturn().response
 
-        val responseBody = jacksonObjectMapper().readTree(response.contentAsByteArray)
-        val responseBodyWrongId = jacksonObjectMapper().readTree(responseWrongId.contentAsByteArray)
+        val responseBody = objectMapper.readTree(response.contentAsByteArray)
+        val responseBodyWrongId = objectMapper.readTree(responseWrongId.contentAsByteArray)
         assertAll(
             { assertThat(responseBody["code"].intValue()).isEqualTo(ErrorCode.INVALID_DATE_FORMAT.code) },
             { assertThat(responseBody["message"].textValue()).isEqualTo(ErrorCode.INVALID_DATE_FORMAT.message) },
@@ -245,6 +252,63 @@ class CourseControllerTest(
         ).andExpect(status().isOk)
             .andReturn().response
 
-        assertThat(jacksonObjectMapper().readTree(response.contentAsString)["data"].isEmpty).isFalse
+        assertThat(objectMapper.readTree(response.contentAsString)["data"].isEmpty).isFalse
+    }
+
+    @Test
+    @DisplayName("성공_올바른 강의를 이용하여 과제 생성 시_과제가 생성된다")
+    fun success_create_assignment() {
+        val course = courseRepository.findAll()[0]
+        val request = AssignmentCreateRequest(
+            courseId = course.id,
+            name = "과제이름",
+            dueAt = LocalDateTime.now().plusDays(6),
+            startAt = LocalDateTime.now().minusHours(3),
+            detail = "과제 상세 내용"
+        )
+
+        mockMvc.perform(post("$baseUrl/assignment")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer test")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+        ).andExpect(status().isOk)
+            .andExpect(jsonPath("$.data").isNotEmpty)
+    }
+
+    @Test
+    @DisplayName("실패_올바른 강의가 넘어오지 않으면_과제가 생성되지 않는다")
+    fun fail_create_assignment() {
+        val request = AssignmentCreateRequest(
+            courseId = 0L,
+            name = "과제이름",
+            dueAt = LocalDateTime.now().minusDays(6),
+            startAt = LocalDateTime.now().minusHours(3),
+            detail = "과제 상세 내용"
+        )
+
+        mockMvc.perform(post("$baseUrl/assignment")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer test")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+        ).andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.code").value(ErrorCode.COURSE_NOT_FOUND.code))
+    }
+
+    @Test
+    @DisplayName("성공_올바른 과제를 이용하여 과제 수정 시_과제가 수정된다")
+    fun success_update_assignment() {
+        val assignment = assignmentRepository.findAll()[0]
+        val request = AssignmentUpdateRequest(
+            id = assignment.id,
+            dueAt = assignment.dueAt?.plusDays(2) ?: LocalDateTime.now(),
+            comments = "대충 추가 내용이라는 뜻"
+        )
+
+        mockMvc.perform(put("$baseUrl/assignment")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer test")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+        ).andExpect(status().isOk)
+            .andExpect(jsonPath("$.data").isNotEmpty)
     }
 }
