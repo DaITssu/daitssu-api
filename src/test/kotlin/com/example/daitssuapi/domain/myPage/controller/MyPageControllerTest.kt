@@ -131,4 +131,50 @@ class MyPageControllerTest(
         ).andExpect(status().isOk)
             .andExpect(jsonPath("$.data").isEmpty)
     }
+
+    @Test
+    @DisplayName("성공_올바른 userId를 넘겨주면_과제를 조회한다")
+    fun successGetAssignments() {
+        val accessToken = tokenProvider.createAccessToken(id = 1L).token
+
+        mockMvc.perform(get("$baseUrl/assignments")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
+        ).andExpect(status().isOk)
+            .andExpect(jsonPath("$.data").isNotEmpty)
+    }
+
+    @Test
+    @DisplayName("성공_올바른 userId와 courseId를 넘겨주면_과제를 조회한다")
+    fun successGetAssignmentsWithCourseId() {
+        val accessToken = tokenProvider.createAccessToken(id = 1L).token
+        val courseId = 1L
+
+        mockMvc.perform(get("$baseUrl/assignments")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
+            .param("courseId", courseId.toString())
+        ).andExpect(status().isOk)
+            .andExpect(jsonPath("$.data").isNotEmpty)
+    }
+
+    @Test
+    @DisplayName("실패_올바르지 않은 courseId를 넘겨주면_과제 조회에 실패한다")
+    fun failGetAssignmentsWithCourseId() {
+        val accessToken = tokenProvider.createAccessToken(id = 1L).token
+        val courseId = 0L
+
+        mockMvc.perform(get("$baseUrl/assignments")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
+            .param("courseId", courseId.toString())
+        ).andExpect(status().isBadRequest)
+    }
+
+    @Test
+    @DisplayName("실패_올바르지 않은 userId 넘겨주면_과제 조회에 실패한다")
+    fun failGetAssignments() {
+        val accessToken = tokenProvider.createAccessToken(id = 0L).token
+
+        mockMvc.perform(get("$baseUrl/assignments")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
+        ).andExpect(status().isBadRequest)
+    }
 }
