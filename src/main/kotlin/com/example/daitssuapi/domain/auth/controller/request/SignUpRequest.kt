@@ -9,10 +9,10 @@ data class SignUpRequest(
     val nickname: String,
     @Schema(description = "이름")
     val name: String,
-    @Schema(description = "학부. Department 테이블의 id값입니다.")
-    val departmentId: Long,
+    @Schema(description = "학부명입니다.")
+    val departmentName: String,
     @Schema(description = "학번")
     val studentId: String,
-    @Schema(description = "학기(ex.3학년 1학기 = 7)")
+    @Schema(description = "학기(ex.3학년 1학기 = 5)")
     val term: Int,
 ) : Serializable

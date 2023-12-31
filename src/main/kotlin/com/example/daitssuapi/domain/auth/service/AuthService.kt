@@ -84,11 +84,11 @@ class AuthService(
     fun signUp(
         nickname: String,
         name: String,
-        departmentId: Long,
+        departmentName: String,
         studentId: String,
         term: Int,
     ): AuthResponse {
-        val department = departmentRepository.findByIdOrNull(departmentId)
+        val department = departmentRepository.findByName(departmentName)
             ?: throw DefaultException(ErrorCode.DEPARTMENT_NOT_FOUND)
 
         var user = userRepository.findByStudentId(

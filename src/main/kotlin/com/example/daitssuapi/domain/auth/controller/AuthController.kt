@@ -36,7 +36,7 @@ class AuthController(
             data = authService.signUp(
                 nickname = signUpRequest.nickname,
                 name = signUpRequest.name,
-                departmentId = signUpRequest.departmentId,
+                departmentName = signUpRequest.departmentName,
                 studentId = signUpRequest.studentId,
                 term = signUpRequest.term,
             )
