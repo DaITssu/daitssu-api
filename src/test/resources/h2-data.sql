@@ -56,11 +56,8 @@ INSERT INTO video (id, course_id, name, start_at, due_at) VALUES
     (3, 2, '첫 번째 강의', '2023-07-20 12:00:00', '2023-07-27 23:59:59'),
     (4, 4, '2번째 강의', '2023-08-20 12:00:00', '2023-08-27 23:59:59');
 
-INSERT INTO assignment (id, course_id, name, start_at, due_at) VALUES
-    (1, 1, '첫 번째 숙제', '2023-07-20 12:00:00', '2023-07-27 23:59:59'),
-    (2, 1, '두 번째 숙제', '2023-08-20 12:00:00', '2023-08-27 23:59:59'),
-    (3, 2, '1-1', '2023-07-20 12:00:00', '2023-07-27 23:59:59'),
-    (4, 3, '2-1', '2023-08-20 12:00:00', '2023-08-27 23:59:59');
+INSERT INTO assignment (id, course_id, name, due_at, start_at, submit_at, detail, comments) VALUES
+    (1, 1, '과제 1', '2024-01-09 12:00:00', '2023-01-01 00:00:00', null, '과제 첫번째 상세 내용', null);
 
 INSERT INTO calendar (id, name, course, type, due_at, is_completed) VALUES
     (11, '이 날까지 과제 제출', 'eat paper', 'ASSIGNMENT', '2023-07-27 23:59:59', false),

@@ -1,12 +1,12 @@
 package com.example.daitssuapi.domain.myPage.controller
 
 import com.example.daitssuapi.common.enums.ErrorCode
+import com.example.daitssuapi.common.objectMapper
 import com.example.daitssuapi.common.security.component.TokenProvider
 import com.example.daitssuapi.domain.article.model.repository.CommentRepository
 import com.example.daitssuapi.domain.myPage.dto.request.CommentDeleteRequest
 import com.example.daitssuapi.domain.user.model.repository.UserRepository
 import com.example.daitssuapi.utils.ControllerTest
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -74,7 +74,7 @@ class MyPageControllerTest(
             commentIds = comments.filter { it.writer.id == userId }.filter { !it.isDeleted }.map { it.id }
         )
         val url = "$baseUrl/comments"
-        val request = jacksonObjectMapper().writeValueAsString(commentDeleteRequest)
+        val request = objectMapper.writeValueAsString(commentDeleteRequest)
         val accessToken = tokenProvider.createAccessToken(id = 0).token
 
         mockMvc.perform(patch(url)
@@ -109,23 +109,23 @@ class MyPageControllerTest(
         ).andExpect(status().isOk)
             .andExpect(jsonPath("$.data").isEmpty)
     }
-    
+
     @Test
     @DisplayName("스크랩한 userId를 이용하여 게시글 조회시 _ 1개 이상의 게시글이 조회된다")
     fun get_my_scraps_with_user_id() {
         val accessToken = tokenProvider.createAccessToken(id = 1L).token
-        
+
         mockMvc.perform(get("$baseUrl/scraps")
             .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
         ).andExpect(status().isOk)
             .andExpect(jsonPath("$.data").isNotEmpty)
     }
-    
+
     @Test
     @DisplayName("스크랩하지 않은 userId를 이용하여 게시글 조회시 _ 빈 리스트가 출력된다")
     fun get_my_scraps_with_wrong_user_id() {
         val accessToken = tokenProvider.createAccessToken(id = 3L).token
-        
+
         mockMvc.perform(get("$baseUrl/scraps")
             .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
         ).andExpect(status().isOk)

@@ -1,8 +1,8 @@
 package com.example.daitssuapi.common.filter
 
+import com.example.daitssuapi.common.objectMapper
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -58,7 +58,7 @@ class RequestLoggingFilter : OncePerRequestFilter() {
                 {
                     "client ip" : "${request.remoteAddr}",
                     "uri" : "${request.requestURI}",
-                    "headers" : ${jacksonObjectMapper().writeValueAsString(requestHeaders)},
+                    "headers" : ${objectMapper.writeValueAsString(requestHeaders)},
                     "body" : $requestBody
                 }
              """.trimIndent()
@@ -74,7 +74,7 @@ class RequestLoggingFilter : OncePerRequestFilter() {
             return """
                  {
                      "status" : "${response.status}",
-                     "headers" : ${jacksonObjectMapper().writeValueAsString(responseHeaders)},
+                     "headers" : ${objectMapper.writeValueAsString(responseHeaders)},
                      "body" : $responseBody
                  }
              """.trimIndent()
@@ -85,14 +85,14 @@ class RequestLoggingFilter : OncePerRequestFilter() {
                 return "{}"
             }
 
-            val readTree = jacksonObjectMapper().readTree(body)
-            val filteredJson: ObjectNode = jacksonObjectMapper().createObjectNode()
+            val readTree = objectMapper.readTree(body)
+            val filteredJson: ObjectNode = objectMapper.createObjectNode()
 
             readTree.fields().forEach { (key, value) ->
                 filteredJson.set<JsonNode>(key, value)
             }
 
-            return jacksonObjectMapper().writeValueAsString(filteredJson)
+            return objectMapper.writeValueAsString(filteredJson)
         }
     }
 }
