@@ -5,6 +5,6 @@ import java.io.Serializable
 
 @Schema(name = "공지사항 조회 API response body")
 data class PageNoticeResponse(
-        val notices: List<NoticeResponse>,
-        val totalPage: Int,
+    val notices: List<NoticeResponse>,
+    val totalPages: Long,
 ) : Serializable

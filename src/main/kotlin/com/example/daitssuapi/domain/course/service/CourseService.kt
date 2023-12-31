@@ -4,12 +4,10 @@ import com.example.daitssuapi.common.enums.CalendarType
 import com.example.daitssuapi.common.enums.ErrorCode
 import com.example.daitssuapi.common.enums.RegisterStatus
 import com.example.daitssuapi.common.exception.DefaultException
-import com.example.daitssuapi.domain.course.dto.request.AssignmentRequest
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
 import com.example.daitssuapi.domain.course.dto.request.CourseRequest
 import com.example.daitssuapi.domain.course.dto.request.VideoRequest
 import com.example.daitssuapi.domain.course.dto.response.*
-import com.example.daitssuapi.domain.course.model.entity.Assignment
 import com.example.daitssuapi.domain.course.model.entity.Calendar
 import com.example.daitssuapi.domain.course.model.entity.Course
 import com.example.daitssuapi.domain.course.model.entity.Video
@@ -53,20 +51,20 @@ class CourseService(
             )
         }
 
-        val assignmentResponses = course.assignments.map {
-            AssignmentResponse(
-                id = it.id,
-                name = it.name,
-                dueAt = it.dueAt,
-                startAt = it.startAt
-            )
-        }
+//        val assignmentResponses = course.assignments.map {
+//            AssignmentResponse(
+//                id = it.id,
+//                name = it.name,
+//                dueAt = it.dueAt,
+//                startAt = it.startAt
+//            )
+//        }
 
         return CourseResponse(
             id = course.id,
             name = course.name,
             videos = videoResponses,
-            assignments = assignmentResponses,
+            // assignments = assignmentResponses,
             term = course.term,
             courseCode = course.courseCode
         )
@@ -87,7 +85,7 @@ class CourseService(
         val endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59)
 
         return calendarRepository.findByDueAtBetween(startDateTime, endDateTime).groupBy(
-            { it.course }, { CalendarResponse(it.id, it.type, it.dueAt, it.name, it.isComplete) }
+            { it.course }, { CalendarResponse(it.id, it.type, it.dueAt, it.name, it.isCompleted) }
         )
     }
 
@@ -99,7 +97,7 @@ class CourseService(
             course = calendarRequest.course,
             dueAt = dateTime,
             name = calendarRequest.name,
-            isComplete = calendarRequest.isCompleted
+            isCompleted = calendarRequest.isCompleted
         ).also { calendarRepository.save(it) }
 
         return CalendarResponse(
@@ -107,7 +105,7 @@ class CourseService(
             type = calendar.type,
             dueAt = calendar.dueAt,
             name = calendar.name,
-            isCompleted = calendar.isComplete
+            isCompleted = calendar.isCompleted
         )
     }
 
@@ -134,29 +132,29 @@ class CourseService(
         )
     }
 
-    fun postAssignment(
-        assignmentRequest: AssignmentRequest
-    ): AssignmentResponse {
-        val course = courseRepository.findByIdOrNull(assignmentRequest.courseId)
-            ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND)
-
-
-        val assignment = Assignment(
-            dueAt = LocalDateTime.now().plusDays(7),
-            startAt = LocalDateTime.now(),
-            name = assignmentRequest.name,
-            course = course
-        ).also { assignmentRepository.save(it) }
-
-        course.addAssignment(assignment)
-
-        return AssignmentResponse(
-            id = assignment.id,
-            name = assignment.name,
-            dueAt = assignment.dueAt,
-            startAt = assignment.startAt
-        )
-    }
+//    fun postAssignment(
+//        assignmentRequest: AssignmentRequest
+//    ): AssignmentResponse {
+//        val course = courseRepository.findByIdOrNull(assignmentRequest.courseId)
+//            ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND)
+//
+//
+//        val assignment = Assignment(
+//            dueAt = LocalDateTime.now().plusDays(7),
+//            startAt = LocalDateTime.now(),
+//            name = assignmentRequest.name,
+//            course = course
+//        ).also { assignmentRepository.save(it) }
+//
+//        course.addAssignment(assignment)
+//
+//        return AssignmentResponse(
+//            id = assignment.id,
+//            name = assignment.name,
+//            dueAt = assignment.dueAt,
+//            startAt = assignment.startAt
+//        )
+//    }
 
     fun postCourse(courseRequest: CourseRequest): CourseResponse {
         val course = Course(courseRequest.name, courseRequest.term, courseRequest.courseCode)
@@ -191,7 +189,7 @@ class CourseService(
             type = calendar.type,
             dueAt = calendar.dueAt,
             name = calendar.name,
-            isCompleted = calendar.isComplete
+            isCompleted = calendar.isCompleted
         )
     }
 

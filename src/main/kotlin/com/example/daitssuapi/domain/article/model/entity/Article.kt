@@ -4,15 +4,7 @@ import com.example.daitssuapi.common.audit.BaseEntity
 import com.example.daitssuapi.common.converter.JsonParsingConverter
 import com.example.daitssuapi.domain.article.enums.Topic
 import com.example.daitssuapi.domain.user.model.entity.User
-import jakarta.persistence.Column
-import jakarta.persistence.Convert
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.FetchType
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.OneToMany
+import jakarta.persistence.*
 
 @Entity
 class Article(
@@ -31,7 +23,7 @@ class Article(
     var writer: User,
 
     @Convert(converter = JsonParsingConverter::class)
-    val imageUrl: List<String> = emptyList(),
+    var imageUrl: List<String> = emptyList(),
 
     @OneToMany(mappedBy = "article")
     var likes: MutableSet<ArticleLike> = mutableSetOf(),

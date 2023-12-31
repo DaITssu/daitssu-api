@@ -10,6 +10,7 @@ import com.example.daitssuapi.domain.article.model.entity.Comment
 import com.example.daitssuapi.domain.article.model.repository.CommentRepository
 import com.example.daitssuapi.domain.notice.dto.NoticePageResponse
 import com.example.daitssuapi.domain.notice.dto.NoticeResponse
+import com.example.daitssuapi.domain.notice.dto.PageNoticeResponse
 import com.example.daitssuapi.domain.notice.model.entity.Notice
 import com.example.daitssuapi.domain.notice.model.repository.NoticeRepository
 import com.example.daitssuapi.domain.user.model.repository.UserRepository
@@ -29,29 +30,36 @@ class NoticeService(
     fun getAllNoticeList(
         searchKeyword: String?,
         pageable: Pageable,
-    ): Page<NoticeResponse> {
+    ): PageNoticeResponse {
         val notices: Page<Notice>
         if (searchKeyword == null) {
             notices = noticeRepository.findAll(pageable)
         } else {
             notices = noticeRepository.findByTitleContaining(searchKeyword = searchKeyword, pageable = pageable)
         }
-        return notices.map { NoticeResponse.fromNotice(it) }
+
+        return PageNoticeResponse(
+            notices = notices.map { NoticeResponse.fromNotice(it) }.content,
+            totalPages = notices.totalElements,
+        )
     }
 
     fun getNoticeList(
         category: NoticeCategory,
         searchKeyword: String?,
         pageable: Pageable,
-
-        ): Page<NoticeResponse> {
+    ): PageNoticeResponse {
         val notices: Page<Notice>
         if (searchKeyword == null) {
             notices = noticeRepository.findByCategory(category, pageable)
         } else {
             notices = noticeRepository.findByCategoryAndTitleContaining(category, searchKeyword, pageable)
         }
-        return notices.map { NoticeResponse.fromNotice(it) }
+
+        return PageNoticeResponse(
+            notices = notices.map { NoticeResponse.fromNotice(it) }.content,
+            totalPages = notices.totalElements,
+        )
     }
 
     fun getNoticePage(
