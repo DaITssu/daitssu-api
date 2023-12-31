@@ -6,12 +6,11 @@ import com.example.daitssuapi.common.security.component.ArgumentResolver
 import com.example.daitssuapi.domain.article.dto.request.CommentWriteRequest
 import com.example.daitssuapi.domain.article.dto.response.CommentResponse
 import com.example.daitssuapi.domain.notice.dto.FunSystemPageResponse
-import com.example.daitssuapi.domain.notice.dto.FunSystemResponse
+import com.example.daitssuapi.domain.notice.dto.PageFunSystemResponse
 import com.example.daitssuapi.domain.notice.service.FunSystemService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
@@ -47,7 +46,7 @@ sort: [\"createdAt\"]
         )
         pageable: Pageable,
         @RequestParam searchKeyword: String? = null
-    ): Response<Page<FunSystemResponse>> {
+    ): Response<PageFunSystemResponse> {
         return Response(data = funSystemService.getAllFunSystemList(searchKeyword, pageable))
     }
 
@@ -62,7 +61,7 @@ sort: [\"createdAt\"]
         @RequestParam category: FunSystemCategory,
         @RequestParam searchKeyword: String? = null,
         @PageableDefault(page = 0, size = 10, sort = ["createdAt"]) pageable: Pageable, // TODO : 이거 swagger에서 조작 불가
-    ): Response<Page<FunSystemResponse>> {
+    ): Response<PageFunSystemResponse> {
         return Response(data = funSystemService.getFunSystemList(category, searchKeyword, pageable))
     }
 

@@ -10,6 +10,7 @@ import com.example.daitssuapi.domain.article.model.entity.Comment
 import com.example.daitssuapi.domain.article.model.repository.CommentRepository
 import com.example.daitssuapi.domain.notice.dto.FunSystemPageResponse
 import com.example.daitssuapi.domain.notice.dto.FunSystemResponse
+import com.example.daitssuapi.domain.notice.dto.PageFunSystemResponse
 import com.example.daitssuapi.domain.notice.model.entity.FunSystem
 import com.example.daitssuapi.domain.notice.model.repository.FunSystemRepository
 import com.example.daitssuapi.domain.user.model.repository.UserRepository
@@ -29,14 +30,18 @@ class FunSystemService(
     fun getAllFunSystemList(
         searchKeyword: String?,
         pageable: Pageable,
-    ): Page<FunSystemResponse> { //모든 펀시스템 가져오기
+    ): PageFunSystemResponse { //모든 펀시스템 가져오기
         val funSystems: Page<FunSystem>
         if (searchKeyword == null) {
             funSystems = funSystemRepository.findAll(pageable)
         } else {
             funSystems = funSystemRepository.findByTitleContaining(searchKeyword, pageable)
         }
-        return funSystems.map { FunSystemResponse.fromFunSystem(it) }
+
+        return PageFunSystemResponse(
+            funSystems = funSystems.map { FunSystemResponse.fromFunSystem(it) }.content,
+            totalPages = funSystems.totalElements,
+        )
     }
 
     fun getFunSystemList(
@@ -44,14 +49,18 @@ class FunSystemService(
         category: FunSystemCategory,
         searchKeyword: String?,
         pageable: Pageable,
-    ): Page<FunSystemResponse> {
+    ): PageFunSystemResponse {
         val funSystems: Page<FunSystem>
         if (searchKeyword == null) {
             funSystems = funSystemRepository.findByCategory(category, pageable)
         } else {
             funSystems = funSystemRepository.findByCategoryAndTitleContaining(category, searchKeyword, pageable)
         }
-        return funSystems.map { FunSystemResponse.fromFunSystem(it) }
+
+        return PageFunSystemResponse(
+            funSystems = funSystems.map { FunSystemResponse.fromFunSystem(it) }.content,
+            totalPages = funSystems.totalElements,
+        )
     }
 
     fun getFunSystemPage(
