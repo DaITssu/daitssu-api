@@ -151,6 +151,14 @@ class MyPageServiceTest(
     }
 
     @Test
+    @DisplayName("실패_올바르지 않은 userId를 넘겨주면_과제 조회에 실패한다")
+    fun failGetAssignments() {
+        val userId = 0L
+
+        assertThrows<DefaultException> { myPageService.getAssignments(userId = userId) }
+    }
+
+    @Test
     @DisplayName("실패_올바르지 않은 courseId를 넘겨주면_과제 조회에 실패한다")
     fun failGetAssignmentsWithCourseId() {
         val userId = 1L
@@ -160,10 +168,31 @@ class MyPageServiceTest(
     }
 
     @Test
-    @DisplayName("실패_올바르지 않은 userId 넘겨주면_과제 조회에 실패한다")
-    fun failGetAssignments() {
-        val userId = 0L
+    @DisplayName("성공_올바른 userId와 courseId를 넘겨주면_해당 강의의 공지 리스트를 조회한다")
+    fun successGetCourseNotices() {
+        val userId = 1L
+        val courseId = 1L
 
-        assertThrows<DefaultException> { myPageService.getAssignments(userId = userId) }
+        val assignments = myPageService.getCourseNotices(userId = userId, courseId = courseId)
+
+        assertThat(assignments.isNotEmpty())
+    }
+
+    @Test
+    @DisplayName("실패_올바르지 않은 userId를 넘겨주면_공지 조회에 실패한다")
+    fun failGetCourseNotices() {
+        val userId = 0L
+        val courseId = 1L
+
+        assertThrows<DefaultException> { myPageService.getCourseNotices(userId = userId, courseId = courseId) }
+    }
+
+    @Test
+    @DisplayName("실패_올바르지 않은 courseId를 넘겨주면_과제 조회에 실패한다")
+    fun failGetCourseNoticesWithCourseId() {
+        val userId = 1L
+        val courseId = 0L
+
+        assertThrows<DefaultException> { myPageService.getCourseNotices(userId = userId, courseId = courseId) }
     }
 }
