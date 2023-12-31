@@ -1,7 +1,6 @@
 package com.example.daitssuapi.domain.course.model.entity
 
 import com.example.daitssuapi.common.audit.BaseEntity
-import com.example.daitssuapi.domain.course.dto.request.AssignmentUpdateRequest
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
 import jakarta.persistence.JoinColumn
@@ -26,20 +25,26 @@ class Assignment(
     @JoinColumn(name = "course_id")
     var course: Course,
 ) : BaseEntity() {
-    fun update(request: AssignmentUpdateRequest) {
-        request.dueAt?.also {
+    fun update(
+        dueAt: LocalDateTime? = null,
+        startAt: LocalDateTime? = null,
+        submitAt: LocalDateTime? = null,
+        detail: String? = null,
+        comments: String? = null
+    ) {
+        dueAt?.also {
             this.dueAt = it
         }
-        request.startAt?.also {
+        startAt?.also {
             this.startAt = it
         }
-        request.submitAt?.also {
+        submitAt?.also {
             this.submitAt = it
         }
-        request.detail?.also {
+        detail?.also {
             this.detail = it
         }
-        request.comments?.also {
+        comments?.also {
             this.comments = it
         }
     }

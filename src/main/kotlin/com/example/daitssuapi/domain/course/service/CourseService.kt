@@ -190,8 +190,15 @@ class CourseService(
 
     @Transactional
     fun updateAssignment(request: AssignmentUpdateRequest): AssignmentResponse {
-        val assignment = assignmentRepository.findByIdOrNull(id = request.id)?.also { it.update(request) }
-            ?: throw DefaultException(errorCode = ErrorCode.ASSIGNMENT_NOT_FOUND)
+        val assignment = assignmentRepository.findByIdOrNull(id = request.id)?.also {
+            it.update(
+                dueAt = request.dueAt,
+                startAt = request.startAt,
+                submitAt = request.submitAt,
+                detail = request.detail,
+                comments = request.comments
+            )
+        } ?: throw DefaultException(errorCode = ErrorCode.ASSIGNMENT_NOT_FOUND)
 
         return with(assignment) {
             AssignmentResponse(
