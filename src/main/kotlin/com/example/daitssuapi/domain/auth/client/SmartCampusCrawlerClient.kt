@@ -2,6 +2,7 @@ package com.example.daitssuapi.domain.auth.client
 
 import com.example.daitssuapi.domain.auth.client.request.CrawlBaseInformationRequest
 import com.example.daitssuapi.domain.auth.client.request.SmartCampusSignInRequest
+import com.example.daitssuapi.domain.auth.client.response.SmartCampusSignInResponse
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -15,7 +16,7 @@ interface SmartCampusCrawlerClient {
     fun smartCampusSignIn(
         @RequestBody
         smartCampusSignInRequest: SmartCampusSignInRequest
-    ): String
+    ): SmartCampusSignInResponse
 
     @PostMapping("/smart-campus/crawling")
     fun crawlBaseInformation(

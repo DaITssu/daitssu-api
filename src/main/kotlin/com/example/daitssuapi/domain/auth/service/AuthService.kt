@@ -6,6 +6,7 @@ import com.example.daitssuapi.common.security.component.TokenProvider
 import com.example.daitssuapi.domain.auth.client.SmartCampusCrawlerClient
 import com.example.daitssuapi.domain.auth.client.request.CrawlBaseInformationRequest
 import com.example.daitssuapi.domain.auth.client.request.SmartCampusSignInRequest
+import com.example.daitssuapi.domain.auth.controller.response.AuthInfoResponse
 import com.example.daitssuapi.domain.auth.controller.response.AuthResponse
 import com.example.daitssuapi.domain.user.model.entity.User
 import com.example.daitssuapi.domain.user.model.repository.DepartmentRepository
@@ -27,8 +28,7 @@ class AuthService(
         studentId: String,
         password: String,
     ): AuthResponse {
-        val user = userRepository.findByNicknameOrStudentId(
-            nickname = studentId,
+        val user = userRepository.findByStudentId(
             studentId = studentId,
         ) ?: throw DefaultException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND)
 
@@ -39,7 +39,7 @@ class AuthService(
                         student_id = studentId,
                         password = password,
                     )
-                ).replace("\"", "")
+                ).token.replace("\"", "")
             } catch (e: Exception) {
                 throw DefaultException(ErrorCode.PASSWORD_INCORRECT, HttpStatus.BAD_REQUEST)
             }
@@ -53,6 +53,30 @@ class AuthService(
         return AuthResponse(
             accessToken = accessToken,
             refreshToken = refreshToken,
+        )
+    }
+
+    @Transactional
+    fun getUserInfo(
+        studentId: String,
+        password: String,
+    ): AuthInfoResponse {
+        val signInResponse =
+            try {
+                smartCampusCrawlerClient.smartCampusSignIn(
+                    smartCampusSignInRequest = SmartCampusSignInRequest(
+                            student_id = studentId,
+                            password = password,
+                    )
+                )
+            } catch (e: Exception) {
+                throw DefaultException(ErrorCode.PASSWORD_INCORRECT, HttpStatus.BAD_REQUEST)
+            }
+
+        return AuthInfoResponse(
+            name = signInResponse.name,
+            studentId = signInResponse.sIdno,
+            term = signInResponse.semester,
         )
     }
 

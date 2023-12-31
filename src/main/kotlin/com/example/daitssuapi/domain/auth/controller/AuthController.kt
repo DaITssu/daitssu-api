@@ -5,6 +5,7 @@ import com.example.daitssuapi.common.security.component.ArgumentResolver
 import com.example.daitssuapi.domain.auth.controller.request.RefreshRequest
 import com.example.daitssuapi.domain.auth.controller.request.SignInRequest
 import com.example.daitssuapi.domain.auth.controller.request.SignUpRequest
+import com.example.daitssuapi.domain.auth.controller.response.AuthInfoResponse
 import com.example.daitssuapi.domain.auth.controller.response.AuthResponse
 import com.example.daitssuapi.domain.auth.service.AuthService
 import io.swagger.v3.oas.annotations.Operation
@@ -43,10 +44,32 @@ class AuthController(
     }
 
     @Operation(
+            summary = "유저 정보 조회",
+            description = "회원가입을 위한 유저 학적 정보 조회 API입니다.",
+            responses = [
+                ApiResponse(responseCode = "200", description = "OK"),
+            ],
+    )
+    @PostMapping("/info")
+    fun getUserInfo(
+        @RequestBody
+        signInRequest: SignInRequest,
+    ): Response<AuthInfoResponse> {
+        return Response(
+            data = authService.getUserInfo(
+                studentId = signInRequest.studentId,
+                password = signInRequest.password,
+            )
+        )
+    }
+
+    @Operation(
         summary = "로그인",
         description = "로그인 API입니다.",
         responses = [
             ApiResponse(responseCode = "200", description = "OK"),
+            ApiResponse(responseCode = "401", description = "PASSWORD_INCORRECT"),
+            ApiResponse(responseCode = "404", description = "USER_NOT_FOUND"),
         ],
     )
     @PostMapping("/sign-in")
