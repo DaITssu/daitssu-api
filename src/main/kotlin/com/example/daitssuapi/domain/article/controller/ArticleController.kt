@@ -3,6 +3,7 @@ package com.example.daitssuapi.domain.article.controller
 import com.example.daitssuapi.common.dto.Response
 import com.example.daitssuapi.common.security.component.ArgumentResolver
 import com.example.daitssuapi.domain.article.dto.request.ArticleCreateRequest
+import com.example.daitssuapi.domain.article.dto.request.ArticleUpdateRequest
 import com.example.daitssuapi.domain.article.dto.request.CommentWriteRequest
 import com.example.daitssuapi.domain.article.dto.response.ArticleResponse
 import com.example.daitssuapi.domain.article.dto.response.CommentResponse
@@ -139,6 +140,29 @@ sort: [\"createdAt\"]
         val userId = argumentResolver.resolveUserId()
 
         articleService.createArticle(articleCreateRequest = articleCreateRequest, userId = userId)
+
+        return Response(code = 0, message = "OK", data = null)
+    }
+
+    @Operation(
+        summary = "게시글 수정",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "OK"
+            )
+        ]
+    )
+    @PutMapping("/{articleId}", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun updateArticle(
+        @Parameter(name = "articleId", description = "게시글 id")
+        @PathVariable articleId: Long,
+        @Parameter(name = "request", description = "게시글 수정 요청")
+        @ModelAttribute articleUpdateRequest: ArticleUpdateRequest
+    ): Response<String> {
+        val userId = argumentResolver.resolveUserId()
+
+        articleService.updateArticle(userId, articleId, articleUpdateRequest)
 
         return Response(code = 0, message = "OK", data = null)
     }

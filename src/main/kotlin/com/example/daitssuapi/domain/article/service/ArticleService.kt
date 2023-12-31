@@ -5,6 +5,7 @@ import com.example.daitssuapi.common.enums.DomainType
 import com.example.daitssuapi.common.enums.ErrorCode
 import com.example.daitssuapi.common.exception.DefaultException
 import com.example.daitssuapi.domain.article.dto.request.ArticleCreateRequest
+import com.example.daitssuapi.domain.article.dto.request.ArticleUpdateRequest
 import com.example.daitssuapi.domain.article.dto.request.CommentWriteRequest
 import com.example.daitssuapi.domain.article.dto.response.ArticleResponse
 import com.example.daitssuapi.domain.article.dto.response.CommentResponse
@@ -113,7 +114,6 @@ class ArticleService(
         }
     }
 
-
     @Transactional
     fun createArticle(articleCreateRequest: ArticleCreateRequest, userId: Long) {
         val user: User = userRepository.findByIdOrNull(userId)
@@ -143,6 +143,52 @@ class ArticleService(
                 s3Service.deleteFromS3ByUrl(url)
             }
         }.getOrThrow()
+    }
+
+    @Transactional
+    fun updateArticle(
+        userId: Long,
+        articleId: Long,
+        articleUpdateRequest: ArticleUpdateRequest
+    ){
+        val user: User = userRepository.findByIdOrNull(userId)
+            ?: throw DefaultException(ErrorCode.USER_NOT_FOUND)
+        val article: Article = articleRepository.findByIdOrNull(articleId)
+            ?: throw DefaultException(ErrorCode.ARTICLE_NOT_FOUND)
+
+        if(articleUpdateRequest.content != null)
+            article.title = articleUpdateRequest.title.toString()
+
+        if(articleUpdateRequest.content != null)
+            article.content = articleUpdateRequest.content.toString()
+
+        article.topic = articleUpdateRequest.topic
+
+        val newImageUrls = if(articleUpdateRequest.images.isNotEmpty()) {
+            articleUpdateRequest.images.mapNotNull { image ->
+            // MultipartFile이 null이 아니고, 이미지 업로드가 성공한 경우에만 URL을 반환
+            runCatching {
+                s3Service.uploadImageToS3(
+                    userId = user.id,
+                    domain = DomainType.COMMUNITY.name,
+                    fileName = image.originalFilename!!,
+                    imageByteArray = image.bytes
+                )
+            }
+                .onFailure { throw DefaultException(errorCode = ErrorCode.S3_UPLOAD_FAILED) }
+                .getOrNull()
+            }
+        } else {
+            emptyList()
+        }
+
+        article.imageUrl.map {
+            s3Service.deleteFromS3ByUrl(it)
+        }
+
+        article.imageUrl = newImageUrls
+
+        articleRepository.save(article)
     }
 
     @Transactional
