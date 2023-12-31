@@ -92,9 +92,10 @@ class ArticleService(
 
     fun getPopularArticles(): List<ArticleResponse> {
         val articles: List<Article> = articleRepository.findAllByCreatedAtIsGreaterThanEqual(
-            createdAt = LocalDateTime.now().minusDays(1)
+            createdAt = LocalDateTime.now().minusDays(7)
         )
 
+        // TODO: 배포 후 게시글 수에 따라 조회 및 정렬 기준 변경
         articles.sortedBy { it.likes.size }
 
         return articles.map {

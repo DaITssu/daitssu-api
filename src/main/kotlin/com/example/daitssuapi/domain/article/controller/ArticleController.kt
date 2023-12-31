@@ -53,18 +53,17 @@ class ArticleController(
     fun pageArticleList(
         @Parameter(
             description = """
-                <b>[필수]</b> 조회할 Page, Page 당 개수, 정렬 기준입니다. <br />
-                `page`는 zero-indexed 입니다. <br />
-                <b>[기본 값]</b><br />
-                page: 0 <br />
-                size: 5 <br />
-                sort: [\"createdAt\"]
+<b>[필수]</b> 조회할 Page, Page 당 개수, 정렬 기준입니다. <br />
+`page`는 zero-indexed 입니다. <br />
+<b>[기본 값]</b><br />
+page: 0 <br />
+size: 5 <br />
+sort: [\"createdAt\"]
             """,
         )
         @PageableDefault(page = 0, size = 10, sort = ["createdAt"]) pageable: Pageable,
         @RequestParam inquiry: String?,
     ): Response<PageArticlesResponse> { // TODO : 유저의 nickname이 null이면 예외 파악이 매우 어려움
-        // TODO : 추가로 ArticleImage가 있는데, 이거는 출처가 뭔지도 모르겠고. image_url이 있는데 저거 왜 쓰는지도 모름. 우선 Table 만들지도 않을 것
         val articles = articleService.pageArticleList(
             inquiry = inquiry,
             pageable = pageable

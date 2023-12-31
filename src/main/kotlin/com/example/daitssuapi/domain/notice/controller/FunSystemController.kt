@@ -32,12 +32,12 @@ class FunSystemController(
     fun getAllFunSystemList(
         @Parameter(
             description = """
-                <b>[필수]</b> 조회할 Page, Page 당 개수, 정렬 기준입니다. <br />
-                `page`는 zero-indexed 입니다. <br />
-                <b>[기본 값]</b><br />
-                page: 0 <br />
-                size: 5 <br />
-                sort: [\"createdAt\"]
+<b>[필수]</b> 조회할 Page, Page 당 개수, 정렬 기준입니다. <br />
+`page`는 zero-indexed 입니다. <br />
+<b>[기본 값]</b><br />
+page: 0 <br />
+size: 5 <br />
+sort: [\"createdAt\"]
             """,
         )
         @PageableDefault(
