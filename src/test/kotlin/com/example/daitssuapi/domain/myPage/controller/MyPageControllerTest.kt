@@ -104,7 +104,7 @@ class MyPageControllerTest(
     fun get_my_articles_with_wrong_user_id() {
         val accessToken = tokenProvider.createAccessToken(id = 1L).token
 
-        mockMvc.perform(get("$baseUrl/artices")
+        mockMvc.perform(get("$baseUrl/articles")
             .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
         ).andExpect(status().isOk)
             .andExpect(jsonPath("$.data").isEmpty)
