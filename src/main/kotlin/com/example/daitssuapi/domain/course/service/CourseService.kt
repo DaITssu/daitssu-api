@@ -7,10 +7,13 @@ import com.example.daitssuapi.common.exception.DefaultException
 import com.example.daitssuapi.domain.course.dto.request.AssignmentCreateRequest
 import com.example.daitssuapi.domain.course.dto.request.AssignmentUpdateRequest
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
+import com.example.daitssuapi.domain.course.dto.request.CourseNoticeCreateRequest
+import com.example.daitssuapi.domain.course.dto.request.CourseNoticeUpdateRequest
 import com.example.daitssuapi.domain.course.dto.request.CourseRequest
 import com.example.daitssuapi.domain.course.dto.request.VideoRequest
 import com.example.daitssuapi.domain.course.dto.response.AssignmentResponse
 import com.example.daitssuapi.domain.course.dto.response.CalendarResponse
+import com.example.daitssuapi.domain.course.dto.response.CourseNoticeResponse
 import com.example.daitssuapi.domain.course.dto.response.CourseResponse
 import com.example.daitssuapi.domain.course.dto.response.TodayCalendarDataDto
 import com.example.daitssuapi.domain.course.dto.response.TodayCalendarResponse
@@ -19,9 +22,11 @@ import com.example.daitssuapi.domain.course.dto.response.VideoResponse
 import com.example.daitssuapi.domain.course.model.entity.Assignment
 import com.example.daitssuapi.domain.course.model.entity.Calendar
 import com.example.daitssuapi.domain.course.model.entity.Course
+import com.example.daitssuapi.domain.course.model.entity.CourseNotice
 import com.example.daitssuapi.domain.course.model.entity.Video
 import com.example.daitssuapi.domain.course.model.repository.AssignmentRepository
 import com.example.daitssuapi.domain.course.model.repository.CalendarRepository
+import com.example.daitssuapi.domain.course.model.repository.CourseNoticeRepository
 import com.example.daitssuapi.domain.course.model.repository.CourseRepository
 import com.example.daitssuapi.domain.course.model.repository.UserCourseRelationRepository
 import com.example.daitssuapi.domain.course.model.repository.VideoRepository
@@ -37,10 +42,11 @@ import java.time.format.DateTimeParseException
 
 @Service
 class CourseService(
-    private val assignmentRepository: AssignmentRepository,
-    private val courseRepository: CourseRepository,
     private val videoRepository: VideoRepository,
+    private val courseRepository: CourseRepository,
     private val calendarRepository: CalendarRepository,
+    private val assignmentRepository: AssignmentRepository,
+    private val courseNoticeRepository: CourseNoticeRepository,
     private val userCourseRelationRepository: UserCourseRelationRepository
 ) {
     fun getCourseList(): List<CourseResponse> {
@@ -324,6 +330,44 @@ class CourseService(
             videos = videos,
             assignments = assignments
         )
+    }
+
+    fun getNotices(courseId: Long): List<CourseNoticeResponse> =
+        courseNoticeRepository.findByCourseId(courseId = courseId).map(CourseNoticeResponse::of)
+
+    fun getNotice(courseId: Long, noticeId: Long): CourseNoticeResponse {
+        val courseNotice = courseNoticeRepository.findByIdOrNull(id = noticeId)?.also { it.viewNotice() }
+            ?: throw DefaultException(errorCode = ErrorCode.NOTICE_NOT_FOUND)
+
+        return CourseNoticeResponse.of(courseNotice)
+    }
+
+    @Transactional
+    fun createNotice(request: CourseNoticeCreateRequest): CourseNoticeResponse {
+        val course = courseRepository.findByIdOrNull(id = request.courseId)
+            ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND)
+
+        val courseNotice = CourseNotice(
+            name = request.name,
+            registeredAt = request.registeredAt,
+            content = request.content,
+            fileUrl = request.fileUrl ?: emptyList(),
+            course = course
+        ).also { courseNoticeRepository.save(it) }
+
+        return CourseNoticeResponse.of(courseNotice)
+    }
+
+    @Transactional
+    fun updateNotice(noticeId: Long, request: CourseNoticeUpdateRequest): CourseNoticeResponse {
+        val courseNotice = courseNoticeRepository.findByIdOrNull(id = noticeId)?.also {
+            it.update(
+                content = request.content,
+                fileUrl = request.fileUrl
+            )
+        } ?: throw DefaultException(errorCode = ErrorCode.NOTICE_NOT_FOUND)
+
+        return CourseNoticeResponse.of(courseNotice)
     }
 }
 

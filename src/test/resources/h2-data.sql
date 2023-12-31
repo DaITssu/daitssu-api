@@ -10,6 +10,7 @@ DELETE FROM users;
 DELETE FROM department;
 DELETE FROM notice;
 DELETE FROM notice_fs;
+DELETE FROM course_notice;
 
 INSERT INTO department(id, name) VALUES
     (1, 'computer'),
@@ -87,3 +88,6 @@ INSERT INTO notice_fs(id, title, content, category,url, image_url, created_at, u
     (3,'공지사항3','3번 공지 내용입니다!!','CERTIFICATION','http://google.com', '{"url": []}', '1000-01-01 00:00:00','1000-01-01 00:00:00',0),
     (4,'공지사항4','4번 공지 내용입니다!!','EXPERIENTIAL_ACTIVITIES','http://google.com', '{"url": []}', '1000-01-01 00:00:00','1000-01-01 00:00:00',0),
     (5,'공지사항5','5번 공지 내용입니다!!','EXPERIENTIAL_ACTIVITIES','http://google.com', '{"url": []}', '1000-01-01 00:00:00','1000-01-01 00:00:00',0);
+
+INSERT INTO course_notice(id, course_id, is_active, name, registered_at, views, content, file_url) VALUES
+    (1, 1, true, '강의의 공지1', '2024-01-01 04:16:12', 3, '공지 상세 내용', '{"url": []}')

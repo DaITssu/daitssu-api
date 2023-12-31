@@ -5,6 +5,8 @@ import com.example.daitssuapi.common.security.component.ArgumentResolver
 import com.example.daitssuapi.domain.course.dto.request.AssignmentCreateRequest
 import com.example.daitssuapi.domain.course.dto.request.AssignmentUpdateRequest
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
+import com.example.daitssuapi.domain.course.dto.request.CourseNoticeCreateRequest
+import com.example.daitssuapi.domain.course.dto.request.CourseNoticeUpdateRequest
 import com.example.daitssuapi.domain.course.dto.request.CourseRequest
 import com.example.daitssuapi.domain.course.dto.request.VideoRequest
 import com.example.daitssuapi.domain.course.dto.response.*
@@ -155,4 +157,55 @@ class CourseController(
     fun getTodayCalendar(): Response<TodayCalendarResponse> =
         Response(data = courseService.getTodayDueAtCalendars())
 
+    @Operation(
+        summary = "공지 리스트 조회",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
+    @GetMapping("{courseId}/notices")
+    fun getNotices(
+        @PathVariable courseId: Long
+    ): Response<List<CourseNoticeResponse>> =
+        Response(data = courseService.getNotices(courseId = courseId))
+
+    @Operation(
+        summary = "공지 조회",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
+    @GetMapping("{courseId}/notices/{noticeId}")
+    fun viewNotice(
+        @PathVariable courseId: Long,
+        @PathVariable noticeId: Long
+    ): Response<CourseNoticeResponse> =
+        Response(data = courseService.getNotice(courseId = courseId, noticeId = noticeId))
+
+    @Operation(
+        summary = "공지 등록",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
+    @PostMapping("{courseId}/notices")
+    fun createNotice(
+        @PathVariable courseId: Long,
+        @RequestBody request: CourseNoticeCreateRequest
+    ): Response<CourseNoticeResponse> =
+        Response(data = courseService.createNotice(request = request))
+
+    @Operation(
+        summary = "공지 수정",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
+    @PutMapping("{courseId}/notices/{noticeId}")
+    fun updateNotice(
+        @PathVariable courseId: Long,
+        @PathVariable noticeId: Long,
+        @RequestBody request: CourseNoticeUpdateRequest
+    ): Response<CourseNoticeResponse> =
+        Response(data = courseService.updateNotice(noticeId = noticeId, request = request))
 }

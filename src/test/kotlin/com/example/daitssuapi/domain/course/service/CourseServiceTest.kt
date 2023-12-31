@@ -6,7 +6,10 @@ import com.example.daitssuapi.common.exception.DefaultException
 import com.example.daitssuapi.domain.course.dto.request.AssignmentCreateRequest
 import com.example.daitssuapi.domain.course.dto.request.AssignmentUpdateRequest
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
+import com.example.daitssuapi.domain.course.dto.request.CourseNoticeCreateRequest
+import com.example.daitssuapi.domain.course.dto.request.CourseNoticeUpdateRequest
 import com.example.daitssuapi.domain.course.model.repository.AssignmentRepository
+import com.example.daitssuapi.domain.course.model.repository.CourseNoticeRepository
 import com.example.daitssuapi.domain.course.model.repository.CourseRepository
 import com.example.daitssuapi.domain.course.model.repository.UserCourseRelationRepository
 import com.example.daitssuapi.utils.IntegrationTest
@@ -23,6 +26,7 @@ class CourseServiceTest(
     private val courseService: CourseService,
     private val courseRepository: CourseRepository,
     private val assignmentRepository: AssignmentRepository,
+    private val courseNoticeRepository: CourseNoticeRepository,
     private val userCourseRelationRepository: UserCourseRelationRepository
 ) {
     @Test
@@ -219,13 +223,13 @@ class CourseServiceTest(
 
         assertAll(
             { assertThat(assignmentResponse.id).isNotZero() },
-            { assertThat(assignmentResponse.courseId).isEqualTo(assignmentResponse.courseId) },
-            { assertThat(assignmentResponse.name).isEqualTo(assignmentResponse.name) },
-            { assertThat(assignmentResponse.dueAt).isEqualTo(assignmentResponse.dueAt) },
-            { assertThat(assignmentResponse.startAt).isEqualTo(assignmentResponse.startAt) },
-            { assertThat(assignmentResponse.submitAt).isEqualTo(assignmentResponse.submitAt) },
-            { assertThat(assignmentResponse.detail).isEqualTo(assignmentResponse.detail) },
-            { assertThat(assignmentResponse.comments).isEqualTo(assignmentResponse.comments) }
+            { assertThat(assignmentResponse.courseId).isEqualTo(request.courseId) },
+            { assertThat(assignmentResponse.name).isEqualTo(request.name) },
+            { assertThat(assignmentResponse.dueAt).isEqualTo(request.dueAt) },
+            { assertThat(assignmentResponse.startAt).isEqualTo(request.startAt) },
+            { assertThat(assignmentResponse.submitAt).isEqualTo(request.submitAt) },
+            { assertThat(assignmentResponse.detail).isEqualTo(request.detail) },
+            { assertThat(assignmentResponse.comments).isEqualTo(request.comments) }
         )
     }
 
@@ -260,5 +264,117 @@ class CourseServiceTest(
             { assertThat(assignmentResponse.dueAt).isEqualTo(assignmentResponse.dueAt) },
             { assertThat(assignmentResponse.comments).isEqualTo(assignmentResponse.comments) }
         )
+    }
+
+    @Test
+    @DisplayName("성공_올바른 정보를 넘겨줄 시_강의의 공지가 생성된다")
+    fun successCreateCourseNotice() {
+        val course = courseRepository.findAll()[0]
+        val request = CourseNoticeCreateRequest(
+            courseId = course.id,
+            name = "공지이름",
+            registeredAt = LocalDateTime.now().minusHours(5),
+            content = "공지 내용"
+        )
+
+        val courseNoticeResponse = courseService.createNotice(request = request)
+
+        assertAll(
+            { assertThat(courseNoticeResponse.id).isNotZero() },
+            { assertThat(courseNoticeResponse.courseId).isEqualTo(request.courseId) },
+            { assertThat(courseNoticeResponse.isActive).isTrue() },
+            { assertThat(courseNoticeResponse.views).isZero() },
+            { assertThat(courseNoticeResponse.content).isEqualTo(request.content) },
+            { assertThat(courseNoticeResponse.fileUrl).isEqualTo(request.fileUrl ?: emptyList<String>()) },
+            { assertThat(courseNoticeResponse.registeredAt).isEqualTo(request.registeredAt) }
+        )
+    }
+
+    @Test
+    @DisplayName("실패_강의가 존재하지 않으면_공지 생성에 실패한다")
+    fun failCreateCourseNotice() {
+        val request = CourseNoticeCreateRequest(
+            courseId = 0L,
+            name = "공지이름",
+            registeredAt = LocalDateTime.now().minusHours(5),
+            content = "공지 내용"
+        )
+
+        assertThrows<DefaultException> { courseService.createNotice(request = request) }
+    }
+
+    @Test
+    @DisplayName("성공_올바른 정보를 넘겨줄 시_강의의 공지가 수정된다")
+    fun successUpdateCourseNotice() {
+        val courseNotice = courseNoticeRepository.findAll()[0]
+        val request = CourseNoticeUpdateRequest(
+            content = "공지 내용",
+            fileUrl = listOf("asdf.png")
+        )
+
+        val courseNoticeResponse = courseService.updateNotice(noticeId = courseNotice.id, request = request)
+
+        assertAll(
+            { assertThat(courseNoticeResponse.id).isEqualTo(courseNotice.id) },
+            { assertThat(courseNoticeResponse.courseId).isEqualTo(courseNotice.course.id) },
+            { assertThat(courseNoticeResponse.isActive).isEqualTo(courseNotice.isActive) },
+            { assertThat(courseNoticeResponse.views).isEqualTo(courseNotice.views) },
+            { assertThat(courseNoticeResponse.content).isEqualTo(request.content) },
+            { assertThat(courseNoticeResponse.fileUrl).isEqualTo(request.fileUrl) },
+            { assertThat(courseNoticeResponse.registeredAt).isEqualTo(courseNotice.registeredAt) }
+        )
+    }
+
+    @Test
+    @DisplayName("실패_강의의 공지가 없다면_공지 수정에 실패한다")
+    fun failUpdateCourseNotice() {
+        val request = CourseNoticeUpdateRequest(
+            content = "공지 내용",
+            fileUrl = listOf("asdf.png")
+        )
+
+        assertThrows<DefaultException> { courseService.updateNotice(noticeId = 0L, request = request) }
+    }
+
+    @Test
+    @DisplayName("성공_올바른 정보를 넘겨줄 시_강의의 공지들이 조회된다")
+    fun successGetNotices() {
+        val course = courseRepository.findAll()[0]
+
+        val courseNoticeResponse = courseService.getNotices(courseId = course.id)
+
+        assertThat(courseNoticeResponse).isNotEmpty
+    }
+
+    @Test
+    @DisplayName("성공_강의 혹은 공지가 없다면_공지가 조회되지 않는다")
+    fun successGetNoticesEmpty() {
+        val course = courseRepository.findAll().filter { it.courseNotices.isEmpty() }[0]
+
+        val courseNoticeResponse = courseService.getNotices(courseId = course.id)
+
+        assertThat(courseNoticeResponse).isEmpty()
+    }
+
+    @Test
+    @DisplayName("성공_올바른 정보를 넘겨줄 시_강의의 공지를 조회하고 조회수가 올라간다")
+    fun successGetNotice() {
+        val courseNotice = courseNoticeRepository.findAll()[0]
+        val originViews = courseNotice.views
+
+        val courseNoticeResponse = courseService.getNotice(courseId = courseNotice.course.id, noticeId = courseNotice.id)
+
+        assertAll(
+            { assertThat(courseNoticeResponse.id).isEqualTo(courseNotice.id) },
+            { assertThat(courseNoticeResponse.views).isEqualTo(originViews + 1) }
+        )
+    }
+
+    @Test
+    @DisplayName("실패_공지가 없다면_공지 조회에 실패한다")
+    fun failGetNotice() {
+        val course = courseRepository.findAll()[0]
+
+        assertThrows<DefaultException> { courseService.getNotice(courseId = course.id, noticeId = 0L) }
     }
 }

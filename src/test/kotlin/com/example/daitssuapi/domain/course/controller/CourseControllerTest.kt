@@ -7,7 +7,10 @@ import com.example.daitssuapi.common.security.component.TokenProvider
 import com.example.daitssuapi.domain.course.dto.request.AssignmentCreateRequest
 import com.example.daitssuapi.domain.course.dto.request.AssignmentUpdateRequest
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
+import com.example.daitssuapi.domain.course.dto.request.CourseNoticeCreateRequest
+import com.example.daitssuapi.domain.course.dto.request.CourseNoticeUpdateRequest
 import com.example.daitssuapi.domain.course.model.repository.AssignmentRepository
+import com.example.daitssuapi.domain.course.model.repository.CourseNoticeRepository
 import com.example.daitssuapi.domain.course.model.repository.CourseRepository
 import com.example.daitssuapi.domain.user.model.repository.UserRepository
 import com.example.daitssuapi.utils.ControllerTest
@@ -25,6 +28,7 @@ import java.time.LocalDateTime
 
 @ControllerTest
 class CourseControllerTest(
+    private val courseNoticeRepository: CourseNoticeRepository,
     private val assignmentRepository: AssignmentRepository,
     private val courseRepository: CourseRepository,
     private val userRepository: UserRepository,
@@ -310,5 +314,124 @@ class CourseControllerTest(
             .content(objectMapper.writeValueAsString(request))
         ).andExpect(status().isOk)
             .andExpect(jsonPath("$.data").isNotEmpty)
+    }
+
+    @Test
+    @DisplayName("성공_올바른 정보를 넘겨줄 시_강의의 공지가 생성된다")
+    fun successCreateCourseNotice() {
+        val course = courseRepository.findAll()[0]
+        val request = CourseNoticeCreateRequest(
+            courseId = course.id,
+            name = "공지이름",
+            registeredAt = LocalDateTime.now().minusHours(5),
+            content = "공지 내용"
+        )
+
+        mockMvc.perform(post("$baseUrl/${course.id}/notices")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer test")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+        ).andExpect(status().isOk)
+            .andExpect(jsonPath("$.data").isNotEmpty)
+    }
+
+    @Test
+    @DisplayName("실패_강의가 존재하지 않으면_공지 생성에 실패한다")
+    fun failCreateCourseNotice() {
+        val wrongCourseId = 0L
+        val request = CourseNoticeCreateRequest(
+            courseId = 0L,
+            name = "공지이름",
+            registeredAt = LocalDateTime.now().minusHours(5),
+            content = "공지 내용"
+        )
+
+        mockMvc.perform(post("$baseUrl/$wrongCourseId/notices")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer test")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+        ).andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.code").value(ErrorCode.COURSE_NOT_FOUND.code))
+    }
+
+    @Test
+    @DisplayName("성공_올바른 정보를 넘겨줄 시_강의의 공지가 수정된다")
+    fun successUpdateCourseNotice() {
+        val courseNotice = courseNoticeRepository.findAll()[0]
+        val request = CourseNoticeUpdateRequest(
+            content = "공지 내용",
+            fileUrl = listOf("asdf.png")
+        )
+
+        mockMvc.perform(put("$baseUrl/${courseNotice.course.id}/notices/${courseNotice.id}")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer test")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+        ).andExpect(status().isOk)
+            .andExpect(jsonPath("$.data").isNotEmpty)
+    }
+
+    @Test
+    @DisplayName("실패_강의의 공지가 없다면_공지 수정에 실패한다")
+    fun failUpdateCourseNotice() {
+        val course = courseRepository.findAll()[0]
+        val wrongCourseNoticeId = 0L
+        val request = CourseNoticeUpdateRequest(
+            content = "공지 내용",
+            fileUrl = listOf("asdf.png")
+        )
+
+        mockMvc.perform(put("$baseUrl/${course.id}/notices/$wrongCourseNoticeId")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer test")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+        ).andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.code").value(ErrorCode.NOTICE_NOT_FOUND.code))
+    }
+
+    @Test
+    @DisplayName("성공_올바른 정보를 넘겨줄 시_강의의 공지들이 조회된다")
+    fun successGetNotices() {
+        val course = courseRepository.findAll()[0]
+
+        mockMvc.perform(get("$baseUrl/${course.id}/notices")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer test")
+        ).andExpect(status().isOk)
+            .andExpect(jsonPath("$.data").isNotEmpty)
+    }
+
+    @Test
+    @DisplayName("성공_강의 혹은 공지가 없다면_공지가 조회되지 않는다")
+    fun successGetNoticesEmpty() {
+        val course = courseRepository.findAll().filter { it.courseNotices.isEmpty() }[0]
+
+        mockMvc.perform(get("$baseUrl/${course.id}/notices")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer test")
+        ).andExpect(status().isOk)
+            .andExpect(jsonPath("$.data").isEmpty)
+    }
+
+    @Test
+    @DisplayName("성공_올바른 정보를 넘겨줄 시_강의의 공지를 조회하고 조회수가 올라간다")
+    fun successGetNotice() {
+        val courseNotice = courseNoticeRepository.findAll()[0]
+        val originViews = courseNotice.views
+
+        mockMvc.perform(get("$baseUrl/${courseNotice.course.id}/notices/${courseNotice.id}")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer test")
+        ).andExpect(status().isOk)
+            .andExpect(jsonPath("$.data.views").value(originViews + 1))
+    }
+
+    @Test
+    @DisplayName("실패_공지가 없다면_공지 조회에 실패한다")
+    fun failGetNotice() {
+        val course = courseRepository.findAll()[0]
+        val wrongCourseNoticeId = 0L
+
+        mockMvc.perform(get("$baseUrl/${course.id}/notices/$wrongCourseNoticeId")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer test")
+        ).andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.code").value(ErrorCode.NOTICE_NOT_FOUND.code))
     }
 }

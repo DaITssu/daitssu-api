@@ -10,6 +10,7 @@ import com.example.daitssuapi.domain.course.model.repository.CourseRepository
 import com.example.daitssuapi.domain.course.model.repository.UserCourseRelationRepository
 import com.example.daitssuapi.domain.myPage.dto.response.MyArticleResponse
 import com.example.daitssuapi.domain.myPage.dto.response.MyAssignmentResponse
+import com.example.daitssuapi.domain.myPage.dto.response.MyCourseNoticeResponse
 import com.example.daitssuapi.domain.myPage.dto.response.MyCourseSimpleResponse
 import com.example.daitssuapi.domain.myPage.dto.response.MyScrapResponse
 import com.example.daitssuapi.domain.user.model.repository.UserRepository
@@ -101,6 +102,34 @@ class MyPageService(
                     comments = assignment.comments
                 )
             }
+        }
+    }
+
+    fun getCourseNotices(userId: Long, courseId: Long): List<MyCourseNoticeResponse> {
+        userRepository.findByIdOrNull(userId)
+            ?: throw DefaultException(errorCode = ErrorCode.USER_NOT_FOUND)
+
+        val course = courseRepository.findByIdOrNull(courseId)
+            ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND)
+
+        val courseResponse = MyCourseSimpleResponse(
+            id = course.id,
+            name = course.name,
+            term = course.term,
+            courseCode = course.courseCode
+        )
+
+        return course.courseNotices.map { courseNotice ->
+            MyCourseNoticeResponse(
+                id = courseNotice.id,
+                course = courseResponse,
+                name = courseNotice.name,
+                isActive = courseNotice.isActive,
+                registeredAt = courseNotice.registeredAt,
+                views = courseNotice.views,
+                content = courseNotice.content,
+                fileUrl = courseNotice.fileUrl
+            )
         }
     }
 }

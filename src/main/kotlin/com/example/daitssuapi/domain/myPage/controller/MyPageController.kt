@@ -6,12 +6,14 @@ import com.example.daitssuapi.domain.article.dto.response.CommentResponse
 import com.example.daitssuapi.domain.myPage.dto.request.CommentDeleteRequest
 import com.example.daitssuapi.domain.myPage.dto.response.MyArticleResponse
 import com.example.daitssuapi.domain.myPage.dto.response.MyAssignmentResponse
+import com.example.daitssuapi.domain.myPage.dto.response.MyCourseNoticeResponse
 import com.example.daitssuapi.domain.myPage.dto.response.MyScrapResponse
 import com.example.daitssuapi.domain.myPage.service.MyPageService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -87,5 +89,20 @@ class MyPageController(
         val userId = argumentResolver.resolveUserId()
 
         return Response(data = myPageService.getAssignments(userId = userId, courseId = courseId))
+    }
+
+    @Operation(
+        summary = "나의 강의의 공지 리스트 조회",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
+    @GetMapping("/course/{courseId}/notices")
+    fun getCourseNotices(
+        @PathVariable courseId: Long
+    ): Response<List<MyCourseNoticeResponse>> {
+        val userId = argumentResolver.resolveUserId()
+
+        return Response(data = myPageService.getCourseNotices(userId = userId, courseId = courseId))
     }
 }
