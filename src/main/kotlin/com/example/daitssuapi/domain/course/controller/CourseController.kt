@@ -2,6 +2,7 @@ package com.example.daitssuapi.domain.course.controller
 
 import com.example.daitssuapi.common.dto.Response
 import com.example.daitssuapi.common.security.component.ArgumentResolver
+import com.example.daitssuapi.domain.course.dto.request.AssignmentCreateRequest
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
 import com.example.daitssuapi.domain.course.dto.request.CourseRequest
 import com.example.daitssuapi.domain.course.dto.request.VideoRequest
@@ -80,18 +81,17 @@ class CourseController(
     ): Response<VideoResponse> =
         Response(data = courseService.postVideo(videoRequest))
 
-    // TODO: 과제 구현 안되어있음
-//    @Operation(
-//        summary = "과제 추가",
-//        responses = [
-//            ApiResponse(responseCode = "200", description = "OK")
-//        ]
-//    )
-//    @PostMapping("/assignment")
-//    fun postCreateAssignment(
-//        @RequestBody assignmentRequest: AssignmentRequest
-//    ): Response<AssignmentResponse> =
-//        Response(data = courseService.postAssignment(assignmentRequest = assignmentRequest))
+    @Operation(
+        summary = "과제 추가",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
+    @PostMapping("/assignment")
+    fun createAssignment(
+        @RequestBody assignmentCreateRequest: AssignmentCreateRequest
+    ): Response<AssignmentResponse> =
+        Response(data = courseService.postAssignment(request = assignmentCreateRequest))
 
     @Operation(
         summary = "과목 추가",
