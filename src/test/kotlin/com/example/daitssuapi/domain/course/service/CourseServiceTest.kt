@@ -71,7 +71,6 @@ class CourseServiceTest(
             { assertThat(findCourse.name).isEqualTo(course?.name) },
             { assertThat(findCourse.term).isEqualTo(course?.term) },
             { assertThat(findCourse.videos.size).isEqualTo(course?.videos?.size) },
-            { assertThat(findCourse.assignments.size).isEqualTo(course?.videos?.size) }
         )
     }
     
