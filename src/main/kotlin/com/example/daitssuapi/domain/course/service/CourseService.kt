@@ -72,7 +72,7 @@ class CourseService(
         )
     }
 
-    fun getCalendar(dateRequest: String, userId: Long): Map<String, List<CalendarResponse>> {
+    fun getCalendar(dateRequest: String, userId: Long): List<CalendarsResponse> {
         val date = "$dateRequest-01"
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val dateTime: LocalDate
@@ -86,17 +86,25 @@ class CourseService(
         val startDateTime = yearMonth.atDay(1).atStartOfDay()
         val endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59)
         
-        return calendarRepository.findByUserIdAndDueAtBetween(userId, startDateTime, endDateTime).groupBy(
-            { it.course }, { CalendarResponse(it.id, it.type, it.dueAt, it.name, it.isCompleted) }
+        
+        val calendars = calendarRepository.findByUserIdAndDueAtBetween(userId, startDateTime, endDateTime).groupBy(
+            { it.course.name }, { CalendarResponse(it.id, it.type, it.dueAt, it.name, it.isCompleted) }
         )
+        
+        return calendars.map { (course, calendars) ->
+            CalendarsResponse(course = course, calendarResponses = calendars)
+        }
     }
 
     fun postCalendar(calendarRequest: CalendarRequest, userId: Long): CalendarResponse {
         val dateTime = checkDateReturnDate(calendarRequest.dueAt)
 
+        val course = courseRepository.findByName(calendarRequest.course)
+            ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND)
+
         val calendar = Calendar(
             type = calendarRequest.type,
-            course = calendarRequest.course,
+            course = course,
             dueAt = dateTime,
             name = calendarRequest.name,
             isCompleted = calendarRequest.isCompleted,
@@ -183,8 +191,11 @@ class CourseService(
             ?: throw DefaultException(ErrorCode.CALENDAR_NOT_FOUND)
 
         val dateTime = checkDateReturnDate(calendarRequest.dueAt)
+        
+        val course = courseRepository.findByName(calendarRequest.course)
+            ?: throw DefaultException(ErrorCode.COURSE_NOT_FOUND)
 
-        calendar.updateCalendar(calendarRequest = calendarRequest, dueAt = dateTime)
+        calendar.updateCalendar(calendarRequest = calendarRequest, dueAt = dateTime, course = course)
             .also { calendarRepository.save(calendar) }
 
         return CalendarResponse(
@@ -241,7 +252,7 @@ class CourseService(
             )
 
             val todayCalendarDataDto = TodayCalendarDataDto(
-                course = calendar.course,
+                course = calendar.course.name,
                 dueAt = calendars.minOf { it.dueAt },
                 count = calendars.size
             )
@@ -259,7 +270,7 @@ class CourseService(
             )
 
             val todayCalendarDataDto = TodayCalendarDataDto(
-                course = calendar.course,
+                course = calendar.course.name,
                 dueAt = calendars.minOf { it.dueAt },
                 count = calendars.size
             )
