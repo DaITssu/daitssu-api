@@ -90,15 +90,12 @@ class CourseServiceTest(
     fun get_calendar_with_date () {
         // case 1. 조회가 잘되는지 확인
         val date = "2023-07"
-        val name = "eat paper"
         val userId = 1L
-        
         val findCalendar = courseService.getCalendar(date, userId)
         
-//        assertAll(
-//            { assertThat(findCalendar.keys).contains(name) },
-//            { assertThat(findCalendar[name]?.size).isEqualTo(1) }
-//        )
+        assertAll(
+            { assertThat(findCalendar.size).isEqualTo(1) }
+        )
      
     }
     
