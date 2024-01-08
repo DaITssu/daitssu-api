@@ -3,6 +3,7 @@ package com.example.daitssuapi.domain.myPage.controller
 import com.example.daitssuapi.common.dto.Response
 import com.example.daitssuapi.common.security.component.ArgumentResolver
 import com.example.daitssuapi.domain.article.dto.response.CommentResponse
+import com.example.daitssuapi.domain.main.dto.response.ServiceNoticeResponse
 import com.example.daitssuapi.domain.myPage.dto.request.CommentDeleteRequest
 import com.example.daitssuapi.domain.myPage.dto.response.MyArticleResponse
 import com.example.daitssuapi.domain.myPage.dto.response.MyScrapResponse
@@ -71,4 +72,16 @@ class MyPageController(
         
         return Response(data = myPageService.getMyScrap(userId = userId))
     }
+
+    @Operation(
+        summary = "서비스 공지사항 전체 조회",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK")
+        ]
+    )
+    @GetMapping("/service-notice")
+    fun getServiceNotice(): Response<List<ServiceNoticeResponse>> =
+        Response(data = myPageService.getServiceNotice())
+
+
 }
