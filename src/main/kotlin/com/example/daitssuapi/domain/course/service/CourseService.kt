@@ -87,11 +87,9 @@ class CourseService(
         val endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59)
         
         
-        val calendars = calendarRepository.findByUserIdAndDueAtBetween(userId, startDateTime, endDateTime).groupBy(
+        return calendarRepository.findByUserIdAndDueAtBetween(userId, startDateTime, endDateTime).groupBy(
             { it.course.name }, { CalendarResponse(it.id, it.type, it.dueAt, it.name, it.isCompleted) }
-        )
-        
-        return calendars.map { (course, calendars) ->
+        ).map {(course, calendars) ->
             CalendarsResponse(course = course, calendarResponses = calendars)
         }
     }
