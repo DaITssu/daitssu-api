@@ -131,7 +131,7 @@ class CourseControllerTest(
         val calendarRequest = CalendarRequest(
             name = "숙제 마감일",
             type = CalendarType.ASSIGNMENT,
-            course = "do it",
+            courseId = 2,
             dueAt = "2023-07-27 23:59:59",
             isCompleted = false
         )
@@ -153,7 +153,7 @@ class CourseControllerTest(
         val calendarRequest = CalendarRequest(
             name = "강의 출석 마감일",
             type = CalendarType.VIDEO,
-            course = "choco",
+            courseId = 4,
             dueAt = "2023-07-27",
             isCompleted = false
         )
@@ -182,7 +182,7 @@ class CourseControllerTest(
         val calendarRequest = CalendarRequest(
             name = "숙제 마감일",
             type = CalendarType.ASSIGNMENT,
-            course = "do it",
+            courseId = 2,
             dueAt = "2023-07-27 23:59:59",
             isCompleted = true
         )
@@ -206,7 +206,7 @@ class CourseControllerTest(
         val calendarRequest = CalendarRequest(
             name = "강의 출석 마감일",
             type = CalendarType.VIDEO,
-            course = "choco",
+            courseId = 4,
             dueAt = "2023-07-27",
             isCompleted = true
         )

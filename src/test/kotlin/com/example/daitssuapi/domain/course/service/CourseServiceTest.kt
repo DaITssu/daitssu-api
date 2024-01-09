@@ -115,7 +115,7 @@ class CourseServiceTest(
     fun post_create_calendar_with_calendar_request() {
         val calendarRequest = CalendarRequest(
             type = CalendarType.VIDEO,
-            course = "do it",
+            courseId = 2,
             dueAt = "2023-07-27 23:59:59",
             name = "과제 꼭 하기",
             isCompleted = false
@@ -136,7 +136,7 @@ class CourseServiceTest(
     fun post_create_calendar_with_wrong_calendar_request() {
         val calendarRequest = CalendarRequest(
             type = CalendarType.VIDEO,
-            course = "do it",
+            courseId = 2,
             dueAt = "2023-07-27",
             name = "과제 꼭 하기",
             isCompleted = false
@@ -153,7 +153,7 @@ class CourseServiceTest(
     fun put_update_calendar_with_calendar_request() {
         val calendarRequestUpdate = CalendarRequest(
             type = CalendarType.ASSIGNMENT,
-            course = "eat paper",
+            courseId = 1,
             dueAt = "2023-08-27 23:59:59",
             name = "과제",
             isCompleted = true
@@ -175,7 +175,7 @@ class CourseServiceTest(
     fun update_create_calendar_with_wrong_calendar_request() {
         val calendarRequest = CalendarRequest(
             type = CalendarType.VIDEO,
-            course = "do it",
+            courseId = 2,
             dueAt = "2023-07-27",
             name = "과제 꼭 하기",
             isCompleted = true
