@@ -8,7 +8,7 @@ data class CalendarRequest(
     @Schema(description = "일정의 종류")
     val type: CalendarType,
     @Schema(description = "일정의 분류")
-    val course: String,
+    val courseId: Long,
     @Schema(description = "일정의 마감기한")
     val dueAt: String,
     @Schema(description = "일정의 제목")

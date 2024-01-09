@@ -97,7 +97,7 @@ class CourseService(
     fun postCalendar(calendarRequest: CalendarRequest, userId: Long): CalendarResponse {
         val dateTime = checkDateReturnDate(calendarRequest.dueAt)
 
-        val course = courseRepository.findByName(calendarRequest.course)
+        val course = courseRepository.findByIdOrNull(calendarRequest.courseId)
             ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND)
 
         val calendar = Calendar(
@@ -190,7 +190,7 @@ class CourseService(
 
         val dateTime = checkDateReturnDate(calendarRequest.dueAt)
         
-        val course = courseRepository.findByName(calendarRequest.course)
+        val course = courseRepository.findByIdOrNull(calendarRequest.courseId)
             ?: throw DefaultException(ErrorCode.COURSE_NOT_FOUND)
 
         calendar.updateCalendar(calendarRequest = calendarRequest, dueAt = dateTime, course = course)
