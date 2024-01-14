@@ -27,7 +27,7 @@ data class ArticleResponse(
     val updatedAt: LocalDateTime,
 
     @Schema(description = "이미지 url 리스트")
-    val imageUrls: List<String>,
+    val imageUrls: List<String> ?= emptyList(),
 
     @Schema(description = "좋아요 수")
     val likes: Int,

@@ -23,7 +23,7 @@ class Article(
     var writer: User,
 
     @Convert(converter = JsonParsingConverter::class)
-    var imageUrl: List<String> = emptyList(),
+    var imageUrl: List<String> ?= emptyList(),
 
     @OneToMany(mappedBy = "article")
     var likes: MutableSet<ArticleLike> = mutableSetOf(),
