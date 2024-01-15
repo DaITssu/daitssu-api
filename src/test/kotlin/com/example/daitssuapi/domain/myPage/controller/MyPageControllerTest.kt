@@ -157,6 +157,16 @@ class MyPageControllerTest(
     }
 
     @Test
+    @DisplayName("실패_올바르지 않은 userId 넘겨주면_과제 조회에 실패한다")
+    fun failGetAssignments() {
+        val accessToken = tokenProvider.createAccessToken(id = 0L).token
+
+        mockMvc.perform(get("$baseUrl/assignments")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
+        ).andExpect(status().isBadRequest)
+    }
+
+    @Test
     @DisplayName("실패_올바르지 않은 courseId를 넘겨주면_과제 조회에 실패한다")
     fun failGetAssignmentsWithCourseId() {
         val accessToken = tokenProvider.createAccessToken(id = 1L).token
@@ -169,12 +179,48 @@ class MyPageControllerTest(
     }
 
     @Test
-    @DisplayName("실패_올바르지 않은 userId 넘겨주면_과제 조회에 실패한다")
-    fun failGetAssignments() {
-        val accessToken = tokenProvider.createAccessToken(id = 0L).token
+    @DisplayName("성공_올바른 userId와 courseId를 넘겨주면_과제를 조회한다")
+    fun successGetCourseNotices() {
+        val accessToken = tokenProvider.createAccessToken(id = 1L).token
+        val courseId = 1L
 
-        mockMvc.perform(get("$baseUrl/assignments")
+        mockMvc.perform(get("$baseUrl/course/$courseId/notices")
             .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
+            .param("courseId", courseId.toString())
+        ).andExpect(status().isOk)
+            .andExpect(jsonPath("$.data").isNotEmpty)
+    }
+
+    @Test
+    @DisplayName("실패_올바르지 않은 userId 넘겨주면_과제 조회에 실패한다")
+    fun failGetCourseNotices() {
+        val accessToken = tokenProvider.createAccessToken(id = 0L).token
+        val courseId = 1L
+
+        mockMvc.perform(get("$baseUrl/course/$courseId/notices")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
+            .param("courseId", courseId.toString())
         ).andExpect(status().isBadRequest)
+    }
+
+    @Test
+    @DisplayName("실패_올바르지 않은 courseId를 넘겨주면_과제 조회에 실패한다")
+    fun failGetCourseNoticesWithCourseId() {
+        val accessToken = tokenProvider.createAccessToken(id = 1L).token
+        val wrongCourseId = 0L
+
+        mockMvc.perform(get("$baseUrl/course/$wrongCourseId/notices")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
+            .param("courseId", wrongCourseId.toString())
+        ).andExpect(status().isBadRequest)
+    }
+
+    @DisplayName("서비스 공지사항 전제 조회")
+    fun get_service_notice() {
+
+        mockMvc.perform(get("$baseUrl/service-notice"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.data").isNotEmpty)
+            .andReturn()
     }
 }
