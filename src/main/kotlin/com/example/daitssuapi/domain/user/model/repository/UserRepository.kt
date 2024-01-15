@@ -14,4 +14,8 @@ interface UserRepository : JpaRepository<User, Long> {
         nickname: String,
         studentId: String,
     ): User?
+
+    fun existsByNickname(
+        nickname: String,
+    ): Boolean
 }
