@@ -8,11 +8,9 @@ import com.example.daitssuapi.domain.article.model.repository.CommentRepository
 import com.example.daitssuapi.domain.article.model.repository.ScrapRepository
 import com.example.daitssuapi.domain.course.model.repository.CourseRepository
 import com.example.daitssuapi.domain.course.model.repository.UserCourseRelationRepository
-import com.example.daitssuapi.domain.myPage.dto.response.MyArticleResponse
-import com.example.daitssuapi.domain.myPage.dto.response.MyAssignmentResponse
-import com.example.daitssuapi.domain.myPage.dto.response.MyCourseNoticeResponse
-import com.example.daitssuapi.domain.myPage.dto.response.MyCourseSimpleResponse
-import com.example.daitssuapi.domain.myPage.dto.response.MyScrapResponse
+import com.example.daitssuapi.domain.main.dto.response.ServiceNoticeResponse
+import com.example.daitssuapi.domain.main.model.repository.ServiceNoticeRepository
+import com.example.daitssuapi.domain.myPage.dto.response.*
 import com.example.daitssuapi.domain.user.model.repository.UserRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -25,7 +23,8 @@ class MyPageService(
     private val commentRepository: CommentRepository,
     private val scrapRepository: ScrapRepository,
     private val courseRepository: CourseRepository,
-    private val userCourseRelationRepository: UserCourseRelationRepository
+    private val userCourseRelationRepository: UserCourseRelationRepository,
+    private val serviceNoticeRepository: ServiceNoticeRepository,
 ) {
     fun getComments(userId: Long): List<CommentResponse> {
         userRepository.findByIdOrNull(id = userId) ?: throw DefaultException(errorCode = ErrorCode.USER_NOT_FOUND)
@@ -70,7 +69,6 @@ class MyPageService(
                 commentSize = it.article.comments.count { comment -> !comment.isDeleted }
             )
         }
-
     }
 
     fun getAssignments(userId: Long, courseId: Long? = null): List<MyAssignmentResponse> {
@@ -128,7 +126,17 @@ class MyPageService(
                 registeredAt = courseNotice.registeredAt,
                 views = courseNotice.views,
                 content = courseNotice.content,
-                fileUrl = courseNotice.fileUrl
+                fileUrl = courseNotice.fileUrl,
+            )
+        }
+    }
+
+    fun getServiceNotice():List<ServiceNoticeResponse>{
+        return serviceNoticeRepository.findAll().map { serviceNotice ->
+            ServiceNoticeResponse(
+                title = serviceNotice.title,
+                content = serviceNotice.content,
+                createdAt = serviceNotice.createdAt
             )
         }
     }

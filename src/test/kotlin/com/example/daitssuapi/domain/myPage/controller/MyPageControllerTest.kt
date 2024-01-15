@@ -214,4 +214,13 @@ class MyPageControllerTest(
             .param("courseId", wrongCourseId.toString())
         ).andExpect(status().isBadRequest)
     }
+
+    @DisplayName("서비스 공지사항 전제 조회")
+    fun get_service_notice() {
+
+        mockMvc.perform(get("$baseUrl/service-notice"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.data").isNotEmpty)
+            .andReturn()
+    }
 }
