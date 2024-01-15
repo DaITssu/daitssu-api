@@ -15,16 +15,18 @@ class Course(
     @OneToMany(mappedBy = "course")
     val videos: MutableList<Video> = mutableListOf(),
 
-//    @OneToMany(mappedBy = "course")
-//    val assignments: MutableList<Assignment> = mutableListOf()
+    @OneToMany(mappedBy = "course")
+    val assignments: MutableList<Assignment> = mutableListOf(),
+
+    @OneToMany(mappedBy = "course")
+    val courseNotices: MutableList<CourseNotice> = mutableListOf()
 ) : BaseEntity() {
     fun addVideo(video: Video) {
         videos.add(video)
         video.course = this
     }
 
-//    fun addAssignment(assignment: Assignment) {
-//        assignments.add(assignment)
-//        assignment.course = this
-//    }
+    fun addAssignment(assignment: Assignment) {
+        assignments.add(assignment)
+    }
 }
