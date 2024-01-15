@@ -74,4 +74,8 @@ class UserService(
         userRepository.findByIdOrNull(userId)?.apply { isDeleted = true }
             ?: throw DefaultException(ErrorCode.USER_NOT_FOUND)
     }
+
+    fun checkNickname(nickname: String): Boolean {
+        return userRepository.existsByNickname(nickname)
+    }
 }
