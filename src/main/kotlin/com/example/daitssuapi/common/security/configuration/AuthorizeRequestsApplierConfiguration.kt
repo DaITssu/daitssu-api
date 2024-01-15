@@ -23,6 +23,7 @@ class AuthorizeRequestsApplierConfiguration {
             "/auth/sign-up",
             "/auth/sign-in",
             "/auth/info",
+            "/auth/check-nickname",
         )
         private val URLS_DOCUMENT = arrayOf(
             "/swagger-ui/**",

@@ -1,6 +1,8 @@
 package com.example.daitssuapi.domain.auth.controller
 
 import com.example.daitssuapi.common.dto.Response
+import com.example.daitssuapi.common.enums.ErrorCode
+import com.example.daitssuapi.common.exception.DefaultException
 import com.example.daitssuapi.common.security.component.ArgumentResolver
 import com.example.daitssuapi.domain.auth.controller.request.RefreshRequest
 import com.example.daitssuapi.domain.auth.controller.request.SignInRequest
@@ -8,9 +10,11 @@ import com.example.daitssuapi.domain.auth.controller.request.SignUpRequest
 import com.example.daitssuapi.domain.auth.controller.response.AuthInfoResponse
 import com.example.daitssuapi.domain.auth.controller.response.AuthResponse
 import com.example.daitssuapi.domain.auth.service.AuthService
+import com.example.daitssuapi.domain.user.service.UserService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -18,6 +22,7 @@ import org.springframework.web.bind.annotation.*
 @Tag(name = "Auth", description = "인증 관련 API")
 class AuthController(
     private val authService: AuthService,
+    private val userService: UserService,
     private val argumentResolver: ArgumentResolver
 ) {
     @Operation(
@@ -118,5 +123,26 @@ class AuthController(
         authService.refreshInfo(userId)
 
         return Response(code = 0, message = "OK", data = null)
+    }
+
+    @Operation(
+        summary = "닉네임 중복 체크",
+        description = "닉네임 중복 체크",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK"),
+            ApiResponse(responseCode = "406", description = "NICKNAME_DUPLICATED(code: 1017)"),
+        ],
+    )
+    @GetMapping("/check-nickname")
+    fun checkNickname(
+        @RequestParam
+        nickname: String,
+    ): Response<Nothing> {
+        val isExist = userService.checkNickname(nickname)
+
+        return if(isExist)
+            throw DefaultException(ErrorCode.NICKNAME_DUPLICATED, HttpStatus.NOT_ACCEPTABLE)
+        else
+            Response(code = 0, message = "OK", data = null)
     }
 }

@@ -24,6 +24,7 @@ enum class ErrorCode(val code: Int, val message: String) {
     TOKEN_INVALID(MAIN_NUMBERING + 14, "유효하지 않은 토큰입니다."),
     TOKEN_EXPIRED(MAIN_NUMBERING + 15, "토큰이 만료되었습니다."),
     TOKEN_NOT_FOUND(MAIN_NUMBERING + 16, "토큰이 존재하지 않습니다. 로그인 해주세요"),
+    NICKNAME_DUPLICATED(MAIN_NUMBERING + 17, "이미 존재하는 닉네임입니다."),
 
     NOTICE_NOT_FOUND(NOTICE_NUMBERING + 1, "공지사항 내용을 찾을 수 없습니다"),
     FUNSYSTEM_NOT_FOUND(NOTICE_NUMBERING + 2, "펀시스템 내용을 찾을 수 없습니다"),
