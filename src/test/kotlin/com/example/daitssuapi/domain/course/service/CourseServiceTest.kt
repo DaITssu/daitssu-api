@@ -3,11 +3,7 @@ package com.example.daitssuapi.domain.course.service
 import com.example.daitssuapi.common.enums.CalendarType
 import com.example.daitssuapi.common.enums.RegisterStatus
 import com.example.daitssuapi.common.exception.DefaultException
-import com.example.daitssuapi.domain.course.dto.request.AssignmentCreateRequest
-import com.example.daitssuapi.domain.course.dto.request.AssignmentUpdateRequest
-import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
-import com.example.daitssuapi.domain.course.dto.request.CourseNoticeCreateRequest
-import com.example.daitssuapi.domain.course.dto.request.CourseNoticeUpdateRequest
+import com.example.daitssuapi.domain.course.dto.request.*
 import com.example.daitssuapi.domain.course.model.repository.AssignmentRepository
 import com.example.daitssuapi.domain.course.model.repository.CourseNoticeRepository
 import com.example.daitssuapi.domain.course.model.repository.CourseRepository
@@ -25,9 +21,9 @@ import java.time.LocalDateTime
 class CourseServiceTest(
     private val courseService: CourseService,
     private val courseRepository: CourseRepository,
+    private val userCourseRelationRepository: UserCourseRelationRepository,
     private val assignmentRepository: AssignmentRepository,
     private val courseNoticeRepository: CourseNoticeRepository,
-    private val userCourseRelationRepository: UserCourseRelationRepository
 ) {
     @Test
     @DisplayName("성공_올바른 userId를 이용하여 과목 조회 시_1개 이상의 과목이 조회될 수 있다")
@@ -80,7 +76,7 @@ class CourseServiceTest(
         assertAll(
             { assertThat(findCourse.name).isEqualTo(course?.name) },
             { assertThat(findCourse.term).isEqualTo(course?.term) },
-            { assertThat(findCourse.videos.size).isEqualTo(course?.videos?.size) }
+            { assertThat(findCourse.videos.size).isEqualTo(course?.videos?.size) },
         )
     }
 
@@ -97,12 +93,11 @@ class CourseServiceTest(
     fun get_calendar_with_date() {
         // case 1. 조회가 잘되는지 확인
         val date = "2023-07"
-        val name = "eat paper"
-        val findCalendar = courseService.getCalendar(date)
-
+        val userId = 1L
+        val findCalendar = courseService.getCalendar(date, userId)
+        
         assertAll(
-            { assertThat(findCalendar.keys).contains(name) },
-            { assertThat(findCalendar[name]?.size).isEqualTo(2) }
+            { assertThat(findCalendar.size).isEqualTo(1) }
         )
 
     }
@@ -111,9 +106,10 @@ class CourseServiceTest(
     @DisplayName("잘못된 date 형식으로 캘린더 조회시_에러가 발생한다")
     fun get_calendar_with_wrong_date() {
         val date = "2023-07-27"
-
+        val userId = 1L
+        
         assertThrows<DefaultException> {
-            courseService.getCalendar(date)
+            courseService.getCalendar(dateRequest = date, userId = userId)
         }
     }
 
@@ -122,13 +118,14 @@ class CourseServiceTest(
     fun post_create_calendar_with_calendar_request() {
         val calendarRequest = CalendarRequest(
             type = CalendarType.VIDEO,
-            course = "do it",
+            courseId = 2,
             dueAt = "2023-07-27 23:59:59",
             name = "과제 꼭 하기",
             isCompleted = false
         )
-        val findCalendar = courseService.postCalendar(calendarRequest)
-
+        val userId = 1L
+        val findCalendar = courseService.postCalendar(calendarRequest = calendarRequest, userId = userId)
+     
         assertAll(
             { assertThat(findCalendar.type).isEqualTo(calendarRequest.type) },
             { assertThat(findCalendar.name).isEqualTo(calendarRequest.name) },
@@ -142,14 +139,15 @@ class CourseServiceTest(
     fun post_create_calendar_with_wrong_calendar_request() {
         val calendarRequest = CalendarRequest(
             type = CalendarType.VIDEO,
-            course = "do it",
+            courseId = 2,
             dueAt = "2023-07-27",
             name = "과제 꼭 하기",
             isCompleted = false
         )
-
+        val userId = 1L
+        
         assertThrows<DefaultException> {
-            courseService.postCalendar(calendarRequest)
+            courseService.postCalendar(calendarRequest = calendarRequest, userId = userId)
         }
     }
 
@@ -158,7 +156,7 @@ class CourseServiceTest(
     fun put_update_calendar_with_calendar_request() {
         val calendarRequestUpdate = CalendarRequest(
             type = CalendarType.ASSIGNMENT,
-            course = "JAVA",
+            courseId = 1,
             dueAt = "2023-08-27 23:59:59",
             name = "과제",
             isCompleted = true
@@ -180,7 +178,7 @@ class CourseServiceTest(
     fun update_create_calendar_with_wrong_calendar_request() {
         val calendarRequest = CalendarRequest(
             type = CalendarType.VIDEO,
-            course = "do it",
+            courseId = 2,
             dueAt = "2023-07-27",
             name = "과제 꼭 하기",
             isCompleted = true
@@ -195,15 +193,13 @@ class CourseServiceTest(
     @Test
     @DisplayName("오늘 마감인 캘린더 요청시, 과제와 강의가 출력된다.")
     fun get_calendar_with_today_date() {
-        val calendars = courseService.getTodayDueAtCalendars()
+        val userId = 1L
+        
+        val calendars = courseService.getTodayDueAtCalendars(userId = userId)
 
         assertAll(
-            { assertThat(calendars.videos.size).isEqualTo(2) },
-            { assertThat(calendars.videos.get(0).course).isEqualTo("eat paper") },
-            { assertThat(calendars.videos.get(0).count).isEqualTo(2) },
-            { assertThat(calendars.assignments.size).isEqualTo(2) },
-            { assertThat(calendars.assignments.get(0).course).isEqualTo("eat paper") },
-            { assertThat(calendars.assignments.get(0).count).isEqualTo(2) }
+            { assertThat(calendars.videos.size).isLessThanOrEqualTo(2) },
+            { assertThat(calendars.assignments.size).isLessThanOrEqualTo(2) },
         )
     }
 

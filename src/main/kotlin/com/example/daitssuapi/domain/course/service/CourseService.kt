@@ -4,32 +4,11 @@ import com.example.daitssuapi.common.enums.CalendarType
 import com.example.daitssuapi.common.enums.ErrorCode
 import com.example.daitssuapi.common.enums.RegisterStatus
 import com.example.daitssuapi.common.exception.DefaultException
-import com.example.daitssuapi.domain.course.dto.request.AssignmentCreateRequest
-import com.example.daitssuapi.domain.course.dto.request.AssignmentUpdateRequest
-import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
-import com.example.daitssuapi.domain.course.dto.request.CourseNoticeCreateRequest
-import com.example.daitssuapi.domain.course.dto.request.CourseNoticeUpdateRequest
-import com.example.daitssuapi.domain.course.dto.request.CourseRequest
-import com.example.daitssuapi.domain.course.dto.request.VideoRequest
-import com.example.daitssuapi.domain.course.dto.response.AssignmentResponse
-import com.example.daitssuapi.domain.course.dto.response.CalendarResponse
+import com.example.daitssuapi.domain.course.dto.request.*
+import com.example.daitssuapi.domain.course.dto.response.*
 import com.example.daitssuapi.domain.course.dto.response.CourseNoticeResponse
-import com.example.daitssuapi.domain.course.dto.response.CourseResponse
-import com.example.daitssuapi.domain.course.dto.response.TodayCalendarDataDto
-import com.example.daitssuapi.domain.course.dto.response.TodayCalendarResponse
-import com.example.daitssuapi.domain.course.dto.response.UserCourseResponse
-import com.example.daitssuapi.domain.course.dto.response.VideoResponse
-import com.example.daitssuapi.domain.course.model.entity.Assignment
-import com.example.daitssuapi.domain.course.model.entity.Calendar
-import com.example.daitssuapi.domain.course.model.entity.Course
-import com.example.daitssuapi.domain.course.model.entity.CourseNotice
-import com.example.daitssuapi.domain.course.model.entity.Video
-import com.example.daitssuapi.domain.course.model.repository.AssignmentRepository
-import com.example.daitssuapi.domain.course.model.repository.CalendarRepository
-import com.example.daitssuapi.domain.course.model.repository.CourseNoticeRepository
-import com.example.daitssuapi.domain.course.model.repository.CourseRepository
-import com.example.daitssuapi.domain.course.model.repository.UserCourseRelationRepository
-import com.example.daitssuapi.domain.course.model.repository.VideoRepository
+import com.example.daitssuapi.domain.course.model.entity.*
+import com.example.daitssuapi.domain.course.model.repository.*
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -94,7 +73,7 @@ class CourseService(
         )
     }
 
-    fun getCalendar(dateRequest: String): Map<String, List<CalendarResponse>> {
+    fun getCalendar(dateRequest: String, userId: Long): List<CalendarsResponse> {
         val date = "$dateRequest-01"
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val dateTime: LocalDate
@@ -107,22 +86,28 @@ class CourseService(
         val yearMonth = YearMonth.of(dateTime.year, dateTime.monthValue)
         val startDateTime = yearMonth.atDay(1).atStartOfDay()
         val endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59)
-
-        return calendarRepository.findByDueAtBetween(startDateTime, endDateTime).groupBy(
-            { it.course }, { CalendarResponse(it.id, it.type, it.dueAt, it.name, it.isCompleted) }
-        )
+        
+        
+        return calendarRepository.findByUserIdAndDueAtBetween(userId, startDateTime, endDateTime).groupBy(
+            { it.course.name }, { CalendarResponse(it.id, it.type, it.dueAt, it.name, it.isCompleted) }
+        ).map {(course, calendars) ->
+            CalendarsResponse(course = course, calendarResponses = calendars)
+        }
     }
 
-    @Transactional
-    fun postCalendar(calendarRequest: CalendarRequest): CalendarResponse {
+    fun postCalendar(calendarRequest: CalendarRequest, userId: Long): CalendarResponse {
         val dateTime = checkDateReturnDate(calendarRequest.dueAt)
+
+        val course = courseRepository.findByIdOrNull(calendarRequest.courseId)
+            ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND)
 
         val calendar = Calendar(
             type = calendarRequest.type,
-            course = calendarRequest.course,
+            course = course,
             dueAt = dateTime,
             name = calendarRequest.name,
-            isCompleted = calendarRequest.isCompleted
+            isCompleted = calendarRequest.isCompleted,
+            userId = userId
         ).also { calendarRepository.save(it) }
 
         return CalendarResponse(
@@ -246,8 +231,11 @@ class CourseService(
             ?: throw DefaultException(ErrorCode.CALENDAR_NOT_FOUND)
 
         val dateTime = checkDateReturnDate(calendarRequest.dueAt)
+        
+        val course = courseRepository.findByIdOrNull(calendarRequest.courseId)
+            ?: throw DefaultException(ErrorCode.COURSE_NOT_FOUND)
 
-        calendar.updateCalendar(calendarRequest = calendarRequest, dueAt = dateTime)
+        calendar.updateCalendar(calendarRequest = calendarRequest, dueAt = dateTime, course = course)
             .also { calendarRepository.save(calendar) }
 
         return CalendarResponse(
@@ -270,8 +258,8 @@ class CourseService(
 
         return dateTime
     }
-
-    fun getTodayDueAtCalendars(): TodayCalendarResponse {
+    
+    fun getTodayDueAtCalendars(userId: Long) : TodayCalendarResponse {
         val day = LocalDate.now()
         val startTime = LocalTime.of(0, 0, 0)
         val endTime = LocalTime.of(23, 59, 59)
@@ -279,29 +267,32 @@ class CourseService(
         val todayEnd = checkDateReturnDate("$day $endTime")
         val videos: MutableList<TodayCalendarDataDto> = mutableListOf()
         val assignments: MutableList<TodayCalendarDataDto> = mutableListOf()
-
-        val videoCourses = calendarRepository.findDistinctTop2ByTypeAndDueAtBetweenOrderByDueAtAsc(
+        
+        val videoCourses = calendarRepository.findDistinctTop2ByUserIdAndTypeAndDueAtBetweenOrderByDueAtAsc(
             startDateTime = todayStart,
             endDateTime = todayEnd,
-            type = CalendarType.VIDEO
+            type = CalendarType.VIDEO,
+            userId = userId
         )
-
-        val assignmentCourses = calendarRepository.findDistinctTop2ByTypeAndDueAtBetweenOrderByDueAtAsc(
+        
+        val assignmentCourses = calendarRepository.findDistinctTop2ByUserIdAndTypeAndDueAtBetweenOrderByDueAtAsc(
             startDateTime = todayStart,
             endDateTime = todayEnd,
-            type = CalendarType.ASSIGNMENT
+            type = CalendarType.ASSIGNMENT,
+            userId = userId
         )
 
         for (calendar: Calendar in videoCourses) {
-            val calendars = calendarRepository.findByTypeAndCourseAndDueAtBetween(
+            val calendars = calendarRepository.findByUserIdAndTypeAndCourseAndDueAtBetween(
                 type = CalendarType.VIDEO,
                 course = calendar.course,
                 startDateTime = todayStart,
-                endDateTime = todayEnd
+                endDateTime = todayEnd,
+                userId = userId
             )
 
             val todayCalendarDataDto = TodayCalendarDataDto(
-                course = calendar.course,
+                course = calendar.course.name,
                 dueAt = calendars.minOf { it.dueAt },
                 count = calendars.size
             )
@@ -310,15 +301,16 @@ class CourseService(
         }
 
         for (calendar: Calendar in assignmentCourses) {
-            val calendars = calendarRepository.findByTypeAndCourseAndDueAtBetween(
+            val calendars = calendarRepository.findByUserIdAndTypeAndCourseAndDueAtBetween(
                 type = CalendarType.ASSIGNMENT,
                 course = calendar.course,
                 startDateTime = todayStart,
-                endDateTime = todayEnd
+                endDateTime = todayEnd,
+                userId = userId
             )
 
             val todayCalendarDataDto = TodayCalendarDataDto(
-                course = calendar.course,
+                course = calendar.course.name,
                 dueAt = calendars.minOf { it.dueAt },
                 count = calendars.size
             )

@@ -119,14 +119,14 @@ class ArticleService(
         val user: User = userRepository.findByIdOrNull(userId)
             ?: throw DefaultException(ErrorCode.USER_NOT_FOUND)
 
-        val imageUrls = articleCreateRequest.images.map {
+        val imageUrls = articleCreateRequest.images?.map {
             s3Service.uploadImageToS3(
                 userId = user.id,
                 domain = DomainType.COMMUNITY.name,
                 fileName = it.originalFilename!!,
                 imageByteArray = it.bytes,
             )
-        }
+        } ?: emptyList()
 
         val article = Article(
             topic = articleCreateRequest.topic,
@@ -139,7 +139,7 @@ class ArticleService(
         runCatching {
             articleRepository.save(article)
         }.onFailure {
-            imageUrls.map { url ->
+            imageUrls?.map { url ->
                 s3Service.deleteFromS3ByUrl(url)
             }
         }.getOrThrow()
@@ -163,9 +163,8 @@ class ArticleService(
             article.content = articleUpdateRequest.content.toString()
 
         article.topic = articleUpdateRequest.topic
-
-        val newImageUrls = if(articleUpdateRequest.images.isNotEmpty()) {
-            articleUpdateRequest.images.mapNotNull { image ->
+        
+        val newImageUrls = articleUpdateRequest.images?.mapNotNull { image ->
             // MultipartFile이 null이 아니고, 이미지 업로드가 성공한 경우에만 URL을 반환
             runCatching {
                 s3Service.uploadImageToS3(
@@ -177,12 +176,9 @@ class ArticleService(
             }
                 .onFailure { throw DefaultException(errorCode = ErrorCode.S3_UPLOAD_FAILED) }
                 .getOrNull()
-            }
-        } else {
-            emptyList()
-        }
+            } ?: emptyList()
 
-        article.imageUrl.map {
+        article.imageUrl?.map {
             s3Service.deleteFromS3ByUrl(it)
         }
 
@@ -196,7 +192,7 @@ class ArticleService(
         val article: Article = articleRepository.findByIdOrNull(articleId)
             ?: throw DefaultException(ErrorCode.ARTICLE_NOT_FOUND)
 
-        article.imageUrl.map {
+        article.imageUrl?.map {
             s3Service.deleteFromS3ByUrl(it)
         }
 

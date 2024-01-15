@@ -19,5 +19,5 @@ data class ArticleCreateRequest(
     val content: String,
 
     @Schema(description = "게시글 사진 리스트입니다.")
-    val images: List<MultipartFile>
+    val images: List<MultipartFile>?
 )

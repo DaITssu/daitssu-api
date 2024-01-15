@@ -17,5 +17,5 @@ data class ArticleUpdateRequest(
     val content: String?,
 
     @Schema(description = "게시글 사진 리스트 (수정할 경우)")
-    val images: List<MultipartFile>
+    val images: List<MultipartFile>?
 )

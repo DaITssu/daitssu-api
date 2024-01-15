@@ -61,20 +61,17 @@ INSERT INTO video (id, course_id, name, start_at, due_at) VALUES
 INSERT INTO assignment (id, course_id, name, due_at, start_at, submit_at, detail, comments) VALUES
     (1, 1, '과제 1', '2024-01-09 12:00:00', '2023-01-01 00:00:00', null, '과제 첫번째 상세 내용', null);
 
-INSERT INTO calendar (id, name, course, type, due_at, is_completed) VALUES
-    (11, '이 날까지 과제 제출', 'eat paper', 'ASSIGNMENT', '2023-07-27 23:59:59', false),
-    (12, '이 날까지 강의 시청', 'eat paper', 'VIDEO', '2023-07-27 23:59:59', false),
-    (13, '강의', 'do it', 'VIDEO', '2023-02-27 23:59:59', false),
-    (14, '강의', 'choco', 'VIDEO', '2023-05-31 23:59:59', false),
-    (15, 'eat 과제1', 'eat paper', 'VIDEO', CURRENT_DATE || ' 16:00:00', false),
-    (16, 'eat 과제2', 'eat paper', 'VIDEO', CURRENT_DATE || ' 23:59:59', false),
-    (17, 'do it 과제', 'do it', 'VIDEO', CURRENT_DATE || ' 23:59:59', false),
-    (18, 'choco 과제', 'choco', 'VIDEO', CURRENT_DATE || ' 18:00:00', false),
-    (19, 'eat 과제1', 'eat paper', 'ASSIGNMENT', CURRENT_DATE || ' 09:00:00', false),
-    (20, 'eat 과제2', 'eat paper', 'ASSIGNMENT', CURRENT_DATE || ' 23:59:59', false),
-    (21, 'just 과제1', 'just', 'ASSIGNMENT', CURRENT_DATE || ' 16:00:00', false),
-    (22, 'just 과제2', 'just', 'ASSIGNMENT', CURRENT_DATE || ' 23:59:59', false),
-    (23, 'just 과제1', 'good', 'ASSIGNMENT', CURRENT_DATE || ' 18:00:00', false);
+INSERT INTO calendar (id, name, course_id, type, due_at, is_completed, user_id) VALUES
+    (11, '이 날까지 과제 제출', 1, 'ASSIGNMENT', '2023-07-27 23:59:59', false, 1),
+    (12, '이 날까지 강의 시청', 1, 'VIDEO', '2023-07-27 23:59:59', false, null),
+    (13, '강의', 2, 'VIDEO', '2023-02-27 23:59:59', false, 1),
+    (14, '강의', 4, 'VIDEO', '2023-05-31 23:59:59', false, null),
+    (17, 'do it 과제', 2, 'VIDEO', CURRENT_DATE || ' 23:59:59', false, 1),
+    (19, 'eat 과제1', 1, 'ASSIGNMENT', CURRENT_DATE || ' 09:00:00', false, 1),
+    (20, 'eat 과제2', 1, 'ASSIGNMENT', CURRENT_DATE || ' 23:59:59', false, null),
+    (21, 'just 과제1', 4, 'ASSIGNMENT', CURRENT_DATE || ' 16:00:00', false, 1),
+    (22, 'just 과제2', 4, 'ASSIGNMENT', CURRENT_DATE || ' 23:59:59', false, null),
+    (23, 'just 과제1', 3, 'ASSIGNMENT', CURRENT_DATE || ' 18:00:00', false, 1);
 
 INSERT INTO notice(id, title, department_id, content, category, image_url, file_url, created_at, updated_at, views) VALUES
     (1,'공지사항1',1,'1번 공지 내용입니다!!','ACADEMICS', '{"url": []}', '{"url": []}', '1000-01-01 00:00:00','1000-01-01 00:00:00',0),
