@@ -1,6 +1,7 @@
 package com.example.daitssuapi.domain.article.controller
 
 import com.example.daitssuapi.common.enums.ErrorCode
+import com.example.daitssuapi.common.objectMapper
 import com.example.daitssuapi.common.security.component.TokenProvider
 import com.example.daitssuapi.domain.article.dto.request.CommentWriteRequest
 import com.example.daitssuapi.domain.article.model.repository.ArticleRepository
@@ -8,7 +9,6 @@ import com.example.daitssuapi.domain.article.model.repository.CommentRepository
 import com.example.daitssuapi.domain.article.model.repository.ScrapRepository
 import com.example.daitssuapi.domain.user.model.repository.UserRepository
 import com.example.daitssuapi.utils.ControllerTest
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -59,7 +59,7 @@ class ArticleControllerTest(
             content = "댓글 추가",
             originalCommentId = null
         )
-        val request = jacksonObjectMapper().writeValueAsString(articleWriteRequest)
+        val request = objectMapper.writeValueAsString(articleWriteRequest)
         val accessToken = tokenProvider.createAccessToken(id = user.id).token
 
         mockMvc.perform(
@@ -78,7 +78,7 @@ class ArticleControllerTest(
             content = "댓글 추가",
             originalCommentId = null
         )
-        val request = jacksonObjectMapper().writeValueAsString(articleWriteRequest)
+        val request = objectMapper.writeValueAsString(articleWriteRequest)
         val accessToken = tokenProvider.createAccessToken(id = user.id).token
 
         mockMvc.perform(post(url)
@@ -98,7 +98,7 @@ class ArticleControllerTest(
             content = "댓글 추가",
             originalCommentId = null
         )
-        val request = jacksonObjectMapper().writeValueAsString(articleWriteRequest)
+        val request = objectMapper.writeValueAsString(articleWriteRequest)
         val accessToken = tokenProvider.createAccessToken(id = 0).token
 
         mockMvc.perform(
@@ -126,7 +126,7 @@ class ArticleControllerTest(
             """.trimIndent(),
             originalCommentId = null
         )
-        val request = jacksonObjectMapper().writeValueAsString(articleWriteRequest)
+        val request = objectMapper.writeValueAsString(articleWriteRequest)
         val accessToken = tokenProvider.createAccessToken(id = user.id).token
 
         mockMvc.perform(post(url)
@@ -147,7 +147,7 @@ class ArticleControllerTest(
             content = "대충 댓글 내용",
             originalCommentId = 0
         )
-        val request = jacksonObjectMapper().writeValueAsString(articleWriteRequest)
+        val request = objectMapper.writeValueAsString(articleWriteRequest)
         val accessToken = tokenProvider.createAccessToken(id = user.id).token
 
         mockMvc.perform(post(url)
@@ -171,7 +171,7 @@ class ArticleControllerTest(
             content = "대충 댓글 내용",
             originalCommentId = originalComment.id
         )
-        val request = jacksonObjectMapper().writeValueAsString(articleWriteRequest)
+        val request = objectMapper.writeValueAsString(articleWriteRequest)
         val accessToken = tokenProvider.createAccessToken(id = user.id).token
 
         mockMvc.perform(post(url)

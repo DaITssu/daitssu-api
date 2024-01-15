@@ -10,6 +10,7 @@ DELETE FROM users;
 DELETE FROM department;
 DELETE FROM notice;
 DELETE FROM notice_fs;
+DELETE FROM course_notice;
 DELETE FROM service_notice;
 
 INSERT INTO department(id, name) VALUES
@@ -57,13 +58,10 @@ INSERT INTO video (id, course_id, name, start_at, due_at) VALUES
     (3, 2, '첫 번째 강의', '2023-07-20 12:00:00', '2023-07-27 23:59:59'),
     (4, 4, '2번째 강의', '2023-08-20 12:00:00', '2023-08-27 23:59:59');
 
-INSERT INTO assignment (id, course_id, name, start_at, due_at) VALUES
-    (1, 1, '첫 번째 숙제', '2023-07-20 12:00:00', '2023-07-27 23:59:59'),
-    (2, 1, '두 번째 숙제', '2023-08-20 12:00:00', '2023-08-27 23:59:59'),
-    (3, 2, '1-1', '2023-07-20 12:00:00', '2023-07-27 23:59:59'),
-    (4, 3, '2-1', '2023-08-20 12:00:00', '2023-08-27 23:59:59');
+INSERT INTO assignment (id, course_id, name, due_at, start_at, submit_at, detail, comments) VALUES
+    (1, 1, '과제 1', '2024-01-09 12:00:00', '2023-01-01 00:00:00', null, '과제 첫번째 상세 내용', null);
 
-INSERT INTO calendar (id, name, course, type, due_at, is_complete) VALUES
+INSERT INTO calendar (id, name, course, type, due_at, is_completed) VALUES
     (11, '이 날까지 과제 제출', 'eat paper', 'ASSIGNMENT', '2023-07-27 23:59:59', false),
     (12, '이 날까지 강의 시청', 'eat paper', 'VIDEO', '2023-07-27 23:59:59', false),
     (13, '강의', 'do it', 'VIDEO', '2023-02-27 23:59:59', false),
@@ -92,5 +90,7 @@ INSERT INTO notice_fs(id, title, content, category,url, image_url, created_at, u
     (4,'공지사항4','4번 공지 내용입니다!!','EXPERIENTIAL_ACTIVITIES','http://google.com', '{"url": []}', '1000-01-01 00:00:00','1000-01-01 00:00:00',0),
     (5,'공지사항5','5번 공지 내용입니다!!','EXPERIENTIAL_ACTIVITIES','http://google.com', '{"url": []}', '1000-01-01 00:00:00','1000-01-01 00:00:00',0);
 
+INSERT INTO course_notice(id, course_id, is_active, name, registered_at, views, content, file_url) VALUES
+    (1, 1, true, '강의의 공지1', '2024-01-01 04:16:12', 3, '공지 상세 내용', '{"url": []}')
 INSERT INTO service_notice(id, title, content, created_at, updated_at ) VALUES
     (1, '6/23 (금) 시스템 점검 및 업데이트 안내', '안녕하세요 다잇슈입니다. 더욱 쾌적하고 안정적인 서비스 지원을 위해 아래와 같이 점검이 진행됩니다.', '2023-12-06 06:44:07', '2023-12-06 06:44:07');

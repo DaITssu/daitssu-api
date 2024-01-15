@@ -4,16 +4,35 @@ import com.example.daitssuapi.common.enums.CalendarType
 import com.example.daitssuapi.common.enums.ErrorCode
 import com.example.daitssuapi.common.enums.RegisterStatus
 import com.example.daitssuapi.common.exception.DefaultException
+import com.example.daitssuapi.domain.course.dto.request.AssignmentCreateRequest
+import com.example.daitssuapi.domain.course.dto.request.AssignmentUpdateRequest
 import com.example.daitssuapi.domain.course.dto.request.CalendarRequest
+import com.example.daitssuapi.domain.course.dto.request.CourseNoticeCreateRequest
+import com.example.daitssuapi.domain.course.dto.request.CourseNoticeUpdateRequest
 import com.example.daitssuapi.domain.course.dto.request.CourseRequest
 import com.example.daitssuapi.domain.course.dto.request.VideoRequest
-import com.example.daitssuapi.domain.course.dto.response.*
+import com.example.daitssuapi.domain.course.dto.response.AssignmentResponse
+import com.example.daitssuapi.domain.course.dto.response.CalendarResponse
+import com.example.daitssuapi.domain.course.dto.response.CourseNoticeResponse
+import com.example.daitssuapi.domain.course.dto.response.CourseResponse
+import com.example.daitssuapi.domain.course.dto.response.TodayCalendarDataDto
+import com.example.daitssuapi.domain.course.dto.response.TodayCalendarResponse
+import com.example.daitssuapi.domain.course.dto.response.UserCourseResponse
+import com.example.daitssuapi.domain.course.dto.response.VideoResponse
+import com.example.daitssuapi.domain.course.model.entity.Assignment
 import com.example.daitssuapi.domain.course.model.entity.Calendar
 import com.example.daitssuapi.domain.course.model.entity.Course
+import com.example.daitssuapi.domain.course.model.entity.CourseNotice
 import com.example.daitssuapi.domain.course.model.entity.Video
-import com.example.daitssuapi.domain.course.model.repository.*
+import com.example.daitssuapi.domain.course.model.repository.AssignmentRepository
+import com.example.daitssuapi.domain.course.model.repository.CalendarRepository
+import com.example.daitssuapi.domain.course.model.repository.CourseNoticeRepository
+import com.example.daitssuapi.domain.course.model.repository.CourseRepository
+import com.example.daitssuapi.domain.course.model.repository.UserCourseRelationRepository
+import com.example.daitssuapi.domain.course.model.repository.VideoRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -23,10 +42,11 @@ import java.time.format.DateTimeParseException
 
 @Service
 class CourseService(
-    private val assignmentRepository: AssignmentRepository,
-    private val courseRepository: CourseRepository,
     private val videoRepository: VideoRepository,
+    private val courseRepository: CourseRepository,
     private val calendarRepository: CalendarRepository,
+    private val assignmentRepository: AssignmentRepository,
+    private val courseNoticeRepository: CourseNoticeRepository,
     private val userCourseRelationRepository: UserCourseRelationRepository
 ) {
     fun getCourseList(): List<CourseResponse> {
@@ -51,20 +71,24 @@ class CourseService(
             )
         }
 
-//        val assignmentResponses = course.assignments.map {
-//            AssignmentResponse(
-//                id = it.id,
-//                name = it.name,
-//                dueAt = it.dueAt,
-//                startAt = it.startAt
-//            )
-//        }
+        val assignmentResponses = course.assignments.map {
+            AssignmentResponse(
+                id = it.id,
+                courseId = it.course.id,
+                name = it.name,
+                dueAt = it.dueAt,
+                startAt = it.startAt,
+                submitAt = it.submitAt,
+                detail = it.detail,
+                comments = it.comments
+            )
+        }
 
         return CourseResponse(
             id = course.id,
             name = course.name,
             videos = videoResponses,
-            // assignments = assignmentResponses,
+            assignments = assignmentResponses,
             term = course.term,
             courseCode = course.courseCode
         )
@@ -89,6 +113,7 @@ class CourseService(
         )
     }
 
+    @Transactional
     fun postCalendar(calendarRequest: CalendarRequest): CalendarResponse {
         val dateTime = checkDateReturnDate(calendarRequest.dueAt)
 
@@ -109,6 +134,7 @@ class CourseService(
         )
     }
 
+    @Transactional
     fun postVideo(
         videoRequest: VideoRequest
     ): VideoResponse {
@@ -132,30 +158,69 @@ class CourseService(
         )
     }
 
-//    fun postAssignment(
-//        assignmentRequest: AssignmentRequest
-//    ): AssignmentResponse {
-//        val course = courseRepository.findByIdOrNull(assignmentRequest.courseId)
-//            ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND)
-//
-//
-//        val assignment = Assignment(
-//            dueAt = LocalDateTime.now().plusDays(7),
-//            startAt = LocalDateTime.now(),
-//            name = assignmentRequest.name,
-//            course = course
-//        ).also { assignmentRepository.save(it) }
-//
-//        course.addAssignment(assignment)
-//
-//        return AssignmentResponse(
-//            id = assignment.id,
-//            name = assignment.name,
-//            dueAt = assignment.dueAt,
-//            startAt = assignment.startAt
-//        )
-//    }
+    @Transactional
+    fun postAssignment(
+        request: AssignmentCreateRequest
+    ): AssignmentResponse {
+        val course = courseRepository.findByIdOrNull(request.courseId)
+            ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND)
 
+        val assignment = with(request) {
+            Assignment(
+                course = course,
+                name = name,
+                dueAt = dueAt,
+                startAt = startAt,
+                submitAt = submitAt,
+                detail = detail,
+                comments = comments
+            )
+        }.also {
+            assignmentRepository.save(it)
+            course.addAssignment(it)
+        }
+
+        return with(assignment) {
+            AssignmentResponse(
+                id = id,
+                courseId = course.id,
+                name = name,
+                dueAt = dueAt,
+                startAt = startAt,
+                submitAt = submitAt,
+                detail = detail,
+                comments = comments
+            )
+        }
+    }
+
+    @Transactional
+    fun updateAssignment(request: AssignmentUpdateRequest): AssignmentResponse {
+        val assignment = assignmentRepository.findByIdOrNull(id = request.id)?.also {
+            it.update(
+                dueAt = request.dueAt,
+                startAt = request.startAt,
+                submitAt = request.submitAt,
+                detail = request.detail,
+                comments = request.comments
+            )
+        } ?: throw DefaultException(errorCode = ErrorCode.ASSIGNMENT_NOT_FOUND)
+
+        return with(assignment) {
+            AssignmentResponse(
+                id = id,
+                courseId = course.id,
+                name = name,
+                dueAt = dueAt,
+                startAt = startAt,
+                submitAt = submitAt,
+                detail = detail,
+                comments = comments
+            )
+        }
+    }
+
+    @Transactional
     fun postCourse(courseRequest: CourseRequest): CourseResponse {
         val course = Course(courseRequest.name, courseRequest.term, courseRequest.courseCode)
             .also { courseRepository.save(it) }
@@ -175,6 +240,7 @@ class CourseService(
             )
         }
 
+    @Transactional
     fun updateCalendar(calendarRequest: CalendarRequest, calendarId: Long): CalendarResponse {
         val calendar = calendarRepository.findByIdOrNull(calendarId)
             ?: throw DefaultException(ErrorCode.CALENDAR_NOT_FOUND)
@@ -264,6 +330,44 @@ class CourseService(
             videos = videos,
             assignments = assignments
         )
+    }
+
+    fun getNotices(courseId: Long): List<CourseNoticeResponse> =
+        courseNoticeRepository.findByCourseId(courseId = courseId).map(CourseNoticeResponse::of)
+
+    fun getNotice(courseId: Long, noticeId: Long): CourseNoticeResponse {
+        val courseNotice = courseNoticeRepository.findByIdOrNull(id = noticeId)?.also { it.viewNotice() }
+            ?: throw DefaultException(errorCode = ErrorCode.NOTICE_NOT_FOUND)
+
+        return CourseNoticeResponse.of(courseNotice)
+    }
+
+    @Transactional
+    fun createNotice(request: CourseNoticeCreateRequest): CourseNoticeResponse {
+        val course = courseRepository.findByIdOrNull(id = request.courseId)
+            ?: throw DefaultException(errorCode = ErrorCode.COURSE_NOT_FOUND)
+
+        val courseNotice = CourseNotice(
+            name = request.name,
+            registeredAt = request.registeredAt,
+            content = request.content,
+            fileUrl = request.fileUrl ?: emptyList(),
+            course = course
+        ).also { courseNoticeRepository.save(it) }
+
+        return CourseNoticeResponse.of(courseNotice)
+    }
+
+    @Transactional
+    fun updateNotice(noticeId: Long, request: CourseNoticeUpdateRequest): CourseNoticeResponse {
+        val courseNotice = courseNoticeRepository.findByIdOrNull(id = noticeId)?.also {
+            it.update(
+                content = request.content,
+                fileUrl = request.fileUrl
+            )
+        } ?: throw DefaultException(errorCode = ErrorCode.NOTICE_NOT_FOUND)
+
+        return CourseNoticeResponse.of(courseNotice)
     }
 }
 

@@ -1,12 +1,12 @@
 package com.example.daitssuapi.domain.myPage.controller
 
 import com.example.daitssuapi.common.enums.ErrorCode
+import com.example.daitssuapi.common.objectMapper
 import com.example.daitssuapi.common.security.component.TokenProvider
 import com.example.daitssuapi.domain.article.model.repository.CommentRepository
 import com.example.daitssuapi.domain.myPage.dto.request.CommentDeleteRequest
 import com.example.daitssuapi.domain.user.model.repository.UserRepository
 import com.example.daitssuapi.utils.ControllerTest
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -74,7 +74,7 @@ class MyPageControllerTest(
             commentIds = comments.filter { it.writer.id == userId }.filter { !it.isDeleted }.map { it.id }
         )
         val url = "$baseUrl/comments"
-        val request = jacksonObjectMapper().writeValueAsString(commentDeleteRequest)
+        val request = objectMapper.writeValueAsString(commentDeleteRequest)
         val accessToken = tokenProvider.createAccessToken(id = 0).token
 
         mockMvc.perform(patch(url)
@@ -104,28 +104,28 @@ class MyPageControllerTest(
     fun get_my_articles_with_wrong_user_id() {
         val accessToken = tokenProvider.createAccessToken(id = 1L).token
 
-        mockMvc.perform(get("$baseUrl/artices")
+        mockMvc.perform(get("$baseUrl/articles")
             .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
         ).andExpect(status().isOk)
             .andExpect(jsonPath("$.data").isEmpty)
     }
-    
+
     @Test
     @DisplayName("스크랩한 userId를 이용하여 게시글 조회시 _ 1개 이상의 게시글이 조회된다")
     fun get_my_scraps_with_user_id() {
         val accessToken = tokenProvider.createAccessToken(id = 1L).token
-        
+
         mockMvc.perform(get("$baseUrl/scraps")
             .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
         ).andExpect(status().isOk)
             .andExpect(jsonPath("$.data").isNotEmpty)
     }
-    
+
     @Test
     @DisplayName("스크랩하지 않은 userId를 이용하여 게시글 조회시 _ 빈 리스트가 출력된다")
     fun get_my_scraps_with_wrong_user_id() {
         val accessToken = tokenProvider.createAccessToken(id = 3L).token
-        
+
         mockMvc.perform(get("$baseUrl/scraps")
             .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
         ).andExpect(status().isOk)
@@ -133,6 +133,88 @@ class MyPageControllerTest(
     }
 
     @Test
+    @DisplayName("성공_올바른 userId를 넘겨주면_과제를 조회한다")
+    fun successGetAssignments() {
+        val accessToken = tokenProvider.createAccessToken(id = 1L).token
+
+        mockMvc.perform(get("$baseUrl/assignments")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
+        ).andExpect(status().isOk)
+            .andExpect(jsonPath("$.data").isNotEmpty)
+    }
+
+    @Test
+    @DisplayName("성공_올바른 userId와 courseId를 넘겨주면_과제를 조회한다")
+    fun successGetAssignmentsWithCourseId() {
+        val accessToken = tokenProvider.createAccessToken(id = 1L).token
+        val courseId = 1L
+
+        mockMvc.perform(get("$baseUrl/assignments")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
+            .param("courseId", courseId.toString())
+        ).andExpect(status().isOk)
+            .andExpect(jsonPath("$.data").isNotEmpty)
+    }
+
+    @Test
+    @DisplayName("실패_올바르지 않은 userId 넘겨주면_과제 조회에 실패한다")
+    fun failGetAssignments() {
+        val accessToken = tokenProvider.createAccessToken(id = 0L).token
+
+        mockMvc.perform(get("$baseUrl/assignments")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
+        ).andExpect(status().isBadRequest)
+    }
+
+    @Test
+    @DisplayName("실패_올바르지 않은 courseId를 넘겨주면_과제 조회에 실패한다")
+    fun failGetAssignmentsWithCourseId() {
+        val accessToken = tokenProvider.createAccessToken(id = 1L).token
+        val courseId = 0L
+
+        mockMvc.perform(get("$baseUrl/assignments")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
+            .param("courseId", courseId.toString())
+        ).andExpect(status().isBadRequest)
+    }
+
+    @Test
+    @DisplayName("성공_올바른 userId와 courseId를 넘겨주면_과제를 조회한다")
+    fun successGetCourseNotices() {
+        val accessToken = tokenProvider.createAccessToken(id = 1L).token
+        val courseId = 1L
+
+        mockMvc.perform(get("$baseUrl/course/$courseId/notices")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
+            .param("courseId", courseId.toString())
+        ).andExpect(status().isOk)
+            .andExpect(jsonPath("$.data").isNotEmpty)
+    }
+
+    @Test
+    @DisplayName("실패_올바르지 않은 userId 넘겨주면_과제 조회에 실패한다")
+    fun failGetCourseNotices() {
+        val accessToken = tokenProvider.createAccessToken(id = 0L).token
+        val courseId = 1L
+
+        mockMvc.perform(get("$baseUrl/course/$courseId/notices")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
+            .param("courseId", courseId.toString())
+        ).andExpect(status().isBadRequest)
+    }
+
+    @Test
+    @DisplayName("실패_올바르지 않은 courseId를 넘겨주면_과제 조회에 실패한다")
+    fun failGetCourseNoticesWithCourseId() {
+        val accessToken = tokenProvider.createAccessToken(id = 1L).token
+        val wrongCourseId = 0L
+
+        mockMvc.perform(get("$baseUrl/course/$wrongCourseId/notices")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
+            .param("courseId", wrongCourseId.toString())
+        ).andExpect(status().isBadRequest)
+    }
+
     @DisplayName("서비스 공지사항 전제 조회")
     fun get_service_notice() {
 
@@ -141,6 +223,4 @@ class MyPageControllerTest(
             .andExpect(jsonPath("$.data").isNotEmpty)
             .andReturn()
     }
-
-
 }
