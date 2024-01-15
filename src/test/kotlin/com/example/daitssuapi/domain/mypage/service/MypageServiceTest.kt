@@ -90,7 +90,7 @@ class MyPageServiceTest(
             myPageService.getMyArticle(userId = wrongUserId)
         }
     }
-    
+
     @Test
     @DisplayName("올바른 userId를 받으면 스크랩한 게시글이 조회된다")
     fun get_my_scraps_with_user_id() {
@@ -98,13 +98,13 @@ class MyPageServiceTest(
         val user = userRepository.findById(userId).get()
         val scraps = scrapRepository.findByUserAndIsActiveTrueOrderByCreatedAtDesc(user)
         val findArticles = myPageService.getMyScrap(userId = userId)
-        
+
         assertAll(
             { assertThat(findArticles).isNotEmpty },
             { assertThat(findArticles.size).isEqualTo(scraps.size) }
         )
     }
-    
+
     @Test
     @DisplayName("스크랩이 false이면 스크랩한 게시글이 조회가 안된다")
     fun get_my_scraps_with_is_active_false() {
@@ -112,21 +112,87 @@ class MyPageServiceTest(
         val user = userRepository.findById(userId).get()
         val scrap = scrapRepository.findByUserAndIsActiveTrueOrderByCreatedAtDesc(user)
         val findScrapRepository = myPageService.getMyScrap(userId)
-        
+
         assertAll(
-            { assertThat(scrap).isEmpty()},
-            { assertThat(findScrapRepository).isEmpty()}
+            { assertThat(scrap).isEmpty() },
+            { assertThat(findScrapRepository).isEmpty() }
         )
     }
-    
+
     @Test
     @DisplayName("없는 userId를 받으면 USER_NOT_FOUND 에러가 발생한다")
     fun get_my_scraps_with_wrong_user_id() {
         val wrongUserId = 999L
-        
+
         assertThrows<DefaultException> {
             myPageService.getMyScrap(userId = wrongUserId)
         }
     }
-    
+
+    @Test
+    @DisplayName("성공_올바른 userId를 넘겨주면_과제를 조회한다")
+    fun successGetAssignments() {
+        val userId = 1L
+
+        val assignments = myPageService.getAssignments(userId = userId)
+
+        assertThat(assignments.isNotEmpty())
+    }
+
+    @Test
+    @DisplayName("성공_올바른 userId와 courseId를 넘겨주면_과제를 조회한다")
+    fun successGetAssignmentsWithCourseId() {
+        val userId = 1L
+        val courseId = 1L
+
+        val assignments = myPageService.getAssignments(userId = userId, courseId = courseId)
+
+        assertThat(assignments.isNotEmpty())
+    }
+
+    @Test
+    @DisplayName("실패_올바르지 않은 userId를 넘겨주면_과제 조회에 실패한다")
+    fun failGetAssignments() {
+        val userId = 0L
+
+        assertThrows<DefaultException> { myPageService.getAssignments(userId = userId) }
+    }
+
+    @Test
+    @DisplayName("실패_올바르지 않은 courseId를 넘겨주면_과제 조회에 실패한다")
+    fun failGetAssignmentsWithCourseId() {
+        val userId = 1L
+        val courseId = 0L
+
+        assertThrows<DefaultException> { myPageService.getAssignments(userId = userId, courseId = courseId) }
+    }
+
+    @Test
+    @DisplayName("성공_올바른 userId와 courseId를 넘겨주면_해당 강의의 공지 리스트를 조회한다")
+    fun successGetCourseNotices() {
+        val userId = 1L
+        val courseId = 1L
+
+        val assignments = myPageService.getCourseNotices(userId = userId, courseId = courseId)
+
+        assertThat(assignments.isNotEmpty())
+    }
+
+    @Test
+    @DisplayName("실패_올바르지 않은 userId를 넘겨주면_공지 조회에 실패한다")
+    fun failGetCourseNotices() {
+        val userId = 0L
+        val courseId = 1L
+
+        assertThrows<DefaultException> { myPageService.getCourseNotices(userId = userId, courseId = courseId) }
+    }
+
+    @Test
+    @DisplayName("실패_올바르지 않은 courseId를 넘겨주면_과제 조회에 실패한다")
+    fun failGetCourseNoticesWithCourseId() {
+        val userId = 1L
+        val courseId = 0L
+
+        assertThrows<DefaultException> { myPageService.getCourseNotices(userId = userId, courseId = courseId) }
+    }
 }
