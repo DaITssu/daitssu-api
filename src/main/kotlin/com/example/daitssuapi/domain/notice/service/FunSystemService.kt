@@ -95,14 +95,7 @@ class FunSystemService(
             originalId = request.originalCommentId
         ))
 
-        return CommentResponse(
-            commentId = comment.id,
-            userId = comment.writer.id,
-            content = comment.content,
-            originalCommentId = comment.originalId,
-            createdAt = comment.createdAt,
-            updatedAt = comment.updatedAt
-        )
+        return CommentResponse.of(comment = comment)
     }
 
     private fun validateComment(funSystem: FunSystem, content: String, originalCommentId: Long?) {
@@ -124,15 +117,6 @@ class FunSystemService(
         funSystemRepository.findByIdOrNull(funSystemId)
             ?: throw DefaultException(errorCode = ErrorCode.FUNSYSTEM_NOT_FOUND)
 
-        return commentRepository.findByFunSystemId(funSystemId = funSystemId).map {
-            CommentResponse(
-                commentId = it.id,
-                userId = it.writer.id,
-                content = it.content,
-                originalCommentId = it.originalId,
-                createdAt = it.createdAt,
-                updatedAt = it.updatedAt
-            )
-        }
+        return commentRepository.findByFunSystemId(funSystemId = funSystemId).map(CommentResponse::of)
     }
 }
