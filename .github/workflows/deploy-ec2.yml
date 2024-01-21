@@ -1,4 +1,4 @@
-name: Deploy to Amazon ECS CI/CD
+name: Deploy to Amazon EC2 CI/CD
 
 on:
   push:
@@ -49,5 +49,5 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER_NAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
-          source: "build/libs/*.jar"
+          source: "build/libs/daitssu-api.jar"
           target: ${{ secrets.EC2_PATH }}
