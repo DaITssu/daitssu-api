@@ -96,14 +96,7 @@ class NoticeService(
             )
         )
 
-        return CommentResponse(
-            commentId = comment.id,
-            userId = comment.writer.id,
-            content = comment.content,
-            originalCommentId = comment.originalId,
-            createdAt = comment.createdAt,
-            updatedAt = comment.updatedAt
-        )
+        return CommentResponse.of(comment = comment)
     }
 
     private fun validateComment(notice: Notice, content: String, originalCommentId: Long?) {
@@ -125,16 +118,7 @@ class NoticeService(
         noticeRepository.findByIdOrNull(noticeId)
             ?: throw DefaultException(errorCode = ErrorCode.ARTICLE_NOT_FOUND)
 
-        return commentRepository.findByNoticeId(noticeId = noticeId).map {
-            CommentResponse(
-                commentId = it.id,
-                userId = it.writer.id,
-                content = it.content,
-                originalCommentId = it.originalId,
-                createdAt = it.createdAt,
-                updatedAt = it.updatedAt
-            )
-        }
+        return commentRepository.findByNoticeId(noticeId = noticeId).map(CommentResponse::of)
     }
 }
 
