@@ -54,3 +54,5 @@ logging:
             CommonsRequestLoggingFilter: DEBUG
       hibernate:
         SQL: DEBUG
+server:
+  port: 5000
