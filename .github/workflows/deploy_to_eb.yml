@@ -1,0 +1,66 @@
+name: Deploy Auto Receipt to Elastic Beanstalk
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  deploy_to_eb:
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    if: "!contains(github.event.head_commit.message, '[skip deploy]')"
+    name: deploy
+    runs-on: ubuntu-latest
+    env:
+      CI: 1
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ap-northeast-2
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      - name: Grant execute permissions for gradlew
+        run: chmod +x gradlew
+      - name: Build
+        shell: bash
+        env:
+          GRADLE_PROPERTIES: ${{ secrets.GRADLE_PROPERTIES }}
+        run: >-
+          BUNDLE_PATH='elasticbeanstalk'
+          BUNDLE_ZIP_FILE_NAME='application.zip'
+
+          mkdir -p ~/.gradle/
+
+          echo "GRADLE_USER_HOME=${HOME}/.gradle" >> $GITHUB_ENV          
+
+          echo "${GRADLE_PROPERTIES}" > ~/.gradle/gradle.properties          
+
+          ./gradlew :daitssu-api:bootJar
+
+          mv auto-receipt/auto-receipt-application/build/libs/daitssu-api.jar ${BUNDLE_PATH}/application.jar
+
+          (cd ${BUNDLE_PATH} && zip -r ../${BUNDLE_ZIP_FILE_NAME} .)
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
+        id: extract_branch
+      - name: Deploy
+        id: deploy
+        uses: einaregilsson/beanstalk-deploy@v20
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          region: ap-northeast-2
+          application_name: auto-receipt
+          environment_name: auto-receipt-${{ steps.extract_branch.outputs.branch }}
+          version_label: ${{ steps.extract_branch.outputs.branch }}-$GITHUB_SHA
+          deployment_package: application.zip
+          wait_for_environment_recovery: 300
