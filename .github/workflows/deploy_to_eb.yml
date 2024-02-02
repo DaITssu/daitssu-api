@@ -1,4 +1,4 @@
-name: Deploy Daitssu API to Elastic Beanstalk
+name: Deploy to Elastic Beanstalk
 on:
   push:
     branches:
@@ -43,24 +43,66 @@ jobs:
 
           echo "${GRADLE_PROPERTIES}" > ~/.gradle/gradle.properties          
 
-          ./gradlew bootJar
+          ./gradlew daitssu-api:bootJar
 
-          mv build/libs/daitssu-api-plain.jar ${BUNDLE_PATH}/application.jar
+          mv daitssu-api/build/libs/daitssu-api.jar ${BUNDLE_PATH}/application.jar
 
           (cd ${BUNDLE_PATH} && zip -r ../${BUNDLE_ZIP_FILE_NAME} .)
       - name: Extract branch name
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
         id: extract_branch
+      - name: Get latest version
+        shell: bash
+        run: echo "##[set-output name=version;]$(aws elasticbeanstalk describe-application-versions --application-name reservation-platform --query 'ApplicationVersions[0].VersionLabel' --output text)"
+        id: latest_version
+      - name: Get tag name
+        uses: WyriHaximus/github-action-get-previous-tag@v1
+        with:
+          fallback: 0.0.0
+        id: extract_tag
+      - name: Set version
+        shell: bash
+        run: >-
+          tag_version="${{ steps.extract_tag.outputs.tag }}"
+          elb_version="${{ steps.latest_version.outputs.version }}"
+          splitted_elb_version=(${elb_version//-/ })
+          elb_version_prefix=${splitted_elb_version[0]}
+          elb_version_value=${splitted_elb_version[1]}
+          elb_version_counter=${splitted_elb_version[2]}
+
+          if ! [[ "$tag_version" =~ v?[0-9]+.[0-9]+.[0-9]+ ]];
+          then
+            tag_version=$elb_version_value
+          fi
+
+          if [ "$tag_version" != "$elb_version_value" ] && [[ $elb_version_value =~ v?[0-9]+.[0-9]+.[0-9]+ ]];
+          then
+            echo "VERSION=$(echo $tag_version)-0" >> $GITHUB_ENV
+          elif [ "$tag_version" = "$elb_version_value" ];
+          then
+            if [[ -z $elb_version_counter ]];
+            then
+              current_version=0
+            else
+              current_version=$elb_version_counter
+            fi
+
+            ((++current_version))
+            echo "VERSION=$(echo $elb_version_value-$current_version)" >> $GITHUB_ENV
+          else
+            echo "VERSION=$(echo ${{ github.event.head_commit.id }} )" >> $GITHUB_ENV
+          fi
+        id: explicit_version
       - name: Deploy
         id: deploy
         uses: einaregilsson/beanstalk-deploy@v20
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          region: ap-northeast-2
+          region: ${{ secrets.AWS_REGION }}
           application_name: daitssu-api
-          environment_name: daitssu-api-${{ steps.extract_branch.outputs.branch }}
-          version_label: ${{ steps.extract_branch.outputs.branch }}-$GITHUB_SHA
+          environment_name: daitssu-api-develop
+          version_label: develop-${{ env.VERSION }}
           deployment_package: application.zip
           wait_for_environment_recovery: 300
