@@ -45,7 +45,7 @@ jobs:
 
           ./gradlew :daitssu-api:bootJar
 
-          mv auto-receipt/auto-receipt-application/build/libs/daitssu-api.jar ${BUNDLE_PATH}/application.jar
+          mv daitssu-api/build/libs/daitssu-api.jar ${BUNDLE_PATH}/application.jar
 
           (cd ${BUNDLE_PATH} && zip -r ../${BUNDLE_ZIP_FILE_NAME} .)
       - name: Extract branch name
@@ -59,8 +59,8 @@ jobs:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           region: ap-northeast-2
-          application_name: auto-receipt
-          environment_name: auto-receipt-${{ steps.extract_branch.outputs.branch }}
+          application_name: daitssu-api
+          environment_name: daitssu-api-${{ steps.extract_branch.outputs.branch }}
           version_label: ${{ steps.extract_branch.outputs.branch }}-$GITHUB_SHA
           deployment_package: application.zip
           wait_for_environment_recovery: 300
