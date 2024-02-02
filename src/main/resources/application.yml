@@ -2,19 +2,8 @@ app:
   jwt:
     accessTokenValidMS: 3600000
     refreshTokenValidMS: 604800000
-    secret: ${APP_JWT_SECRET}
-
-aws:
-  s3:
-    bucket: ${AWS_S3_BUCKET}
-    url: ${AWS_S3_URL}
 
 spring:
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${DATASOURCE_URL}
-    username: ${DATASOURCE_USERNAME}
-    password: ${DATASOURCE_PASSWORD}
   jpa:
     properties:
       hibernate:
