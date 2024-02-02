@@ -1,4 +1,4 @@
-name: Deploy Auto Receipt to Elastic Beanstalk
+name: Deploy Daitssu API to Elastic Beanstalk
 on:
   push:
     branches:
@@ -45,7 +45,7 @@ jobs:
 
           ./gradlew :bootJar
 
-          mv build/libs/daitssu-api.jar ${BUNDLE_PATH}/application.jar
+          mv daitssu-api/build/libs/daitssu-api.jar ${BUNDLE_PATH}/application.jar
 
           (cd ${BUNDLE_PATH} && zip -r ../${BUNDLE_ZIP_FILE_NAME} .)
       - name: Extract branch name
