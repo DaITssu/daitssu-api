@@ -102,7 +102,7 @@ jobs:
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          region: ${{ secrets.AWS_REGION }}
+          region: ap-northeast-2
           application_name: daitssu-api
           environment_name: daitssu-api-develop
           version_label: develop-${{ env.VERSION }}
