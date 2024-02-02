@@ -29,6 +29,14 @@ jobs:
           java-version: 17
       - name: Grant execute permissions for gradlew
         run: chmod +x gradlew
+
+      - name: Copy Secret
+        env:
+          CREATE_SECRET: ${{secrets.DAITSSU_DEV_APPLICATION_YML}}
+          CREATE_SECRET_DIR: src/main/resources
+          CREATE_SECRET_DIR_FILE_NAME: application-dev.yml
+        run: echo $CREATE_SECRET | base64 --decode > $CREATE_SECRET_DIR/$CREATE_SECRET_DIR_FILE_NAME
+
       - name: Build
         shell: bash
         env:
@@ -61,8 +69,8 @@ jobs:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           region: ap-northeast-2
-          application_name: daitssu-api
-          environment_name: daitssu-api-develop
+          application_name: daitssu-spring
+          environment_name: daitssu-spring-develop
           version_label: ${{ steps.extract_branch.outputs.branch }}-${{ github.sha }}
           deployment_package: application.zip
           wait_for_environment_recovery: 300
