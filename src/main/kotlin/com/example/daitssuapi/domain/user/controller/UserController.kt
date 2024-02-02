@@ -19,7 +19,7 @@ class UserController(
     private val argumentResolver: ArgumentResolver,
 ) {
     @Operation(
-        summary = "유저 조회",
+        summary = "유저 조회.",
         responses = [
             ApiResponse(
                 responseCode = "200",
