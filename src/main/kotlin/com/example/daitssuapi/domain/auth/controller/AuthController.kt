@@ -25,6 +25,11 @@ class AuthController(
     private val userService: UserService,
     private val argumentResolver: ArgumentResolver
 ) {
+    @GetMapping
+    fun ping(): String {
+        return "pong"
+    }
+
     @Operation(
         summary = "회원가입",
         description = "회원가입 API입니다.",
