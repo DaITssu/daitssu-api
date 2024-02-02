@@ -6,7 +6,7 @@
         </encoder>
     </appender>
 
-    <springProfile name="local, dev, prod">
+    <springProfile name="local, develop, main">
         <root level="INFO">
             <appender-ref ref="UUID_CONSOLE"/>
         </root>
