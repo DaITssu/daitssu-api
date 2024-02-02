@@ -38,6 +38,8 @@ jobs:
           BUNDLE_ZIP_FILE_NAME='application.zip'
 
           mkdir -p ~/.gradle/
+          
+          mkdir ~/${BUNDLE_PATH}
 
           echo "GRADLE_USER_HOME=${HOME}/.gradle" >> $GITHUB_ENV          
 
@@ -45,7 +47,10 @@ jobs:
 
           ./gradlew bootJar
 
-          mv ./build/libs/daitssu-api.jar ${BUNDLE_PATH}/application.jar
+          file_list=$(ls build/libs/)
+          echo "$file_list"
+
+          mv build/libs/daitssu-api.jar ${BUNDLE_PATH}/application.jar
 
           (cd ${BUNDLE_PATH} && zip -r ../${BUNDLE_ZIP_FILE_NAME} .)
       - name: Extract branch name
