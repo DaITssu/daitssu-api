@@ -38,6 +38,7 @@ jobs:
           BUNDLE_ZIP_FILE_NAME='application.zip'
 
           mkdir -p ~/.gradle/
+          mkdir -p ~/${BUNDLE_PATH}/
 
           echo "GRADLE_USER_HOME=${HOME}/.gradle" >> $GITHUB_ENV          
 
