@@ -38,17 +38,14 @@ jobs:
           BUNDLE_ZIP_FILE_NAME='application.zip'
 
           mkdir -p ~/.gradle/
-          
-          mkdir ~/${BUNDLE_PATH}
+      
+          mkdir -p ${BUNDLE_PATH}
 
           echo "GRADLE_USER_HOME=${HOME}/.gradle" >> $GITHUB_ENV          
 
           echo "${GRADLE_PROPERTIES}" > ~/.gradle/gradle.properties          
 
           ./gradlew bootJar
-
-          file_list=$(ls build/libs/)
-          echo "$file_list"
 
           mv build/libs/daitssu-api.jar ${BUNDLE_PATH}/application.jar
 
