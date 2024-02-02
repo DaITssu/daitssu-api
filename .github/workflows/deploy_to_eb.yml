@@ -54,48 +54,6 @@ jobs:
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
         id: extract_branch
-      - name: Get latest version
-        shell: bash
-        run: echo "##[set-output name=version;]$(aws elasticbeanstalk describe-application-versions --application-name reservation-platform --query 'ApplicationVersions[0].VersionLabel' --output text)"
-        id: latest_version
-      - name: Get tag name
-        uses: WyriHaximus/github-action-get-previous-tag@v1
-        with:
-          fallback: 0.0.0
-        id: extract_tag
-      - name: Set version
-        shell: bash
-        run: >-
-          tag_version="${{ steps.extract_tag.outputs.tag }}"
-          elb_version="${{ steps.latest_version.outputs.version }}"
-          splitted_elb_version=(${elb_version//-/ })
-          elb_version_prefix=${splitted_elb_version[0]}
-          elb_version_value=${splitted_elb_version[1]}
-          elb_version_counter=${splitted_elb_version[2]}
-
-          if ! [[ "$tag_version" =~ v?[0-9]+.[0-9]+.[0-9]+ ]];
-          then
-            tag_version=$elb_version_value
-          fi
-
-          if [ "$tag_version" != "$elb_version_value" ] && [[ $elb_version_value =~ v?[0-9]+.[0-9]+.[0-9]+ ]];
-          then
-            echo "VERSION=$(echo $tag_version)-0" >> $GITHUB_ENV
-          elif [ "$tag_version" = "$elb_version_value" ];
-          then
-            if [[ -z $elb_version_counter ]];
-            then
-              current_version=0
-            else
-              current_version=$elb_version_counter
-            fi
-
-            ((++current_version))
-            echo "VERSION=$(echo $elb_version_value-$current_version)" >> $GITHUB_ENV
-          else
-            echo "VERSION=$(echo ${{ github.event.head_commit.id }} )" >> $GITHUB_ENV
-          fi
-        id: explicit_version
       - name: Deploy
         id: deploy
         uses: einaregilsson/beanstalk-deploy@v20
@@ -105,6 +63,6 @@ jobs:
           region: ap-northeast-2
           application_name: daitssu-api
           environment_name: daitssu-api-develop
-          version_label: develop-${{ env.VERSION }}
+          version_label: ${{ steps.extract_branch.outputs.branch }}-${{ github.sha }}
           deployment_package: application.zip
           wait_for_environment_recovery: 300
