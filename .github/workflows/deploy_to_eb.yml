@@ -43,9 +43,9 @@ jobs:
 
           echo "${GRADLE_PROPERTIES}" > ~/.gradle/gradle.properties          
 
-          ./gradlew :bootJar
+          ./gradlew bootJar
 
-          mv daitssu-api/build/libs/daitssu-api.jar ${BUNDLE_PATH}/application.jar
+          mv build/libs/daitssu-api.jar ${BUNDLE_PATH}/application.jar
 
           (cd ${BUNDLE_PATH} && zip -r ../${BUNDLE_ZIP_FILE_NAME} .)
       - name: Extract branch name
