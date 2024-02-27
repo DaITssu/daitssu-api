@@ -14,7 +14,9 @@ data class CommentResponse(
     val updatedAt: LocalDateTime,
     val title: String? = null,
     val topic: Topic? = null,
-    val articleId: Long? = null
+    val articleId: Long? = null,
+    val noticeId: Long? = null,
+    val funSystemId: Long? = null
 ) {
     companion object {
         fun of(comment: Comment): CommentResponse = with(comment) {
@@ -26,9 +28,16 @@ data class CommentResponse(
                 originalCommentId = originalId,
                 createdAt = createdAt,
                 updatedAt = updatedAt,
-                title = article?.title,
+                title = when{
+                    article != null -> article?.title
+                    notice != null -> notice?.title
+                    funSystem != null -> funSystem?.title
+                    else -> null
+                            },
                 topic = article?.topic,
-                articleId = article?.id
+                articleId = article?.id,
+                noticeId = notice?.id,
+                funSystemId = funSystem?.id
             )
         }
     }

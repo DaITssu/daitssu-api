@@ -29,7 +29,7 @@ class MyPageService(
     fun getComments(userId: Long): List<CommentResponse> {
         userRepository.findByIdOrNull(id = userId) ?: throw DefaultException(errorCode = ErrorCode.USER_NOT_FOUND)
 
-        return commentRepository.findByWriterIdAndIsDeletedFalseOrderByIdDesc(userId = userId).map {
+        return commentRepository.findByWriterIdOrderByIdDesc(userId = userId).map {
             CommentResponse.of(it)
         }
     }
