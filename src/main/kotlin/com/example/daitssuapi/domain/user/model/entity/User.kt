@@ -6,9 +6,11 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import org.hibernate.annotations.Where
 
 @Entity
 @Table(name = "users")
+@Where(clause = "is_deleted = 0")
 class User(
     val studentId: String,
 
