@@ -77,6 +77,7 @@ class AuthService(
             name = signInResponse.name,
             studentId = signInResponse.sIdno,
             term = signInResponse.semester,
+            department = signInResponse.department,
         )
     }
 

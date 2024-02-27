@@ -4,4 +4,5 @@ data class AuthInfoResponse(
     val name: String,
     val studentId: String,
     val term: String,
+    val department: String,
 )
