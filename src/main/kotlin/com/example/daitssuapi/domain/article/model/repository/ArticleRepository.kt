@@ -21,6 +21,7 @@ interface ArticleRepository : JpaRepository<Article, Long> {
         pageable: Pageable,
     ):Page<Article>
 
+    // TODO : Query문 교체 필요
     @Query("SELECT a FROM Article a WHERE (a.topic = :topic) AND (a.title LIKE %:title% OR a.content LIKE %:content%)")
     fun findByTitleContainingOrContentContainingAndTopic(
         title: String,
