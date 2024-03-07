@@ -8,6 +8,7 @@ import com.example.daitssuapi.domain.auth.client.request.CrawlBaseInformationReq
 import com.example.daitssuapi.domain.auth.client.request.SmartCampusSignInRequest
 import com.example.daitssuapi.domain.auth.controller.response.AuthInfoResponse
 import com.example.daitssuapi.domain.auth.controller.response.AuthResponse
+import com.example.daitssuapi.domain.user.model.entity.Department
 import com.example.daitssuapi.domain.user.model.entity.User
 import com.example.daitssuapi.domain.user.model.repository.DepartmentRepository
 import com.example.daitssuapi.domain.user.model.repository.UserRepository
@@ -72,6 +73,13 @@ class AuthService(
             } catch (e: Exception) {
                 throw DefaultException(ErrorCode.PASSWORD_INCORRECT, HttpStatus.BAD_REQUEST)
             }
+
+        departmentRepository.findByName(signInResponse.department)
+            ?: departmentRepository.save(
+                Department(
+                    name = signInResponse.department,
+                )
+            )
 
         return AuthInfoResponse(
             name = signInResponse.name,
