@@ -10,6 +10,7 @@ import com.example.daitssuapi.domain.article.dto.request.CommentWriteRequest
 import com.example.daitssuapi.domain.article.dto.response.ArticleResponse
 import com.example.daitssuapi.domain.article.dto.response.CommentResponse
 import com.example.daitssuapi.domain.article.dto.response.PageArticlesResponse
+import com.example.daitssuapi.domain.article.enums.Topic
 import com.example.daitssuapi.domain.article.model.entity.Article
 import com.example.daitssuapi.domain.article.model.entity.ArticleLike
 import com.example.daitssuapi.domain.article.model.entity.Comment
@@ -69,6 +70,45 @@ class ArticleService(
                     title = inquiry,
                     content = inquiry,
                     pageable = pageable,
+                )
+
+        val articleResponses = articles.map {
+            ArticleResponse(
+                id = it.id,
+                topic = it.topic.value,
+                title = it.title,
+                content = it.content,
+                writerNickName = it.writer.nickname!!,
+                updatedAt = it.updatedAt,
+                imageUrls = it.imageUrl,
+                likes = it.likes.size,
+                comments = it.comments.size
+            )
+        }
+
+        return PageArticlesResponse(
+            articles = articleResponses.content,
+            totalPages = articleResponses.totalPages
+        )
+    }
+
+    // topic으로 article 가져오기
+    fun pageArticleListWithTopic(
+        pageable: Pageable,
+        inquiry: String?,
+        topic: Topic,
+    ): PageArticlesResponse {
+        val articles: Page<Article> =
+            if (inquiry == null)
+                articleRepository.findByTopic(
+                    pageable = pageable,
+                    topic = topic)
+            else
+                articleRepository.findByTitleContainingOrContentContainingAndTopic(
+                    title = inquiry,
+                    content = inquiry,
+                    pageable = pageable,
+                    topic = topic,
                 )
 
         val articleResponses = articles.map {
