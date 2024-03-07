@@ -8,6 +8,7 @@ import com.example.daitssuapi.domain.article.dto.request.CommentWriteRequest
 import com.example.daitssuapi.domain.article.dto.response.ArticleResponse
 import com.example.daitssuapi.domain.article.dto.response.CommentResponse
 import com.example.daitssuapi.domain.article.dto.response.PageArticlesResponse
+import com.example.daitssuapi.domain.article.enums.Topic
 import com.example.daitssuapi.domain.article.service.ArticleService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -68,6 +69,42 @@ sort: [\"createdAt\"]
         val articles = articleService.pageArticleList(
             inquiry = inquiry,
             pageable = pageable
+        )
+
+        return Response(
+            data = articles
+        )
+    }
+
+    @Operation(
+        summary = "게시글 토픽으로 조회",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "OK"
+            )
+        ]
+    )
+    @GetMapping("/topic")
+    fun pageArticleListWithTopic(
+        @Parameter(
+            description = """
+<b>[필수]</b> 조회할 Page, Page 당 개수, 정렬 기준입니다. <br />
+`page`는 zero-indexed 입니다. <br />
+<b>[기본 값]</b><br />
+page: 0 <br />
+size: 5 <br />
+sort: [\"createdAt\"]
+            """,
+        )
+        @PageableDefault(page = 0, size = 10, sort = ["createdAt"]) pageable: Pageable,
+        @RequestParam topic: Topic,
+        @RequestParam inquiry: String?,
+    ): Response<PageArticlesResponse> { // TODO : 유저의 nickname이 null이면 예외 파악이 매우 어려움
+        val articles = articleService.pageArticleListWithTopic(
+            inquiry = inquiry,
+            pageable = pageable,
+            topic = topic,
         )
 
         return Response(
